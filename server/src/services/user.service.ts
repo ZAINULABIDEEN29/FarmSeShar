@@ -1,6 +1,6 @@
 import User from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js";
-import type { RegisterInput, LoginInput } from "../validator/auth.schema.js";
+
 
 
 interface UserService{
@@ -36,12 +36,4 @@ export const registerService = async ({firstName,lastName,email,phoneNumber,pass
   return user;
 };
 
-// export const loginService = async (data: LoginInput) => {
-//   const user = await User.findOne({ email: data.email }).select("+password");
-//   if (!user) throw new Error("Invalid email or password");
 
-//   const isMatch = await user.comparePassword(data.password);
-//   if (!isMatch) throw new Error("Invalid email or password");
-
-//   return user;
-// };

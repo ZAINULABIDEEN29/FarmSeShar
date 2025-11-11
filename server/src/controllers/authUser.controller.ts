@@ -12,6 +12,7 @@ import bcrypt from "bcryptjs";
 
 
 
+
 export const registerUser = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const { fullName, email, phoneNumber, password } = req.body;
@@ -85,43 +86,35 @@ export const registerUser = asyncHandler(
     });
   }
 );
+
+
 export const verifyOtp = asyncHandler(
     async (req: Request, res: Response):Promise<any> => {
   
-    const { email, otp } = req.body;
+    const { userId, otp } = req.body;
 
-    if (!email || !otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and OTP are required",
-      });
+    if (!userId || !otp) {
+      throw new ApiError(400, "All fields are required");
     }
 
-    const user = await findUserByEmail(email);
+    const user = await findUserById(userId);
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+     throw new ApiError(404, "User not found");
     }
 
+    if (user.isVerified) {
+      throw new ApiError(400, "User already verified");
+    }
     
-    if (user.verifyCodeExpire && user.verifyCodeExpire < new Date()) {
-      return res.status(400).json({
-        success: false,
-        message: "OTP expired",
-      });
+     if (String(user.verifyCode) !== String(otp)) {
+          throw new ApiError(400, "Invalid OTP");
     }
 
-    if (String(user.verifyCode) !== String(otp)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid OTP",
-      });
+    if (!user.verifyCodeExpire || user.verifyCodeExpire < new Date()) {
+      throw new ApiError(400, "OTP expired");
     }
 
-    
     user.isVerified = true;
     user.verifyCode = undefined;
     user.verifyCodeExpire = undefined;
@@ -147,25 +140,18 @@ export const forgotPassword = asyncHandler(
     if (!user) {
       throw new ApiError(404, "User not found");
     }
-
-   
     const resetToken = crypto.randomBytes(32).toString("hex");
-
-   
-    const hashedToken = await bcrypt.hash(resetToken, 10);
-
-    
-    user.resetPasswordToken = hashedToken;
+    user.resetPasswordToken = resetToken;
     user.resetPasswordExpire = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-   
-    const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}&id=${user._id}`;
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetLink = `${clientUrl}/reset-password?token=${resetToken}&userId=${user._id}`;
 
     const emailResponse = await sendResetPasswordEmail(
       user.email,
       user.fullName.firstName,
-      `Use this link to reset your password: ${resetLink}`
+      resetLink
     );
 
     if (!emailResponse.success) {
@@ -193,15 +179,18 @@ export const resetPassword = asyncHandler(
     }
 
   
-    if (!user.resetPasswordToken || !user.resetPasswordExpire || user.resetPasswordExpire < new Date()) {
+    if (!user.resetPasswordExpire || user.resetPasswordExpire < new Date()) {
       throw new ApiError(400, "Reset token is invalid or expired");
     }
-
- 
-    const isValid = await bcrypt.compare(token, user.resetPasswordToken);
-    if (!isValid) {
+    if(!user.resetPasswordToken){
+      throw new ApiError(400,"Reset token not found")
+    }
+     console.log("Token comparison:", { received: token, stored: user.resetPasswordToken, match: user.resetPasswordToken === token });
+   
+     if (user.resetPasswordToken !== token) {
       throw new ApiError(400, "Invalid reset token");
     }
+
 
 
     user.password = newPassword;

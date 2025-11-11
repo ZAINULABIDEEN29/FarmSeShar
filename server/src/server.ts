@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import type { Request, Response, NextFunction } from "express";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -8,7 +9,7 @@ import morgan from "morgan";
 import connectDB from "./db/db.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import userRoutes from "./routes/user.routes.js"
-import type { Request, Response, NextFunction } from "express";
+import farmerRoutes from "./routes/farmer.routes.js";
 
 const app = express();
 
@@ -35,6 +36,8 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 
 app.use("/api/users", userRoutes);
+app.use("/api/farmers", farmerRoutes);
+
 
 app.get("/", (_req, res) => res.json({ status: "OK" }));
 

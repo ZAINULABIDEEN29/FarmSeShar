@@ -47,6 +47,9 @@ export default function ResetPasswordEmail({ username, resetLink }: ResetPasswor
 
         <Row style={{ margin: '20px 0' }}>
           <Button
+            href={resetLink}
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               backgroundColor: '#ff0000',
               color: '#ffffff',
@@ -57,7 +60,6 @@ export default function ResetPasswordEmail({ username, resetLink }: ResetPasswor
               padding: '10px 20px',
        
             }}
-            href={resetLink}
           >
             Reset Password
           </Button>
