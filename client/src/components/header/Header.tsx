@@ -1,7 +1,8 @@
 import React from "react";
+import { Menu, ShoppingCart, X } from "lucide-react";
 import Container from "../container/Container";
 import Logo from "./Logo";
-import NavMenu from "./NavMenu";
+import NavMenu, { NAV_ITEMS } from "./NavMenu";
 import SearchBar from "./SearchBar";
 import AccountCart from "./AccountCart";
 import TopInfoBar from "./TopInfoBar";
@@ -21,43 +22,87 @@ const Header: React.FC<HeaderProps> = ({
   onCartClick,
   onLogoClick,
 }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev);
+  };
+
+  const handleMobileNavClick = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <header className="w-full sticky top-0 z-50 shadow-sm">
-      {/* Top Information Bar - Light Gray Background */}
-      <div className="w-full bg-white ">
+    <header className="w-full sticky top-0 z-50 bg-white shadow-sm">
+      <div className="border-b border-gray-100">
         <Container>
-          <div className="flex items-center justify-between py-2.5">
-            <TopInfoBar className="hidden sm:flex" />
-            <div className="sm:ml-auto">
-              <AccountCart
-                cartCount={cartCount}
-                onAccountClick={onAccountClick}
-                onCartClick={onCartClick}
+          <div className="flex flex-col gap-4 py-4 md:py-6">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 hover:text-purple-600 md:hidden"
+                  onClick={toggleMobileMenu}
+                  aria-label={isMobileMenuOpen ? "Close navigation" : "Open navigation"}
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="h-5 w-5" />
+                  ) : (
+                    <Menu className="h-5 w-5" />
+                  )}
+                </button>
+                <Logo onClick={onLogoClick} className="shrink-0" />
+              </div>
+              <TopInfoBar className="hidden lg:flex flex-1 justify-center text-sm font-medium text-gray-500" />
+              <div className="hidden sm:block">
+                <AccountCart
+                  cartCount={cartCount}
+                  onAccountClick={onAccountClick}
+                  onCartClick={onCartClick}
+                />
+              </div>
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 text-gray-700 hover:text-purple-600 sm:hidden"
+                onClick={onCartClick}
+                aria-label="View cart"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="sr-only">Cart items: {cartCount}</span>
+                )}
+              </button>
+            </div>
+            <TopInfoBar className="flex items-center justify-center text-sm font-medium text-gray-500 lg:hidden" />
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
+              <NavMenu className="md:flex-1" />
+              <SearchBar
+                onSearch={onSearch}
+                className="w-full md:w-auto md:ml-auto"
+                inputClassName="w-full md:w-80 lg:w-[420px]"
               />
             </div>
           </div>
         </Container>
       </div>
-
-      {/* Main Navigation Bar - White Background */}
-      <div className="w-full bg-white">
-        <Container>
-          <div className="flex items-center gap-4 md:gap-6 py-4">
-            {/* Left: Logo */}
-            <Logo onClick={onLogoClick} className="shrink-0" />
-
-            {/* Center: Navigation Menu - Hidden on mobile, visible on md+ */}
-            <div className="flex-1 flex justify-center">
-              <NavMenu />
-            </div>
-
-            {/* Right: Search Bar */}
-            <div className="flex items-center shrink-0">
-              <SearchBar onSearch={onSearch} />
-            </div>
-          </div>
-        </Container>
-      </div>
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-b border-gray-100 bg-white">
+          <Container>
+            <nav className="flex flex-col gap-1 py-3">
+              {NAV_ITEMS.map((item) => (
+                <a
+                  key={item.path}
+                  href={item.path}
+                  onClick={handleMobileNavClick}
+                  className="rounded-full px-4 py-3 text-base font-semibold text-gray-900 hover:bg-gray-100"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          </Container>
+        </div>
+      )}
     </header>
   );
 };

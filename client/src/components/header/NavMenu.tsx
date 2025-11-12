@@ -13,7 +13,7 @@ interface NavMenuProps {
   onItemClick?: (item: NavItem) => void;
 }
 
-const defaultNavItems: NavItem[] = [
+export const NAV_ITEMS: NavItem[] = [
   { label: "Home", path: "/" },
   { label: "Vegetables", path: "/vegetables" },
   { label: "Fruits", path: "/fruits" },
@@ -24,7 +24,7 @@ const defaultNavItems: NavItem[] = [
 ];
 
 const NavMenu: React.FC<NavMenuProps> = ({
-  items = defaultNavItems,
+  items = NAV_ITEMS,
   className,
   itemClassName,
   onItemClick,
@@ -37,14 +37,19 @@ const NavMenu: React.FC<NavMenuProps> = ({
   };
 
   return (
-    <nav className={cn("hidden md:flex items-center gap-6", className)}>
+    <nav
+      className={cn(
+        "hidden md:flex items-center gap-6 lg:gap-8",
+        className
+      )}
+    >
       {items.map((item) => (
         <a
           key={item.path}
           href={item.path}
           onClick={(e) => handleClick(e, item)}
           className={cn(
-            "text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors duration-200 cursor-pointer",
+            "text-base font-semibold text-gray-900 hover:text-purple-500 transition-colors duration-200 cursor-pointer",
             itemClassName
           )}
         >

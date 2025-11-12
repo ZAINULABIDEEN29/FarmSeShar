@@ -6,12 +6,14 @@ import { cn } from "@/lib/utils";
 interface SearchBarProps {
   placeholder?: string;
   className?: string;
+  inputClassName?: string;
   onSearch?: (value: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Search products...",
   className,
+  inputClassName,
   onSearch,
 }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,7 +31,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           name="search"
           type="search"
           placeholder={placeholder}
-          className="w-full md:w-64 pl-9 pr-4 h-9 rounded-full border-gray-300 bg-gray-50 focus:bg-white transition-colors"
+          className={cn(
+            "w-full pl-9 pr-4 h-10 md:h-11 rounded-full border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-300 transition-colors",
+            inputClassName
+          )}
         />
       </div>
     </form>
