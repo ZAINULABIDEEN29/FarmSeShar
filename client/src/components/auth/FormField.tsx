@@ -8,6 +8,7 @@ interface FormFieldProps {
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   error?: string;
   className?: string;
   inputClassName?: string;
@@ -22,6 +23,7 @@ const FormField: React.FC<FormFieldProps> = ({
   placeholder,
   value,
   onChange,
+  onBlur,
   error,
   className,
   inputClassName,
@@ -44,6 +46,7 @@ const FormField: React.FC<FormFieldProps> = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           className={cn(
             "w-full h-12 px-4 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all",
             error && "border-red-500 focus:ring-red-500",

@@ -1,58 +1,89 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { Eye, EyeOff } from "lucide-react";
 import FormField from "@/components/auth/FormField";
 import { Button } from "@/components/ui/button";
 import StepIndicator from "@/components/auth/StepIndicator";
+import { useRegisterFarmer } from "@/hooks/useAuth";
+import { storage } from "@/utils/storage";
+
+const validationSchema = Yup.object({
+  accountHolderName: Yup.string()
+    .min(2, "Account holder name must be at least 2 characters")
+    .required("Account holder name is required"),
+  accountNumber: Yup.string()
+    .min(2, "Account number must be at least 2 characters")
+    .required("Account number is required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Passwords must match")
+    .required("Please confirm your password"),
+});
 
 const BankDetailsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [accountHolderName, setAccountHolderName] = useState("John Doe");
-  const [accountNumber, setAccountNumber] = useState("PK36SCBL0000001123456702");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+  const registerFarmerMutation = useRegisterFarmer();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    // Validation
-    if (!accountHolderName || !accountNumber || !password || !confirmPassword) {
-      setError("Please fill in all required fields");
-      return;
+  useEffect(() => {
+    const step1Data = storage.get("farmer_registration_step1");
+    const step2Data = storage.get("farmer_registration_step2");
+    if (!step1Data || !step2Data) {
+      navigate("/farmer-registration");
     }
+  }, [navigate]);
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
+  const formik = useFormik({
+    initialValues: {
+      accountHolderName: "",
+      accountNumber: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      const step1Data = storage.get("farmer_registration_step1");
+      const step2Data = storage.get("farmer_registration_step2");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+      if (!step1Data || !step2Data) {
+        navigate("/farmer-registration");
+        return;
+      }
 
-    // Handle bank details and registration logic here
-    console.log("Bank Details:", {
-      accountHolderName,
-      accountNumber,
-      password,
-      confirmPassword,
-    });
+      const registrationData = {
+        fullName: {
+          firstName: step1Data.firstName,
+          lastName: step1Data.lastName,
+        },
+        cnic: step1Data.cnic,
+        email: step1Data.email,
+        phoneNumber: step1Data.phoneNumber,
+        farmName: step2Data.farmName,
+        farmLocation: step2Data.farmLocation,
+        farmDescription: step2Data.farmDescription,
+        accountHolderName: values.accountHolderName,
+        bankAccountNumber: values.accountNumber,
+        password: values.password,
+      };
 
-    // Navigate to login page after successful registration
-    navigate("/login");
-  };
+      registerFarmerMutation.mutate(registrationData, {
+        onSuccess: () => {
+          storage.remove("farmer_registration_step1");
+          storage.remove("farmer_registration_step2");
+        },
+      });
+    },
+  });
 
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Left Section - Bank Details Form */}
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
         <div className="max-w-sm w-full mx-auto lg:mx-0">
-          {/* Logo */}
           <div className="mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-200 shrink-0" />
@@ -60,14 +91,8 @@ const BankDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Step Indicator with Back Button */}
-          <StepIndicator
-            currentStep={3}
-            totalSteps={3}
-            backTo="/farm-details"
-          />
+          <StepIndicator currentStep={3} totalSteps={3} backTo="/farm-details" />
 
-          {/* Heading */}
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Bank Details
           </h1>
@@ -75,111 +100,110 @@ const BankDetailsPage: React.FC = () => {
             This secure step ensures you receive timely payments for your sales and sets up your account login
           </p>
 
-          {/* Bank Details Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Account Holder Name */}
-            <FormField
-              label="Account Holder Name"
-              id="account-holder-name"
-              type="text"
-              placeholder="John Doe"
-              value={accountHolderName}
-              onChange={(e) => {
-                setAccountHolderName(e.target.value);
-                setError("");
-              }}
-              required
-            />
+          <form onSubmit={formik.handleSubmit} className="space-y-6">
+            <div>
+              <FormField
+                label="Account Holder Name"
+                id="accountHolderName"
+                type="text"
+                placeholder="John Doe"
+                value={formik.values.accountHolderName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+              />
+              {formik.touched.accountHolderName && formik.errors.accountHolderName && (
+                <p className="text-sm text-red-600 mt-1">{formik.errors.accountHolderName}</p>
+              )}
+            </div>
 
-            {/* Account Number */}
-            <FormField
-              label="Account Number"
-              id="account-number"
-              type="text"
-              placeholder="PK36SCBL0000001123456702"
-              value={accountNumber}
-              onChange={(e) => {
-                setAccountNumber(e.target.value);
-                setError("");
-              }}
-              required
-            />
+            <div>
+              <FormField
+                label="Account Number"
+                id="accountNumber"
+                type="text"
+                placeholder="PK36SCBL0000001123456702"
+                value={formik.values.accountNumber}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+              />
+              {formik.touched.accountNumber && formik.errors.accountNumber && (
+                <p className="text-sm text-red-600 mt-1">{formik.errors.accountNumber}</p>
+              )}
+            </div>
 
-            {/* Password Field */}
-            <FormField
-              label="Password"
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError("");
-              }}
-              required
-              rightElement={
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              }
-            />
+            <div>
+              <FormField
+                label="Password"
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+                rightElement={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                }
+              />
+              {formik.touched.password && formik.errors.password && (
+                <p className="text-sm text-red-600 mt-1">{formik.errors.password}</p>
+              )}
+            </div>
 
-            {/* Confirm Password Field */}
-            <FormField
-              label="Confirm Password"
-              id="confirm-password"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                setError("");
-              }}
-              required
-              rightElement={
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              }
-            />
+            <div>
+              <FormField
+                label="Confirm Password"
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                value={formik.values.confirmPassword}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                required
+                rightElement={
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                }
+              />
+              {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                <p className="text-sm text-red-600 mt-1">{formik.errors.confirmPassword}</p>
+              )}
+            </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
-                {error}
-              </div>
-            )}
-
-            {/* Sign Up Button */}
             <Button
               type="submit"
-              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-base"
+              disabled={registerFarmerMutation.isPending}
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign up
+              {registerFarmerMutation.isPending ? "Registering..." : "Sign up"}
             </Button>
           </form>
         </div>
       </div>
 
-      {/* Right Section - Grey Panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
@@ -188,4 +212,3 @@ const BankDetailsPage: React.FC = () => {
 };
 
 export default BankDetailsPage;
-

@@ -6,17 +6,28 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import SocialLoginButton from "@/components/auth/SocialLoginButton";
 import Divider from "@/components/auth/Divider";
+import { useLoginUser } from "@/hooks/useAuth";
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState("john.doe@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+
+  const loginMutation = useLoginUser();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login:", { email, password, rememberMe });
+    setError("");
+
+    // Validation
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    loginMutation.mutate({ email, password });
   };
 
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
@@ -98,12 +109,20 @@ const LoginPage: React.FC = () => {
               </Link>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+                {error}
+              </div>
+            )}
+
             {/* Login Button */}
             <Button
               type="submit"
-              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-base"
+              disabled={loginMutation.isPending}
+              className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Login
+              {loginMutation.isPending ? "Logging in..." : "Login"}
             </Button>
           </form>
 

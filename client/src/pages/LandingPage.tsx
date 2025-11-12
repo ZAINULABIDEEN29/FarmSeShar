@@ -15,7 +15,7 @@ const LandingPage:React.FC = () => {
         navigate('/farmer-registration')
       }
     
-      const handleCategoryClick = (category: any) => {
+      const handleCategoryClick = (category: unknown) => {
         console.log('Category clicked:', category)
       }
     
@@ -23,7 +23,7 @@ const LandingPage:React.FC = () => {
         console.log('View All clicked')
       }
     
-      const handleAddToCart = (product: any) => {
+      const handleAddToCart = (product: unknown) => {
         console.log('Add to Cart:', product)
       }
   return (

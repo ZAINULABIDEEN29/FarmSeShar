@@ -7,6 +7,7 @@ interface TextAreaFieldProps {
   placeholder?: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
   error?: string;
   className?: string;
   textAreaClassName?: string;
@@ -20,6 +21,7 @@ const TextAreaField: React.FC<TextAreaFieldProps> = ({
   placeholder,
   value,
   onChange,
+  onBlur,
   error,
   className,
   textAreaClassName,
@@ -42,6 +44,7 @@ const TextAreaField: React.FC<TextAreaFieldProps> = ({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          onBlur={onBlur}
           className={cn(
             "w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all resize-none",
             error && "border-red-500 focus:ring-red-500",
