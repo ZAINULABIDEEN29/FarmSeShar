@@ -15,12 +15,12 @@ const TopInfoBar: React.FC<TopInfoBarProps> = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 text-sm text-gray-700",
+        "flex items-center gap-3 text-sm text-gray-500",
         className
       )}
     >
       <span>{deliveryText}</span>
-      <span className="text-gray-400">|</span>
+      <span className="text-gray-300">|</span>
       <span>{supportText}</span>
     </div>
   );

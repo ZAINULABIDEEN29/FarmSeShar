@@ -1,15 +1,18 @@
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
 import { FeaturedProductsSection, HeroSection, ShopByCategorySection, WhyChooseUsSection } from '@/components/sections'
+import { useNavigate } from 'react-router-dom'
 import React from 'react'
 
 const LandingPage:React.FC = () => {
+    const navigate = useNavigate()
+    
     const handleShopNow = () => {
         console.log('Shop Now clicked')
       }
     
       const handleLearnMore = () => {
-        console.log('Learn More clicked')
+        navigate('/farmer-registration')
       }
     
       const handleCategoryClick = (category: any) => {
