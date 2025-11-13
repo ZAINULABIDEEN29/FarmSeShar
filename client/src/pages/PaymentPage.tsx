@@ -15,6 +15,9 @@ import type { PaymentData } from "@/types/payment.types";
 import type { CheckoutAddress } from "@/types/checkout.types";
 import { toast } from "react-toastify";
 import { ShoppingBag } from "lucide-react";
+import { orderService, cartItemsToOrderItems } from "@/services/order.service";
+import { clearCart } from "@/store/slices/cartSlice";
+import { useAppDispatch } from "@/store/hooks";
 
 interface LocationState {
   address?: CheckoutAddress;
@@ -23,6 +26,7 @@ interface LocationState {
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const cartItems = useAppSelector(selectCartItems);
   const cartTotals = useAppSelector(selectCartTotal);
@@ -49,18 +53,28 @@ const PaymentPage: React.FC = () => {
       return;
     }
 
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty");
+      navigate("/cart");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // TODO: Implement order submission API call
-      console.log("Submitting order with:", {
-        address,
-        payment: paymentData,
-        items: cartItems,
-        total: cartTotals.total,
+      // Convert cart items to order items
+      const orderItems = cartItemsToOrderItems(cartItems);
+
+      // Create order
+      const orderResponse = await orderService.createOrder({
+        items: orderItems,
+        shippingAddress: address,
+        paymentMethod: paymentData.method,
       });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Clear cart on success
+      dispatch(clearCart());
+
+      toast.success("Order placed successfully!");
 
       // Navigate to confirmation page with order details
       navigate("/order-confirmation", {
@@ -68,11 +82,16 @@ const PaymentPage: React.FC = () => {
           address,
           payment: paymentData,
           orderTotal: cartTotals.total,
+          orderId: orderResponse.data.orderId,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error placing order:", error);
-      toast.error("Failed to place order. Please try again.");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to place order. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

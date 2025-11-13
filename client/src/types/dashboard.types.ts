@@ -71,3 +71,46 @@ export interface Shipment {
   updatedAt?: string;
 }
 
+// Dashboard Statistics Types
+export interface DashboardStats {
+  totalProducts: number;
+  availableProducts: number;
+  totalOrders: number;
+  pendingOrders: number;
+  completedOrders: number;
+  totalRevenue: number;
+  pendingShipments: number;
+  inTransitShipments: number;
+  deliveredShipments: number;
+  totalCustomers: number;
+}
+
+// Query Types
+export interface DashboardStatsQuery {
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface DashboardCustomersQuery {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface DashboardOrdersQuery {
+  search?: string;
+  status?: OrderStatus;
+  page?: number;
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface DashboardShipmentsQuery {
+  search?: string;
+  status?: ShipmentStatus;
+  page?: number;
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+}

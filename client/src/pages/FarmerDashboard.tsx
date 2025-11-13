@@ -14,130 +14,13 @@ import {
 import { useLogoutFarmer } from "@/hooks/useAuth";
 import { useAppSelector } from "@/store/hooks";
 import { useGetMyProducts } from "@/hooks/useProducts";
-import type { Customer, Order, Shipment } from "@/types/dashboard.types";
+import {
+  useDashboardStats,
+  useDashboardCustomers,
+  useDashboardOrders,
+  useDashboardShipments,
+} from "@/hooks/useDashboard";
 import { cn } from "@/lib/utils";
-
-// Mock data for customers, orders, and shipments (replace with API calls later)
-const mockCustomers: Customer[] = [
-  {
-    _id: "1",
-    fullName: { firstName: "John", lastName: "Doe" },
-    email: "john.doe@example.com",
-    phoneNumber: "+1234567890",
-    totalOrders: 5,
-    totalSpent: 1250.0,
-    lastOrderDate: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
-  },
-  {
-    _id: "2",
-    fullName: { firstName: "Jane", lastName: "Smith" },
-    email: "jane.smith@example.com",
-    phoneNumber: "+1234567891",
-    totalOrders: 3,
-    totalSpent: 850.5,
-    lastOrderDate: new Date(Date.now() - 86400000).toISOString(),
-    createdAt: new Date().toISOString(),
-  },
-];
-
-const mockOrders: Order[] = [
-  {
-    _id: "1",
-    orderId: "ORD-001",
-    customerId: "1",
-    customerName: "John Doe",
-    items: [
-      {
-        productId: "1",
-        productName: "Organic Tomatoes",
-        quantity: 2,
-        unit: "Kg",
-        price: 80,
-        total: 160,
-      },
-    ],
-    totalAmount: 361,
-    status: "confirmed",
-    shippingAddress: {
-      streetAddress: "123 Main St",
-      houseNo: "Apt 4B",
-      town: "Downtown",
-      city: "Lahore",
-      country: "Pakistan",
-      postalCode: "54000",
-    },
-    paymentMethod: "card",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    _id: "2",
-    orderId: "ORD-002",
-    customerId: "2",
-    customerName: "Jane Smith",
-    items: [
-      {
-        productId: "2",
-        productName: "Chaunsa Mangoes",
-        quantity: 1,
-        unit: "Kg",
-        price: 250,
-        total: 250,
-      },
-    ],
-    totalAmount: 237.5,
-    status: "processing",
-    shippingAddress: {
-      streetAddress: "456 Oak Ave",
-      houseNo: "10",
-      town: "Uptown",
-      city: "Karachi",
-      country: "Pakistan",
-      postalCode: "75000",
-    },
-    paymentMethod: "cash",
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-];
-
-const mockShipments: Shipment[] = [
-  {
-    _id: "1",
-    shipmentId: "SHIP-001",
-    orderId: "ORD-001",
-    customerName: "John Doe",
-    customerAddress: {
-      streetAddress: "123 Main St",
-      houseNo: "Apt 4B",
-      town: "Downtown",
-      city: "Lahore",
-      country: "Pakistan",
-      postalCode: "54000",
-    },
-    status: "in_transit",
-    expectedDeliveryDate: new Date(Date.now() + 7 * 86400000).toISOString(),
-    trackingNumber: "TRACK123456",
-    carrier: "LocalHarvest Express",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    _id: "2",
-    shipmentId: "SHIP-002",
-    orderId: "ORD-002",
-    customerName: "Jane Smith",
-    customerAddress: {
-      streetAddress: "456 Oak Ave",
-      houseNo: "10",
-      town: "Uptown",
-      city: "Karachi",
-      country: "Pakistan",
-      postalCode: "75000",
-    },
-    status: "preparing",
-    expectedDeliveryDate: new Date(Date.now() + 7 * 86400000).toISOString(),
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-];
 
 const FarmerDashboard: React.FC = () => {
   const farmer = useAppSelector((state) => state.auth.farmer);
@@ -149,22 +32,43 @@ const FarmerDashboard: React.FC = () => {
   // Get products for stats
   const { data: products = [] } = useGetMyProducts();
 
-  // Compute stats from products and mock data
+  // Get dashboard statistics
+  const { data: statsData, isLoading: isStatsLoading } = useDashboardStats();
+
+  // Get customers (only when customers view is active)
+  const { data: customersData, isLoading: isCustomersLoading } = useDashboardCustomers(
+    undefined,
+    { enabled: activeView === "customers" }
+  );
+
+  // Get orders (only when orders view is active)
+  const { data: ordersData, isLoading: isOrdersLoading } = useDashboardOrders(
+    undefined,
+    { enabled: activeView === "orders" }
+  );
+
+  // Get shipments (only when shipments view is active)
+  const { data: shipmentsData, isLoading: isShipmentsLoading } = useDashboardShipments(
+    undefined,
+    { enabled: activeView === "shipments" }
+  );
+
+  // Compute stats from API data and products
   const stats = useMemo(() => {
     const totalProducts = products.length;
-    const totalOrders = mockOrders.length;
-    const pendingShipments = mockShipments.filter(
-      (s) => s.status !== "delivered" && s.status !== "cancelled"
-    ).length;
-    const totalCustomers = mockCustomers.length;
+    const availableProducts = statsData?.availableProducts || 0;
+    const totalOrders = statsData?.totalOrders || 0;
+    const pendingShipments = statsData?.pendingShipments || 0;
+    const totalCustomers = statsData?.totalCustomers || 0;
 
     return {
       totalProducts,
+      availableProducts,
       totalOrders,
       pendingShipments,
       totalCustomers,
     };
-  }, [products]);
+  }, [products, statsData]);
 
   const handleLogout = useCallback(() => {
     logoutMutation.mutate();
@@ -264,19 +168,31 @@ const FarmerDashboard: React.FC = () => {
                 totalOrders={stats.totalOrders}
                 pendingShipments={stats.pendingShipments}
                 totalCustomers={stats.totalCustomers}
+                isLoading={isStatsLoading}
               />
             )}
 
             {activeView === "products" && <ProductsSection />}
 
             {activeView === "customers" && (
-              <CustomersSection customers={mockCustomers} />
+              <CustomersSection
+                customers={customersData?.customers || []}
+                isLoading={isCustomersLoading}
+              />
             )}
 
-            {activeView === "orders" && <OrdersSection orders={mockOrders} />}
+            {activeView === "orders" && (
+              <OrdersSection
+                orders={ordersData?.orders || []}
+                isLoading={isOrdersLoading}
+              />
+            )}
 
             {activeView === "shipments" && (
-              <ShipmentsSection shipments={mockShipments} />
+              <ShipmentsSection
+                shipments={shipmentsData?.shipments || []}
+                isLoading={isShipmentsLoading}
+              />
             )}
 
             {activeView === "help" && <HelpSection />}

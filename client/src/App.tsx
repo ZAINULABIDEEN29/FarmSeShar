@@ -19,6 +19,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import PaymentPage from './pages/PaymentPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import ContactPage from './pages/ContactPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
 
@@ -110,6 +111,10 @@ const router = createBrowserRouter([
         <OrderConfirmationPage />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "/contact",
+    element: <ContactPage />,
   },
 ]);
 

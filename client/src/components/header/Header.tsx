@@ -128,7 +128,7 @@ const Header: React.FC<HeaderProps> = ({
                   key={item.path}
                   href={item.path}
                   onClick={handleMobileNavClick}
-                  className="rounded-full px-4 py-3 text-base font-semibold text-gray-900 hover:bg-gray-100"
+                  className="rounded-full px-4 py-3 text-base font-semibold text-gray-900 hover:bg-gray-100 hover:text-green-600 transition-colors duration-200"
                 >
                   {item.label}
                 </a>

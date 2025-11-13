@@ -7,6 +7,7 @@ interface OverviewSectionProps {
   totalOrders: number;
   pendingShipments: number;
   totalCustomers: number;
+  isLoading?: boolean;
   className?: string;
 }
 
@@ -59,8 +60,20 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
   totalOrders,
   pendingShipments,
   totalCustomers,
+  isLoading = false,
   className,
 }) => {
+  if (isLoading) {
+    return (
+      <div className={cn("flex items-center justify-center py-12", className)}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard statistics...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("space-y-6", className)}>
       <div>

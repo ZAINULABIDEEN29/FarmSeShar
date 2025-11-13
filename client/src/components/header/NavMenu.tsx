@@ -1,4 +1,5 @@
 import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 export interface NavItem {
@@ -29,6 +30,8 @@ const NavMenu: React.FC<NavMenuProps> = ({
   itemClassName,
   onItemClick,
 }) => {
+  const location = useLocation();
+
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, item: NavItem) => {
     if (onItemClick) {
       e.preventDefault();
@@ -43,19 +46,28 @@ const NavMenu: React.FC<NavMenuProps> = ({
         className
       )}
     >
-      {items.map((item) => (
-        <a
-          key={item.path}
-          href={item.path}
-          onClick={(e) => handleClick(e, item)}
-          className={cn(
-            "text-base font-semibold text-gray-900 hover:text-purple-500 transition-colors duration-200 cursor-pointer",
-            itemClassName
-          )}
-        >
-          {item.label}
-        </a>
-      ))}
+      {items.map((item) => {
+        const isActive = location.pathname === item.path;
+        return (
+          <Link
+            key={item.path}
+            to={item.path}
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleClick(e, item)}
+            className={cn(
+              "text-base font-semibold transition-colors duration-200 cursor-pointer relative",
+              isActive
+                ? "text-green-600"
+                : "text-gray-900 hover:text-green-600",
+              itemClassName
+            )}
+          >
+            {item.label}
+            {isActive && (
+              <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-green-600 rounded-full" />
+            )}
+          </Link>
+        );
+      })}
     </nav>
   );
 };
