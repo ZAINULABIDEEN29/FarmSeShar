@@ -17,6 +17,8 @@ import FarmerVerifyCodePage from './pages/FarmerVerifyCodePage';
 import FarmerResetPasswordPage from './pages/FarmerResetPasswordPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
+import PaymentPage from './pages/PaymentPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
 
@@ -90,6 +92,22 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute userType="user" redirectTo="/login">
         <CheckoutPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/payment",
+    element: (
+      <ProtectedRoute userType="user" redirectTo="/login">
+        <PaymentPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/order-confirmation",
+    element: (
+      <ProtectedRoute userType="user" redirectTo="/login">
+        <OrderConfirmationPage />
       </ProtectedRoute>
     ),
   },
