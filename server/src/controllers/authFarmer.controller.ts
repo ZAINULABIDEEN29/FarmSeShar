@@ -160,7 +160,7 @@ export const forgotPasswordFarmer = asyncHandler(
         await farmerFound.save();
 
         const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-        const resetLink = `${clientUrl}/reset-password?token=${resetToken}&farmerId=${farmerFound._id}`;
+        const resetLink = `${clientUrl}/farmer-reset-password?token=${resetToken}&farmerId=${farmerFound._id}`;
         
         const emailResponse = await sendResetPasswordEmail(
             farmerFound.email,
