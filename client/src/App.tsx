@@ -10,6 +10,12 @@ import VerifyCodePage from './pages/VerifyCodePage';
 import FarmerRegistrationPage from './pages/FarmerRegistrationPage';
 import FarmDetailsPage from './pages/FarmDetailsPage';
 import BankDetailsPage from './pages/BankDetailsPage';
+import FarmerLoginPage from './pages/FarmerLoginPage';
+import FarmerDashboard from './pages/FarmerDashboard';
+import FarmerForgotPasswordPage from './pages/FarmerForgotPasswordPage';
+import FarmerVerifyCodePage from './pages/FarmerVerifyCodePage';
+import FarmerResetPasswordPage from './pages/FarmerResetPasswordPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -47,6 +53,30 @@ const router = createBrowserRouter([
   {
     path: "/bank-details",
     element: <BankDetailsPage />,
+  },
+  {
+    path: "/farmer-login",
+    element: <FarmerLoginPage />,
+  },
+  {
+    path: "/farmer-dashboard",
+    element: (
+      <ProtectedRoute userType="farmer" redirectTo="/farmer-login">
+        <FarmerDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/farmer-forgot-password",
+    element: <FarmerForgotPasswordPage />,
+  },
+  {
+    path: "/farmer-verify-code",
+    element: <FarmerVerifyCodePage />,
+  },
+  {
+    path: "/farmer-reset-password",
+    element: <FarmerResetPasswordPage />,
   },
 ]);
 

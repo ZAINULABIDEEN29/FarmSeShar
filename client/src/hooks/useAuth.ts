@@ -191,7 +191,7 @@ export const useVerifyFarmerCode = () => {
       toast.success(response.message || "Farmer verified successfully!");
       storage.remove(STORAGE_KEYS.FARMER_ID);
       queryClient.invalidateQueries({ queryKey: ["farmer"] });
-      navigate("/login");
+      navigate("/farmer-login");
     },
     onError: (error: any) => {
       const errorMessage =
@@ -214,7 +214,7 @@ export const useLoginFarmer = () => {
         dispatch(setFarmer(response.farmer));
         storage.set(STORAGE_KEYS.FARMER, response.farmer);
         queryClient.setQueryData(["farmer"], response.farmer);
-        navigate("/");
+        navigate("/farmer-dashboard");
       }
     },
     onError: (error: any) => {
@@ -226,13 +226,10 @@ export const useLoginFarmer = () => {
 };
 
 export const useForgotPasswordFarmer = () => {
-  const navigate = useNavigate();
-
   return useMutation({
     mutationFn: (data: ForgotPasswordFarmerInput) => farmerService.forgotPassword(data),
     onSuccess: (response) => {
       toast.success(response.message || "Password reset link sent to your email.");
-      navigate("/set-password");
     },
     onError: (error: any) => {
       const errorMessage =
@@ -249,7 +246,7 @@ export const useResetPasswordFarmer = () => {
     mutationFn: (data: ResetPasswordFarmerInput) => farmerService.resetPassword(data),
     onSuccess: (response) => {
       toast.success(response.message || "Password reset successfully!");
-      navigate("/login");
+      navigate("/farmer-login");
     },
     onError: (error: any) => {
       const errorMessage =

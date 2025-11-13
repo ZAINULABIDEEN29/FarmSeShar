@@ -22,9 +22,10 @@ export const api = axios.create({
   },
 });
 
-// Log the baseURL for debugging (remove in production)
-console.log('API Base URL:', getBaseURL());
-
+// Log the baseURL for debugging (only in development)
+if (import.meta.env.DEV) {
+  console.log('API Base URL:', getBaseURL());
+}
 
 api.interceptors.response.use(
     (response) => response,
@@ -32,10 +33,21 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             const currentPath = window.location.pathname;
             // Use setTimeout to avoid blocking the main thread
-            if (currentPath !== "/login" && currentPath !== "/signup") {
-                setTimeout(() => {
-                    window.location.href = "/login";
-                }, 0);
+            const isAuthPage = 
+              currentPath === "/login" || 
+              currentPath === "/signup" || 
+              currentPath === "/farmer-login" || 
+              currentPath === "/farmer-registration";
+            
+            if (!isAuthPage) {
+              // Determine redirect based on current path
+              const redirectTo = currentPath.startsWith("/farmer") 
+                ? "/farmer-login" 
+                : "/login";
+              
+              setTimeout(() => {
+                window.location.href = redirectTo;
+              }, 0);
             }
         }
         return Promise.reject(error);

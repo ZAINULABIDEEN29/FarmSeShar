@@ -82,7 +82,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 size="lg"
                 className="border-green-600 text-green-600 hover:bg-green-50 px-8 py-6 text-base md:text-lg"
               >
-                Learn More
+                Join as a Farmer
               </Button>
             </div>
 

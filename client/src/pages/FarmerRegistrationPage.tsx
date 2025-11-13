@@ -194,7 +194,7 @@ const FarmerRegistrationPage: React.FC = () => {
             <span className="text-sm text-gray-600">
               Already have an account?{" "}
               <Link
-                to="/login"
+                to="/farmer-login"
                 className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
               >
                 Login

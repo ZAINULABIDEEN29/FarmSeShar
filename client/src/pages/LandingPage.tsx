@@ -14,6 +14,9 @@ const LandingPage:React.FC = () => {
       const handleLearnMore = () => {
         navigate('/farmer-registration')
       }
+      const handleAccountClick = () => {
+        navigate('/login')
+      }
     
       const handleCategoryClick = (category: unknown) => {
         console.log('Category clicked:', category)
@@ -28,7 +31,7 @@ const LandingPage:React.FC = () => {
       }
   return (
     <div className="w-full flex flex-col min-h-screen">
-    <Header/>
+    <Header onAccountClick={handleAccountClick}/>
     <main className="w-full flex-1">
       <HeroSection
         onShopNow={handleShopNow}
