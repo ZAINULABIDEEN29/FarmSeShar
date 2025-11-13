@@ -1,8 +1,10 @@
 import express from "express"
-import { getUser, loginUser, logoutUser, registerUser,verifyOtp,forgotPassword,resetPassword } from "../controllers/authUser.controller.js";
+import { getUser, loginUser, logoutUser, registerUser, verifyOtp, forgotPassword, resetPassword, refreshToken } from "../controllers/authUser.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema, verifyCode } from "../validator/auth.schema.js";
 import { authUser } from "../middlewares/auth.middleware.js";
+import { createOrder } from "../controllers/order.controller.js";
+import { createOrderSchema } from "../validator/order.schema.js";
 const router = express.Router();
 
 
@@ -13,8 +15,12 @@ router.post("/forgot-password",validate(forgotPasswordSchema),forgotPassword);
 router.post("/reset-password",validate(resetPasswordSchema),resetPassword);
 router.post("/login",validate(loginSchema),loginUser)
 
-router.get("/me",authUser,getUser)
-router.get("/logout",authUser,logoutUser);
+router.post("/refresh", refreshToken); // Public route - uses refresh token from cookie
+router.get("/me", authUser, getUser);
+router.get("/logout", authUser, logoutUser);
+
+// Order routes (protected - requires user authentication)
+router.post("/orders", authUser, validate(createOrderSchema), createOrder);
 
 
 

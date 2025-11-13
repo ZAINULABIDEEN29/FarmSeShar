@@ -1,6 +1,6 @@
 import express from "express"
 const router = express.Router();
-import { registerFarmer,loginFarmer,logoutFarmer,getFarmer,verifyCodeForFarmer, forgotPasswordFarmer, resetPasswordFarmer } from "../controllers/authFarmer.controller.js";
+import { registerFarmer, loginFarmer, logoutFarmer, getFarmer, verifyCodeForFarmer, forgotPasswordFarmer, resetPasswordFarmer, refreshTokenFarmer } from "../controllers/authFarmer.controller.js";
 import { authFarmer } from "../middlewares/auth.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { forgotPasswordSchema, loginFarmerSchema, registerFarmerSchema, resetPasswordSchema, verifyCodeSchema } from "../validator/farmerAuth.schema.js";
@@ -17,15 +17,32 @@ import {
   updateProductSchema,
   productQuerySchema,
 } from "../validator/product.schema.js";
+import {
+  getDashboardStats,
+  getDashboardCustomers,
+  getDashboardOrders,
+  getDashboardShipments,
+} from "../controllers/dashboard.controller.js";
+import {
+  updateOrderStatus,
+  createShipment,
+  updateShipmentStatus,
+} from "../controllers/order.controller.js";
+import {
+  updateOrderStatusSchema,
+  createShipmentSchema,
+  updateShipmentStatusSchema,
+} from "../validator/order.schema.js";
 
 // Authentication routes
-router.post("/register-farmer",validate(registerFarmerSchema),registerFarmer)
-router.post("/verify-farmer",validate(verifyCodeSchema),verifyCodeForFarmer);
-router.post("/login-farmer",validate(loginFarmerSchema),loginFarmer)
-router.post("/forgot-password",validate(forgotPasswordSchema),forgotPasswordFarmer)
-router.post("/reset-password",validate(resetPasswordSchema),resetPasswordFarmer)
-router.get("/farmer",authFarmer,getFarmer)
-router.get("/logout",authFarmer,logoutFarmer)
+router.post("/register-farmer", validate(registerFarmerSchema), registerFarmer);
+router.post("/verify-farmer", validate(verifyCodeSchema), verifyCodeForFarmer);
+router.post("/login-farmer", validate(loginFarmerSchema), loginFarmer);
+router.post("/refresh", refreshTokenFarmer); // Public route - uses refresh token from cookie
+router.post("/forgot-password", validate(forgotPasswordSchema), forgotPasswordFarmer);
+router.post("/reset-password", validate(resetPasswordSchema), resetPasswordFarmer);
+router.get("/farmer", authFarmer, getFarmer);
+router.get("/logout", authFarmer, logoutFarmer);
 
 // Product routes (protected - requires farmer authentication)
 router.get("/products", authFarmer, getProducts);
@@ -34,5 +51,18 @@ router.post("/products", authFarmer, validate(createProductSchema), createProduc
 router.put("/products/:id", authFarmer, validate(updateProductSchema), updateProduct);
 router.delete("/products/:id", authFarmer, deleteProduct);
 router.patch("/products/:id/toggle-availability", authFarmer, toggleProductAvailability);
+
+// Dashboard routes (protected - requires farmer authentication)
+router.get("/dashboard/stats", authFarmer, getDashboardStats);
+router.get("/dashboard/customers", authFarmer, getDashboardCustomers);
+router.get("/dashboard/orders", authFarmer, getDashboardOrders);
+router.get("/dashboard/shipments", authFarmer, getDashboardShipments);
+
+// Order management routes (protected - requires farmer authentication)
+router.patch("/orders/:id/status", authFarmer, validate(updateOrderStatusSchema), updateOrderStatus);
+
+// Shipment management routes (protected - requires farmer authentication)
+router.post("/shipments", authFarmer, validate(createShipmentSchema), createShipment);
+router.patch("/shipments/:id/status", authFarmer, validate(updateShipmentStatusSchema), updateShipmentStatus);
 
 export default router;

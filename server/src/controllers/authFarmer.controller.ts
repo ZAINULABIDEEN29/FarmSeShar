@@ -4,7 +4,7 @@ import { findFarmerByEmail, findFarmerById } from "../utils/farmers.utils.js";
 import { ApiError } from "../utils/ApiError.js";
 import { sendVerificationEmail } from "../helpers/sendVerificationEmail.js";
 import { registerFarmerService } from "../services/farmer.service.js";
-import { generateAccessToken } from "../utils/auth.utils.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/auth.utils.js";
 import Token from "../models/blackListToken.model.js";
 import crypto from "crypto";
 import { sendResetPasswordEmail } from "../helpers/sendResetPasswordEmail.js";
@@ -58,11 +58,7 @@ export const registerFarmer = asyncHandler(
             password
         })
 
-     const token = generateAccessToken(farmerRegistered.id.toString())
-     res.cookie("token",token,{
-        httpOnly:true
-     })
-
+     // No tokens needed for registration - farmer must verify email first
      const emailResponse = await sendVerificationEmail(email,fullName.firstName,verifyCode)
      if(!emailResponse.success){
         throw new ApiError(400,emailResponse.message)
@@ -126,19 +122,37 @@ export const loginFarmer =asyncHandler(
         }
 
         const accessToken = generateAccessToken(farmer._id.toString());
-        const refreshToken = generateAccessToken(farmer._id.toString());
+        const refreshToken = generateRefreshToken(farmer._id.toString());
         farmer.refreshToken = refreshToken;
         await farmer.save();
         
-        const {password:_,...farmerResponse} = farmer.toObject();
-        return res.status(200).cookie("token",accessToken,{
-            httpOnly:true,
-            secure:process.env.NODE_ENV === "production"
-        }).json({
-            message:"Login successful",
-            refreshToken,
-            farmer:farmerResponse
-        })
+        const { password: _, refreshToken: __, ...farmerResponse } = farmer.toObject();
+        
+        const isProduction = process.env.NODE_ENV === "production";
+        // Cookie options for secure HTTP-only cookies
+        const cookieOptions = {
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: isProduction ? ("strict" as const) : ("lax" as const),
+        };
+
+        // Store both tokens in HTTP-only cookies (secure, not accessible to JavaScript)
+        // This prevents XSS attacks as tokens cannot be accessed via JavaScript
+        return res
+          .status(200)
+          .cookie("accessToken", accessToken, {
+            ...cookieOptions,
+            maxAge: 24 * 60 * 60 * 1000, // 1 day for access token
+          })
+          .cookie("refreshToken", refreshToken, {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for refresh token
+          })
+          .json({
+            message: "Login successful",
+            farmer: farmerResponse,
+            // Tokens are in HTTP-only cookies, not exposed to JavaScript
+          });
     }
     
 )
@@ -213,23 +227,117 @@ export const resetPasswordFarmer = asyncHandler(
     }
 )
 
-export const getFarmer = asyncHandler(
-    async (req:Request, res:Response):Promise<any>=>{
-        res.status(200).json({
-            success:true,
-            farmer:req.farmer
-        })
-    }
-)
-export const logoutFarmer = asyncHandler(
-    async (req:Request, res:Response):Promise<any>=>{
+export const refreshTokenFarmer = asyncHandler(
+  async (req: Request, res: Response): Promise<any> => {
+    // Refresh token is sent via HTTP-only cookie
+    const refreshToken = req.cookies.refreshToken;
 
-        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-        await Token.create({token})
-        res.clearCookie("token");
-        return res.status(200).json({
-            success:true,
-            message:"Farmer logged out successfully"
-        })
+    // If no refresh token, return success: false (not an error - user is just not logged in)
+    if (!refreshToken) {
+      return res.status(200).json({
+        success: false,
+        message: "No refresh token provided",
+      });
     }
-)
+
+    // Verify refresh token
+    let decoded: any;
+    try {
+      decoded = verifyRefreshToken(refreshToken) as any;
+      if (!decoded || !decoded.id) {
+        return res.status(200).json({
+          success: false,
+          message: "Invalid refresh token",
+        });
+      }
+    } catch (error) {
+      // Token verification failed (expired or invalid)
+      return res.status(200).json({
+        success: false,
+        message: "Invalid or expired refresh token",
+      });
+    }
+
+    // Find farmer and verify refresh token matches stored one
+    const farmer = await findFarmerById(decoded.id);
+    if (!farmer || !farmer.refreshToken || farmer.refreshToken !== refreshToken) {
+      return res.status(200).json({
+        success: false,
+        message: "Invalid refresh token",
+      });
+    }
+
+    // Generate new access token
+    const newAccessToken = generateAccessToken(farmer._id.toString());
+
+    // Optionally rotate refresh token for better security
+    const newRefreshToken = generateRefreshToken(farmer._id.toString());
+    farmer.refreshToken = newRefreshToken;
+    await farmer.save();
+
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? ("strict" as const) : ("lax" as const),
+    };
+
+    const { password: _, refreshToken: __, ...farmerResponse } = farmer.toObject();
+
+    // Store both new tokens in HTTP-only cookies
+    return res
+      .status(200)
+      .cookie("accessToken", newAccessToken, {
+        ...cookieOptions,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day for access token
+      })
+      .cookie("refreshToken", newRefreshToken, {
+        ...cookieOptions,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for refresh token
+      })
+      .json({
+        success: true,
+        farmer: farmerResponse,
+        // Tokens are in HTTP-only cookies, not exposed to JavaScript
+      });
+  }
+);
+
+export const getFarmer = asyncHandler(
+  async (req: Request, res: Response): Promise<any> => {
+    res.status(200).json({
+      success: true,
+      farmer: req.farmer,
+    });
+  }
+);
+export const logoutFarmer = asyncHandler(
+  async (req: Request, res: Response): Promise<any> => {
+    const accessToken = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
+    
+    // Blacklist both tokens
+    if (accessToken) {
+      await Token.create({ token: accessToken });
+    }
+    if (refreshToken) {
+      await Token.create({ token: refreshToken });
+    }
+
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? ("strict" as const) : ("lax" as const),
+    };
+
+    // Clear both token cookies
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
+
+    return res.status(200).json({
+      success: true,
+      message: "Farmer logged out successfully",
+    });
+  }
+);
