@@ -39,7 +39,7 @@ const CartItem: React.FC<CartItemProps> = ({
       )}
     >
       {/* Product Image */}
-      <div className="w-full sm:w-24 h-24 sm:h-24 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+      <div className="w-full sm:w-24 h-24 sm:h-24 bg-gray-200 rounded-lg shrink-0 flex items-center justify-center overflow-hidden">
         {item.image ? (
           <img
             src={item.image}
@@ -71,7 +71,7 @@ const CartItem: React.FC<CartItemProps> = ({
           {/* Remove Button */}
           <button
             onClick={handleRemove}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-md transition-colors"
+            className="shrink-0 w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-md transition-colors"
             aria-label="Remove item"
           >
             <X className="h-4 w-4" />
@@ -90,7 +90,7 @@ const CartItem: React.FC<CartItemProps> = ({
           >
             <Minus className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium text-gray-900 min-w-[2rem] text-center">
+          <span className="text-sm font-medium text-gray-900 min-w-8 text-center">
             {item.quantity}
           </span>
           <Button
