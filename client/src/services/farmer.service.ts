@@ -8,6 +8,7 @@ import type {
   RegisterFarmerResponse,
   LoginFarmerResponse,
   GetFarmerResponse,
+  Farmer,
 } from "@/types/farmer.types";
 
 // Farmer API Service Layer
@@ -58,6 +59,17 @@ export const farmerService = {
   // Get current farmer
   getCurrentFarmer: async (): Promise<GetFarmerResponse> => {
     const response = await api.get<GetFarmerResponse>("/farmers/farmer");
+    return response.data;
+  },
+
+  // Refresh token
+  refreshToken: async (): Promise<{ success: boolean; farmer?: Farmer; message?: string }> => {
+    // Refresh token is sent via HTTP-only cookie
+    // New access token is returned in HTTP-only cookie
+    // Returns success: false if no valid refresh token (farmer not logged in)
+    const response = await api.post<{ success: boolean; farmer?: Farmer; message?: string }>(
+      "/farmers/refresh"
+    );
     return response.data;
   },
 

@@ -63,8 +63,8 @@ export interface RegisterFarmerResponse {
 
 export interface LoginFarmerResponse {
   message: string;
-  refreshToken: string;
   farmer: Farmer;
+  // Access and refresh tokens are stored in HTTP-only cookies (secure, not accessible to JavaScript)
 }
 
 export interface GetFarmerResponse {

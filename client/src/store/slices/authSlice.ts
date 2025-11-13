@@ -2,47 +2,24 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { User } from "@/types/user.types";
 import type { Farmer } from "@/types/farmer.types";
-import { storage, STORAGE_KEYS } from "@/utils/storage";
 
 interface AuthState {
   user: User | null;
   farmer: Farmer | null;
   isAuthenticated: boolean;
   userType: "user" | "farmer" | null;
+  isRestoring: boolean; // Flag to track if auth is being restored
+  // Tokens are stored in HTTP-only cookies (secure, not accessible to JavaScript)
+  // No need to store them in Redux state
 }
 
-// Load initial state from localStorage
-const loadInitialState = (): AuthState => {
-  const storedUser = storage.get<User>(STORAGE_KEYS.USER);
-  const storedFarmer = storage.get<Farmer>(STORAGE_KEYS.FARMER);
-
-  if (storedUser) {
-    return {
-      user: storedUser,
-      farmer: null,
-      isAuthenticated: true,
-      userType: "user",
-    };
-  }
-
-  if (storedFarmer) {
-    return {
-      user: null,
-      farmer: storedFarmer,
-      isAuthenticated: true,
-      userType: "farmer",
-    };
-  }
-
-  return {
-    user: null,
-    farmer: null,
-    isAuthenticated: false,
-    userType: null,
-  };
+const initialState: AuthState = {
+  user: null,
+  farmer: null,
+  isAuthenticated: false,
+  userType: null,
+  isRestoring: true, // Start with true, will be set to false after restoration attempt
 };
-
-const initialState: AuthState = loadInitialState();
 
 const authSlice = createSlice({
   name: "auth",
@@ -53,28 +30,35 @@ const authSlice = createSlice({
       state.farmer = null;
       state.isAuthenticated = true;
       state.userType = "user";
+      state.isRestoring = false;
     },
     setFarmer: (state, action: PayloadAction<Farmer>) => {
       state.farmer = action.payload;
       state.user = null;
       state.isAuthenticated = true;
       state.userType = "farmer";
+      state.isRestoring = false;
+    },
+    setRestoring: (state, action: PayloadAction<boolean>) => {
+      state.isRestoring = action.payload;
     },
     logout: (state) => {
       state.user = null;
       state.farmer = null;
       state.isAuthenticated = false;
       state.userType = null;
+      state.isRestoring = false;
     },
     clearAuth: (state) => {
       state.user = null;
       state.farmer = null;
       state.isAuthenticated = false;
       state.userType = null;
+      state.isRestoring = false;
     },
   },
 });
 
-export const { setUser, setFarmer, logout, clearAuth } = authSlice.actions;
+export const { setUser, setFarmer, setRestoring, logout, clearAuth } = authSlice.actions;
 export default authSlice.reducer;
 

@@ -1,59 +1,174 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import config from "@/conf/conf";
+import { store } from "@/store";
+import { logout } from "@/store/slices/authSlice";
 
-// Ensure baseURL includes /api prefix
-// Default to port 8000 to match docker-compose.yml, or use env variable
+// Flag to track if we're currently restoring auth (to avoid clearing state during restoration)
+let isRestoringAuth = false;
+
 const getBaseURL = () => {
   if (config.backenedURL) {
-    // If env variable is set, use it
     return config.backenedURL.endsWith('/api') 
       ? config.backenedURL 
       : `${config.backenedURL}/api`;
   }
-  // Default fallback - try 8000 first (docker), then 5000 (local dev)
   return 'http://localhost:8000/api';
 };
 
 export const api = axios.create({
   baseURL: getBaseURL(),
-  withCredentials: true,
+  withCredentials: true, // Important: Send HTTP-only cookies (access and refresh tokens) with requests
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Log the baseURL for debugging (only in development)
 if (import.meta.env.DEV) {
   console.log('API Base URL:', getBaseURL());
 }
 
-api.interceptors.response.use(
-    (response) => response,
-    (error: AxiosError) => {
-        if (error.response?.status === 401) {
-            const currentPath = window.location.pathname;
-            // Use setTimeout to avoid blocking the main thread
-            const isAuthPage = 
-              currentPath === "/login" || 
-              currentPath === "/signup" || 
-              currentPath === "/farmer-login" || 
-              currentPath === "/farmer-registration";
-            
-            if (!isAuthPage) {
-              // Determine redirect based on current path
-              const redirectTo = currentPath.startsWith("/farmer") 
-                ? "/farmer-login" 
-                : "/login";
-              
-              setTimeout(() => {
-                window.location.href = redirectTo;
-              }, 0);
-            }
-        }
-        return Promise.reject(error);
+// Request interceptor - tokens are automatically sent via HTTP-only cookies
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // Check if this is an auth restoration request
+    if (
+      config.url?.includes("/users/me") ||
+      config.url?.includes("/farmers/farmer") ||
+      config.url?.includes("/users/refresh") ||
+      config.url?.includes("/farmers/refresh")
+    ) {
+      isRestoringAuth = true;
     }
+
+    // Tokens are automatically sent via HTTP-only cookies (withCredentials: true)
+    // No need to manually add Authorization header
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
+// Response interceptor to handle 401 errors and automatic token refresh
+api.interceptors.response.use(
+  (response) => {
+    // Reset restoring flag on successful response
+    if (
+      response.config.url?.includes("/users/me") ||
+      response.config.url?.includes("/farmers/farmer") ||
+      response.config.url?.includes("/users/refresh") ||
+      response.config.url?.includes("/farmers/refresh")
+    ) {
+      isRestoringAuth = false;
+    }
+    return response;
+  },
+  async (error: AxiosError) => {
+    // Reset restoring flag on error
+    if (
+      error.config?.url?.includes("/users/me") ||
+      error.config?.url?.includes("/farmers/farmer") ||
+      error.config?.url?.includes("/users/refresh") ||
+      error.config?.url?.includes("/farmers/refresh")
+    ) {
+      isRestoringAuth = false;
+    }
+    
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      const currentPath = window.location.pathname;
+      
+      // Public pages that don't require authentication
+      const publicPages = [
+        "/",
+        "/login",
+        "/signup",
+        "/forgot-password",
+        "/reset-password",
+        "/verify-code",
+        "/farmer-login",
+        "/farmer-registration",
+        "/farmer-forgot-password",
+        "/farmer-reset-password",
+        "/farmer-verify-code",
+        "/farm-details",
+        "/bank-details",
+      ];
+      
+      const isPublicPage = publicPages.includes(currentPath);
+      const isRefreshEndpoint = originalRequest.url?.includes("/refresh");
+      
+      // Don't handle 401s during auth restoration - let restoration hook handle it
+      if (isRestoringAuth) {
+        // During restoration, let the restoration hook handle auth state
+        // Silently reject to prevent interceptor from interfering
+        return Promise.reject(error);
+      }
+      
+      // Don't handle 401s on refresh endpoints - they return 200 with success: false if no valid token
+      // The restoration hook handles refresh endpoint responses
+      if (isRefreshEndpoint) {
+        return Promise.reject(error);
+      }
+      
+      // Try to refresh token automatically if access token expired
+      // Only for protected endpoints (not public pages or auth endpoints)
+      if (!isPublicPage && !originalRequest.url?.includes("/login") && !originalRequest.url?.includes("/register")) {
+        originalRequest._retry = true;
+        
+        try {
+          // Determine if this is a user or farmer request
+          const isFarmerRequest = originalRequest.url?.includes("/farmers/");
+          
+          // Attempt to refresh token using refresh token cookie
+          // Refresh endpoint returns 200 with success: false if no valid refresh token
+          const refreshResponse = isFarmerRequest
+            ? await api.post<{ success: boolean }>("/farmers/refresh")
+            : await api.post<{ success: boolean }>("/users/refresh");
+          
+          // Check if refresh was successful
+          if (refreshResponse.data.success) {
+            // Retry the original request with new access token (in cookie)
+            return api(originalRequest);
+          } else {
+            // Refresh failed - refresh token is invalid or expired
+            // User needs to log in again
+            store.dispatch(logout());
+            
+            const redirectTo = currentPath.startsWith("/farmer") 
+              ? "/farmer-login" 
+              : "/login";
+            
+            setTimeout(() => {
+              window.location.href = redirectTo;
+            }, 0);
+            
+            return Promise.reject(new Error("Refresh token invalid or expired"));
+          }
+        } catch (refreshError) {
+          // Network error or other error during refresh
+          // User needs to log in again
+          store.dispatch(logout());
+          
+          const redirectTo = currentPath.startsWith("/farmer") 
+            ? "/farmer-login" 
+            : "/login";
+          
+          setTimeout(() => {
+            window.location.href = redirectTo;
+          }, 0);
+          
+          return Promise.reject(refreshError);
+        }
+      } else {
+        // On public pages or auth endpoints, just clear state silently
+        // User can still access the page
+        store.dispatch(logout());
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 export default api;
 

@@ -57,8 +57,8 @@ export interface RegisterUserResponse {
 
 export interface LoginUserResponse {
   message: string;
-  refreshToken: string;
   user: User;
+  // Access and refresh tokens are stored in HTTP-only cookies (secure, not accessible to JavaScript)
 }
 
 export interface GetUserResponse {

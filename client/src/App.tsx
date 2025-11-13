@@ -15,7 +15,10 @@ import FarmerDashboard from './pages/FarmerDashboard';
 import FarmerForgotPasswordPage from './pages/FarmerForgotPasswordPage';
 import FarmerVerifyCodePage from './pages/FarmerVerifyCodePage';
 import FarmerResetPasswordPage from './pages/FarmerResetPasswordPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { useAuthRestore } from './hooks/useAuth';
 
 const router = createBrowserRouter([
   {
@@ -78,10 +81,24 @@ const router = createBrowserRouter([
     path: "/farmer-reset-password",
     element: <FarmerResetPasswordPage />,
   },
+  {
+    path: "/cart",
+    element: <CartPage />,
+  },
+  {
+    path: "/checkout",
+    element: (
+      <ProtectedRoute userType="user" redirectTo="/login">
+        <CheckoutPage />
+      </ProtectedRoute>
+    ),
+  },
 ]);
 
 const App:React.FC = () => {
- 
+  // Restore authentication state on app load (non-blocking)
+  // This allows the app to render immediately, auth restoration happens in background
+  useAuthRestore();
 
   return (
     <>

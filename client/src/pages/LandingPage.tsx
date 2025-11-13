@@ -3,9 +3,12 @@ import { Header } from '@/components/header'
 import { FeaturedProductsSection, HeroSection, ShopByCategorySection, WhyChooseUsSection } from '@/components/sections'
 import { useNavigate } from 'react-router-dom'
 import React from 'react'
+import { useAppSelector } from '@/store/hooks'
+import { selectCartItemCount } from '@/store/slices/cartSlice'
 
 const LandingPage:React.FC = () => {
     const navigate = useNavigate()
+    const cartItemCount = useAppSelector(selectCartItemCount)
     
     const handleShopNow = () => {
         console.log('Shop Now clicked')
@@ -14,8 +17,17 @@ const LandingPage:React.FC = () => {
       const handleLearnMore = () => {
         navigate('/farmer-registration')
       }
+      
       const handleAccountClick = () => {
         navigate('/login')
+      }
+      
+      const handleCartClick = () => {
+        navigate('/cart')
+      }
+      
+      const handleLogoClick = () => {
+        navigate('/')
       }
     
       const handleCategoryClick = (category: unknown) => {
@@ -31,7 +43,12 @@ const LandingPage:React.FC = () => {
       }
   return (
     <div className="w-full flex flex-col min-h-screen">
-    <Header onAccountClick={handleAccountClick}/>
+    <Header 
+      cartCount={cartItemCount}
+      onAccountClick={handleAccountClick}
+      onCartClick={handleCartClick}
+      onLogoClick={handleLogoClick}
+    />
     <main className="w-full flex-1">
       <HeroSection
         onShopNow={handleShopNow}

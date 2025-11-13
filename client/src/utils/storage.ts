@@ -36,11 +36,11 @@ export const storage = {
 };
 
 // Storage Keys
+// Only non-sensitive data should be stored in localStorage
+// Tokens and user/farmer data are stored in Redux (memory) and HTTP-only cookies
 export const STORAGE_KEYS = {
-  USER_ID: "userId",
-  FARMER_ID: "farmerId",
-  USER: "user",
-  FARMER: "farmer",
-  RESET_TOKEN: "resetToken",
+  USER_ID: "userId", // Temporary storage for verification flow (non-sensitive)
+  FARMER_ID: "farmerId", // Temporary storage for verification flow (non-sensitive)
+  RESET_TOKEN: "resetToken", // Temporary storage for password reset (non-sensitive)
 } as const;
 

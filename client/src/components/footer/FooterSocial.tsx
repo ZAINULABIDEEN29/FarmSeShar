@@ -1,5 +1,5 @@
 import React from "react";
-import { Facebook, Twitter, Instagram } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SocialLink {
@@ -28,6 +28,11 @@ const defaultSocialLinks: SocialLink[] = [
     name: "Instagram",
     icon: <Instagram className="h-5 w-5" />,
     href: "https://instagram.com",
+  },
+  {
+    name: "LinkedIn",
+    icon: <Linkedin className="h-5 w-5" />,
+    href: "https://linkedin.com",
   },
 ];
 

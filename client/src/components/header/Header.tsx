@@ -6,6 +6,8 @@ import NavMenu, { NAV_ITEMS } from "./NavMenu";
 import SearchBar from "./SearchBar";
 import AccountCart from "./AccountCart";
 import TopInfoBar from "./TopInfoBar";
+import { useAppSelector } from "@/store/hooks";
+import { useLogoutUser, useLogoutFarmer } from "@/hooks/useAuth";
 
 interface HeaderProps {
   cartCount?: number;
@@ -23,6 +25,35 @@ const Header: React.FC<HeaderProps> = ({
   onLogoClick,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const { user, farmer, isAuthenticated, userType } = useAppSelector(
+    (state) => state.auth
+  );
+  const logoutUserMutation = useLogoutUser();
+  const logoutFarmerMutation = useLogoutFarmer();
+
+  // Get user name based on authentication type
+  const getUserName = (): string | undefined => {
+    if (user && user.fullName) {
+      // For users, combine first and last name
+      const { firstName, lastName } = user.fullName;
+      return `${firstName} ${lastName}`.trim();
+    }
+    if (farmer && farmer.fullName) {
+      // For farmers, combine first and last name
+      const { firstName, lastName } = farmer.fullName;
+      return `${firstName} ${lastName}`.trim();
+    }
+    return undefined;
+  };
+
+  // Handle logout based on user type
+  const handleLogout = () => {
+    if (userType === "user") {
+      logoutUserMutation.mutate();
+    } else if (userType === "farmer") {
+      logoutFarmerMutation.mutate();
+    }
+  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -59,6 +90,9 @@ const Header: React.FC<HeaderProps> = ({
                   cartCount={cartCount}
                   onAccountClick={onAccountClick}
                   onCartClick={onCartClick}
+                  onLogout={handleLogout}
+                  userName={getUserName()}
+                  isLoggedIn={isAuthenticated}
                 />
               </div>
               <button

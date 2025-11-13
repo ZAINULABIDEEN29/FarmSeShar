@@ -8,8 +8,8 @@ interface TopInfoBarProps {
 }
 
 const TopInfoBar: React.FC<TopInfoBarProps> = ({
-  deliveryText = "Free Delivery over Rs.1000",
-  supportText = "Support: (111)-2347-1968",
+  deliveryText = "Free Delivery over Rs.3000",
+  supportText = "Support: (0)-2047-1008",
   className,
 }) => {
   return (
