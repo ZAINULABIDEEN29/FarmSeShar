@@ -8,6 +8,7 @@ import {
   CustomersSection,
   OrdersSection,
   ShipmentsSection,
+  HelpSection,
   type DashboardView,
 } from "@/components/dashboard";
 import { useLogoutFarmer } from "@/hooks/useAuth";
@@ -277,6 +278,8 @@ const FarmerDashboard: React.FC = () => {
             {activeView === "shipments" && (
               <ShipmentsSection shipments={mockShipments} />
             )}
+
+            {activeView === "help" && <HelpSection />}
           </div>
         </main>
       </div>
