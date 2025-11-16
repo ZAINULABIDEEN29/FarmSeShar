@@ -1,5 +1,4 @@
-export { default as ContactHero } from "./ContactHero";
-export { default as ContactInfoCard } from "./ContactInfoCard";
-export { default as SocialLinks } from "./SocialLinks";
-export { default as ContactForm } from "./ContactForm";
+export { default as SupportHero } from "./SupportHero";
+export { default as ConnectWithUs } from "./ConnectWithUs";
+export { default as GetInTouch } from "./GetInTouch";
 

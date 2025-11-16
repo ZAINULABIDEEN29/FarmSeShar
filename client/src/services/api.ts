@@ -74,7 +74,10 @@ api.interceptors.response.use(
     
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
     
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    // Handle both 401 and 403 errors (403 can occur on refresh token mismatch)
+    const isAuthError = error.response?.status === 401 || error.response?.status === 403;
+    
+    if (isAuthError && originalRequest && !originalRequest._retry) {
       const currentPath = window.location.pathname;
       
       // Public pages that don't require authentication
@@ -97,14 +100,14 @@ api.interceptors.response.use(
       const isPublicPage = publicPages.includes(currentPath);
       const isRefreshEndpoint = originalRequest.url?.includes("/refresh");
       
-      // Don't handle 401s during auth restoration - let restoration hook handle it
+      // Don't handle auth errors during auth restoration - let restoration hook handle it
       if (isRestoringAuth) {
         // During restoration, let the restoration hook handle auth state
         // Silently reject to prevent interceptor from interfering
         return Promise.reject(error);
       }
       
-      // Don't handle 401s on refresh endpoints - they return 200 with success: false if no valid token
+      // Don't handle auth errors on refresh endpoints - they return 200 with success: false if no valid token
       // The restoration hook handles refresh endpoint responses
       if (isRefreshEndpoint) {
         return Promise.reject(error);

@@ -1,12 +1,12 @@
 import React from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { SupportHero, ConnectWithUs, GetInTouch } from "@/components/contact";
+import { AboutHero, OurImpact, OurStory, OurValues, JoinOurTeam } from "@/components/about";
 import { useAppSelector } from "@/store/hooks";
 import { selectCartItemCount } from "@/store/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
 
-const ContactPage: React.FC = () => {
+const AboutPage: React.FC = () => {
   const navigate = useNavigate();
   const cartItemCount = useAppSelector(selectCartItemCount);
 
@@ -32,9 +32,11 @@ const ContactPage: React.FC = () => {
       />
 
       <main className="flex-1 w-full">
-        <SupportHero />
-        <ConnectWithUs />
-        <GetInTouch />
+        <AboutHero />
+        <OurImpact />
+        <OurStory />
+        <OurValues />
+        <JoinOurTeam />
       </main>
 
       <Footer />
@@ -42,5 +44,5 @@ const ContactPage: React.FC = () => {
   );
 };
 
-export default ContactPage;
+export default AboutPage;
 

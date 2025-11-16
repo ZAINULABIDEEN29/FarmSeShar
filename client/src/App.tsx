@@ -20,6 +20,9 @@ import CheckoutPage from './pages/CheckoutPage';
 import PaymentPage from './pages/PaymentPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
+import VegetablesPage from './pages/VegetablesPage';
+
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
 
@@ -116,6 +119,15 @@ const router = createBrowserRouter([
     path: "/contact",
     element: <ContactPage />,
   },
+  {
+    path: "/about",
+    element: <AboutPage />,
+  },
+  {
+    path: "/vegetables",
+    element: <VegetablesPage />,
+  },
+ 
 ]);
 
 const App:React.FC = () => {
