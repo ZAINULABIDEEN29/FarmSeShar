@@ -162,7 +162,7 @@ const VegetablesPage: React.FC = () => {
       <main className="flex-1 w-full py-6 sm:py-8 lg:py-10">
         <Container>
           {/* Breadcrumbs */}
-          <Breadcrumbs />
+          <Breadcrumbs currentPage="Vegetables" />
 
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mt-6 relative">
             {/* Left Sidebar - Filters */}

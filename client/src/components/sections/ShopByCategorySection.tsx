@@ -2,12 +2,14 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Container from "../container/Container";
+import { useNavigate } from "react-router-dom";
 
 export interface Category {
   id: string;
   title: string;
   description: string;
   image?: string;
+  to: string;
 }
 
 interface ShopByCategorySectionProps {
@@ -20,28 +22,33 @@ const defaultCategories: Category[] = [
     id: "1",
     title: "Fresh Vegetables",
     description: "Farm-fresh vegetables delivered daily",
+    to: "/vegetables",
   },
   {
     id: "2",
     title: "Nutritious Fruits",
     description: "Organic fruits picked at peak ripeness",
+    to: "/fruits",
   },
   {
     id: "3",
     title: "Dairy Products",
     description: "Fresh dairy products from local farms",
+    to: "/dairy",
   },
   {
     id: "4",
     title: "Healthy Spices",
     description: "Aromatic spices and herbs",
-  },
+    to: "/herbs",
+    },
 ];
 
 const ShopByCategorySection: React.FC<ShopByCategorySectionProps> = ({
   categories = defaultCategories,
   onCategoryClick,
 }) => {
+  const navigate = useNavigate();
   return (
     <section className="w-full bg-white py-12 md:py-16 lg:py-20">
       <Container>
@@ -77,7 +84,7 @@ const ShopByCategorySection: React.FC<ShopByCategorySectionProps> = ({
 
               <CardFooter className="p-6 pt-0">
                 <Button
-                  onClick={() => onCategoryClick?.(category)}
+                  onClick={ () => navigate(category.to)}
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
                 >
                   Shop Category

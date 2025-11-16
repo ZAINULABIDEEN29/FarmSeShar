@@ -22,9 +22,14 @@ import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import ContactPage from './pages/ContactPage';
 import AboutPage from './pages/AboutPage';
 import VegetablesPage from './pages/VegetablesPage';
+import FruitsPage from './pages/FruitsPage';
+import DairyPage from './pages/DairyPage';
+import HerbsPage from './pages/HerbsPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 const router = createBrowserRouter([
   {
@@ -127,6 +132,22 @@ const router = createBrowserRouter([
     path: "/vegetables",
     element: <VegetablesPage />,
   },
+  {
+    path: "/fruits",
+    element: <FruitsPage />,
+  },
+  {
+    path: "/dairy",
+    element: <DairyPage />,
+  },
+  {
+    path: "/herbs",
+    element: <HerbsPage />,
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
+  },
  
 ]);
 
@@ -136,9 +157,15 @@ const App:React.FC = () => {
   useAuthRestore();
 
   return (
-    <>
-    <RouterProvider router={router} />
-    </>
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        // Log error to error tracking service
+        console.error("Unhandled React error:", error, errorInfo);
+        // TODO: Send to error tracking service
+      }}
+    >
+      <RouterProvider router={router} />
+    </ErrorBoundary>
   )
 }
 

@@ -2,6 +2,7 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import config from "@/conf/conf";
 import { store } from "@/store";
 import { logout } from "@/store/slices/authSlice";
+import { handleApiError, handleNetworkError, logError } from "@/utils/errorHandler";
 
 // Flag to track if we're currently restoring auth (to avoid clearing state during restoration)
 let isRestoringAuth = false;
@@ -47,7 +48,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle 401 errors and automatic token refresh
+// Response interceptor to handle errors and automatic token refresh
 api.interceptors.response.use(
   (response) => {
     // Reset restoring flag on successful response
@@ -95,6 +96,12 @@ api.interceptors.response.use(
         "/farmer-verify-code",
         "/farm-details",
         "/bank-details",
+        "/contact",
+        "/about",
+        "/vegetables",
+        "/fruits",
+        "/dairy",
+        "/herbs",
       ];
       
       const isPublicPage = publicPages.includes(currentPath);
@@ -167,6 +174,28 @@ api.interceptors.response.use(
         // User can still access the page
         store.dispatch(logout());
       }
+      
+      // Reject auth errors without showing toast (handled by interceptor logic)
+      return Promise.reject(error);
+    }
+    
+    // Handle network errors (no response from server)
+    if (!error.response) {
+      logError(error, "Network Error");
+      handleNetworkError(error);
+      return Promise.reject(error);
+    }
+    
+    // Handle other API errors (4xx, 5xx)
+    const status = error.response.status;
+    
+    // Log error for monitoring
+    logError(error, `API Error (${status})`);
+    
+    // Don't show toast for auth errors (already handled above)
+    if (status !== 401 && status !== 403) {
+      // Show error toast for other errors
+      handleApiError(error);
     }
     
     return Promise.reject(error);
