@@ -8,7 +8,7 @@ import blackListTokenModel from "../models/blackListToken.model.js"
 import { sendVerificationEmail } from "../helpers/sendVerificationEmail.js";
 import {sendResetPasswordEmail} from "../helpers/sendResetPasswordEmail.js";
 import crypto from "crypto";
-import bcrypt from "bcryptjs";
+
 
 
 
@@ -238,7 +238,7 @@ export const loginUser = asyncHandler(
       .status(200)
       .cookie("accessToken", accessToken, {
         ...cookieOptions,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day for access token
+        maxAge: 15 * 60 * 1000, // 15 minutes for access token
       })
       .cookie("refreshToken", refreshToken, {
         ...cookieOptions,
@@ -259,6 +259,7 @@ export const refreshToken = asyncHandler(
     const refreshToken = req.cookies.refreshToken;
 
     // If no refresh token, return success: false (not an error - user is just not logged in)
+    // Return 200 with success: false to match farmer refresh endpoint behavior
     if (!refreshToken) {
       return res.status(200).json({
         success: false,
@@ -289,7 +290,7 @@ export const refreshToken = asyncHandler(
     if (!user || !user.refreshToken || user.refreshToken !== refreshToken) {
       return res.status(200).json({
         success: false,
-        message: "Invalid refresh token",
+        message: "Refresh token mismatch",
       });
     }
 
@@ -313,7 +314,7 @@ export const refreshToken = asyncHandler(
       .status(200)
       .cookie("accessToken", newAccessToken, {
         ...cookieOptions,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day for access token
+        maxAge: 15 * 60 * 1000, // 15 minutes for access token
       })
       .cookie("refreshToken", newRefreshToken, {
         ...cookieOptions,
@@ -328,7 +329,7 @@ export const refreshToken = asyncHandler(
           phoneNumber: user.phoneNumber,
           isVerified: user.isVerified,
         },
-        // Tokens are in HTTP-only cookies, not exposed to JavaScript
+        
       });
   }
 );

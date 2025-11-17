@@ -49,7 +49,7 @@ export const productQuerySchema = z.object({
   maxPrice: z.coerce.number().positive().optional(),
   isAvailable: z.coerce.boolean().optional(),
   search: z.string().optional(),
-});
+}).passthrough(); // Allow additional query parameters
 
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;

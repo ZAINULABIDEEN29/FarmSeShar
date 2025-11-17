@@ -232,7 +232,8 @@ export const refreshTokenFarmer = asyncHandler(
     // Refresh token is sent via HTTP-only cookie
     const refreshToken = req.cookies.refreshToken;
 
-    // If no refresh token, return success: false (not an error - user is just not logged in)
+    // If no refresh token, return success: false (not an error - farmer is just not logged in)
+    // Return 200 with success: false to match user refresh endpoint behavior
     if (!refreshToken) {
       return res.status(200).json({
         success: false,
