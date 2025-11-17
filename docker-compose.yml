@@ -1,0 +1,54 @@
+services:
+
+  mongodb:
+    image: mongo:7.0
+    container_name: farmers_marketplace_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - farmers-network
+
+  server:
+    build: ./server
+    image: ${DOCKERHUB_USERNAME}/farmers_marketplace_server
+    container_name: farmer_marketplace_server
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - MONGO_URI=mongodb://mongodb:27017/farmers
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    networks:
+      - farmers-network
+
+  client:
+    build: ./client
+    image: ${DOCKERHUB_USERNAME}/farmers_marketplace_client
+    container_name: farmer_client
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://server:8000
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - farmers-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  farmers-network:
+    driver: bridge

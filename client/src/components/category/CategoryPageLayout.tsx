@@ -104,15 +104,21 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
               </div>
 
               {/* Product Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {currentProducts.map((product) => (
-                  <ProductGridCard
-                    key={product._id}
-                    product={product}
-                    onAddToCart={handleAddToCart}
-                  />
-                ))}
-              </div>
+              {currentProducts.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-600">No products found in this category.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  {currentProducts.map((product) => (
+                    <ProductGridCard
+                      key={product._id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                    />
+                  ))}
+                </div>
+              )}
 
               {/* Pagination */}
               {totalPages > 1 && (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -9,12 +9,13 @@ import {
   selectCartItems,
   selectCartTotal,
   selectCartItemCount,
-  removeItem,
-  updateQuantity,
+  setCart,
   applyPromoCode,
 } from "@/store/slices/cartSlice";
+import { useGetCart, useUpdateCartItem, useRemoveFromCart } from "@/hooks/useCart";
 import { ShoppingBag } from "lucide-react";
 import { toast } from "react-toastify";
+import Loader from "@/components/common/Loader";
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,14 +25,65 @@ const CartPage: React.FC = () => {
   const cartItemCount = useAppSelector(selectCartItemCount);
   const discountPercentage = useAppSelector((state) => state.cart.discount);
   const promoCode = useAppSelector((state) => state.cart.promoCode);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+
+  // Fetch cart from API if user is authenticated
+  const { data: cartData, isLoading: isLoadingCart } = useGetCart();
+  const updateCartItem = useUpdateCartItem();
+  const removeFromCart = useRemoveFromCart();
+
+  // Sync cart from API to Redux store
+  useEffect(() => {
+    if (isAuthenticated && cartData?.items) {
+      const cartItems = cartData.items.map((item) => ({
+        id: item.productId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        unit: item.unit,
+        image: item.image,
+      }));
+      dispatch(setCart(cartItems));
+    } else if (!isAuthenticated) {
+      // Clear cart if user is not authenticated
+      dispatch(setCart([]));
+    }
+  }, [cartData, isAuthenticated, dispatch]);
 
   const handleUpdateQuantity = (id: string, quantity: number) => {
-    dispatch(updateQuantity({ id, quantity }));
+    if (!isAuthenticated) {
+      toast.error("Please login to update cart");
+      navigate("/login", { state: { from: "/cart" } });
+      return;
+    }
+
+    if (quantity <= 0) {
+      handleRemoveItem(id);
+      return;
+    }
+
+    updateCartItem.mutate(
+      { productId: id, data: { quantity } },
+      {
+        onError: () => {
+          // Error is handled in the hook
+        },
+      }
+    );
   };
 
   const handleRemoveItem = (id: string) => {
-    dispatch(removeItem(id));
+    if (!isAuthenticated) {
+      toast.error("Please login to remove items from cart");
+      navigate("/login", { state: { from: "/cart" } });
+      return;
+    }
+
+    removeFromCart.mutate(id, {
+      onError: () => {
+        // Error is handled in the hook
+      },
+    });
   };
 
   const handleApplyPromoCode = (code: string) => {
@@ -82,14 +134,20 @@ const CartPage: React.FC = () => {
             </h1>
           </div>
 
-          {cartItems.length === 0 ? (
+          {isLoadingCart && isAuthenticated ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader />
+            </div>
+          ) : cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 sm:py-24">
               <ShoppingBag className="h-16 w-16 sm:h-24 sm:w-24 text-gray-400 mb-4" />
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
                 Your cart is empty
               </h2>
               <p className="text-gray-600 mb-6 text-center px-4">
-                Start adding items to your cart to see them here.
+                {isAuthenticated
+                  ? "Start adding items to your cart to see them here."
+                  : "Please login to add items to your cart."}
               </p>
               <button
                 onClick={() => navigate("/")}

@@ -1,6 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Star, User, MapPin } from "lucide-react";
+import { Plus, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ProductGridCardProps {
@@ -14,6 +15,9 @@ interface ProductGridCardProps {
     farmerImage?: string;
     location?: string;
     rating: number;
+    category?: string;
+    createdAt?: string;
+    isAvailable?: boolean;
   };
   onAddToCart?: (productId: string) => void;
 }
@@ -22,9 +26,45 @@ const ProductGridCard: React.FC<ProductGridCardProps> = ({
   product,
   onAddToCart,
 }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/product/${product._id}`);
+  };
+
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation when clicking add to cart
+    onAddToCart?.(product._id);
+  };
+
+  // Determine label based on product properties
+  const getProductLabel = () => {
+    // Check if product is new (created within last 7 days)
+    if (product.createdAt) {
+      const createdDate = new Date(product.createdAt);
+      const daysSinceCreation = (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSinceCreation <= 7) {
+        return "New";
+      }
+    }
+    
+    // Check category for seasonal items
+    if (product.category === "Fruits" || product.category === "Vegetables") {
+      return "Seasonal";
+    }
+    
+    // Default to Local
+    return "Local";
+  };
+
+  const productLabel = getProductLabel();
+
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-      {/* Image with Local tag */}
+    <div 
+      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-300 flex flex-col h-full cursor-pointer"
+      onClick={handleCardClick}
+    >
+      {/* Image with Label badge */}
       <div className="relative w-full h-48 sm:h-56 bg-gray-100 flex items-center justify-center overflow-hidden">
         {product.image ? (
           <img
@@ -35,79 +75,67 @@ const ProductGridCard: React.FC<ProductGridCardProps> = ({
         ) : (
           <span className="text-gray-400 text-sm">No Image</span>
         )}
-        {/* Local tag - top left (black background, white text) */}
-        <div className="absolute top-2 left-2">
-          <span className="bg-gray-900 text-white text-xs font-semibold px-2 py-1 rounded-md">
-            Local
+        {/* Label badge - top left (black background, white text) */}
+        <div className="absolute top-2 left-2 z-10">
+          <span className="bg-gray-900 text-white text-xs font-semibold px-2 py-1 rounded">
+            {productLabel}
           </span>
         </div>
       </div>
 
       {/* Product Info */}
-      <div className="p-4 flex-1 flex flex-col">
+      <div className="p-4 sm:p-5 flex-1 flex flex-col">
         {/* Product Name - Large, bold, dark gray */}
-        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+        <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 line-clamp-2 min-h-10">
           {product.name}
         </h3>
 
-        {/* Price - Green price, gray unit */}
-        <div className="mb-3">
-          <span className="text-xl sm:text-2xl font-bold text-green-600">
+        {/* Price - Green price with unit */}
+        <div className="mb-2">
+          <span className="text-lg sm:text-xl font-bold text-green-600">
             Rs.{product.price}
           </span>
-          <span className="text-sm sm:text-base text-gray-600 ml-1">
+          <span className="text-sm text-gray-600 ml-1">
             /{product.unit}
           </span>
         </div>
 
-        {/* Seller Information with Rating */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          {/* Left: Farmer Image, Name, Location */}
-          <div className="flex items-start gap-2 flex-1 min-w-0">
-            {/* Farmer Image/Avatar */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-              {product.farmerImage ? (
-                <img
-                  src={product.farmerImage}
-                  alt={product.sellerName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
-              )}
-            </div>
-            {/* Seller Name and Location */}
-            <div className="flex-1 min-w-0">
-              {/* Seller Name - Dark gray */}
-              <p className="text-sm sm:text-base font-medium text-gray-900 mb-1 truncate">
-                {product.sellerName}
-              </p>
-              {/* Location with pin icon - Lighter gray */}
-              {product.location && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 shrink-0" />
-                  <p className="text-xs sm:text-sm text-gray-500 truncate">
-                    {product.location}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right: Rating with star icon */}
-          <div className="flex items-center gap-1 shrink-0">
-            <Star className="h-4 w-4 sm:h-5 sm:w-5 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm sm:text-base font-medium text-gray-900">
-              {product.rating}
+        {/* Category Tag - Small pill-shaped */}
+        {product.category && (
+          <div className="mb-3">
+            <span className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded-full">
+              {product.category}
             </span>
           </div>
+        )}
+
+        {/* Seller Information */}
+        <div className="mb-3">
+          {/* Seller Name - Dark gray */}
+          <p className="text-sm font-medium text-gray-900 mb-1">
+            {product.sellerName}
+          </p>
+          {/* Location - Lighter gray */}
+          {product.location && (
+            <p className="text-xs text-gray-500">
+              {product.location}
+            </p>
+          )}
+        </div>
+
+        {/* Rating with star icon */}
+        <div className="flex items-center gap-1 mb-4">
+          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+          <span className="text-sm font-medium text-gray-900">
+            {product.rating.toFixed(1)}
+          </span>
         </div>
 
         {/* Add to Cart Button - Green with plus icon */}
         <Button
-          onClick={() => onAddToCart?.(product._id)}
+          onClick={handleAddToCartClick}
           className={cn(
-            "bg-green-600 hover:bg-green-700 text-white font-bold",
+            "bg-green-600 hover:bg-green-700 text-white font-semibold",
             "w-full py-2.5 sm:py-3 text-sm sm:text-base",
             "rounded-lg transition-colors duration-200",
             "flex items-center justify-center gap-2",

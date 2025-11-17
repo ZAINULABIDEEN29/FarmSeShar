@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import Container from "@/components/container/Container";
-import { PaymentForm } from "@/components/payment";
+import StripePaymentForm from "@/components/payment/StripePaymentForm";
 import { CartSummary } from "@/components/checkout";
 import { useAppSelector } from "@/store/hooks";
 import {
@@ -11,12 +11,10 @@ import {
   selectCartTotal,
   selectCartItemCount,
 } from "@/store/slices/cartSlice";
-import type { PaymentData } from "@/types/payment.types";
 import type { CheckoutAddress } from "@/types/checkout.types";
 import { toast } from "react-toastify";
 import { ShoppingBag } from "lucide-react";
-import { orderService, cartItemsToOrderItems } from "@/services/order.service";
-import { clearCart } from "@/store/slices/cartSlice";
+import { useCreatePaymentIntent, useConfirmPayment } from "@/hooks/usePayment";
 import { useAppDispatch } from "@/store/hooks";
 
 interface LocationState {
@@ -27,12 +25,17 @@ const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
+  const [clientSecret, setClientSecret] = useState<string>("");
+  const [paymentIntentId, setPaymentIntentId] = useState<string>("");
   const cartItems = useAppSelector(selectCartItems);
   const cartTotals = useAppSelector(selectCartTotal);
   const cartItemCount = useAppSelector(selectCartItemCount);
   const discountPercentage = useAppSelector((state) => state.cart.discount);
   const address = (location.state as LocationState)?.address;
+  
+  const createPaymentIntent = useCreatePaymentIntent();
+  const confirmPayment = useConfirmPayment();
 
   const handleLogoClick = () => {
     navigate("/");
@@ -46,54 +49,61 @@ const PaymentPage: React.FC = () => {
     navigate("/cart");
   };
 
-  const handleSubmitPayment = async (paymentData: PaymentData) => {
-    if (!address) {
-      toast.error("Shipping address is required. Please go back to checkout.");
-      navigate("/checkout");
+  // Create payment intent when component mounts or payment method changes
+  useEffect(() => {
+    if (!address || cartItems.length === 0) return;
+
+    const createIntent = async () => {
+      try {
+        const response = await createPaymentIntent.mutateAsync({
+          shippingAddress: address,
+          paymentMethod,
+        });
+        setClientSecret(response.clientSecret);
+        setPaymentIntentId(response.paymentIntentId);
+      } catch (error: any) {
+        console.error("Error creating payment intent:", error);
+        // Error is already handled by the hook
+      }
+    };
+
+    createIntent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, paymentMethod, cartItems.length]);
+
+  const handlePaymentMethodChange = (method: "card" | "cash") => {
+    setPaymentMethod(method);
+  };
+
+  const handleCashPayment = async () => {
+    if (!address || !paymentIntentId) {
+      toast.error("Payment setup incomplete. Please try again.");
       return;
     }
 
-    if (cartItems.length === 0) {
-      toast.error("Your cart is empty");
-      navigate("/cart");
-      return;
-    }
-
-    setIsSubmitting(true);
     try {
-      // Convert cart items to order items
-      const orderItems = cartItemsToOrderItems(cartItems);
-
-      // Create order
-      const orderResponse = await orderService.createOrder({
-        items: orderItems,
+      await confirmPayment.mutateAsync({
+        paymentIntentId,
         shippingAddress: address,
-        paymentMethod: paymentData.method,
-      });
-
-      // Clear cart on success
-      dispatch(clearCart());
-
-      toast.success("Order placed successfully!");
-
-      // Navigate to confirmation page with order details
-      navigate("/order-confirmation", {
-        state: {
-          address,
-          payment: paymentData,
-          orderTotal: cartTotals.total,
-          orderId: orderResponse.data.orderId,
-        },
       });
     } catch (error: any) {
-      console.error("Error placing order:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to place order. Please try again.";
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+      // Error is already handled by the hook
+    }
+  };
+
+  const handleCardPaymentSuccess = async () => {
+    if (!address || !paymentIntentId) {
+      toast.error("Payment setup incomplete. Please try again.");
+      return;
+    }
+
+    try {
+      await confirmPayment.mutateAsync({
+        paymentIntentId,
+        shippingAddress: address,
+      });
+    } catch (error: any) {
+      // Error is already handled by the hook
     }
   };
 
@@ -154,10 +164,20 @@ const PaymentPage: React.FC = () => {
               {/* Payment Form - Left Side */}
               <div className="lg:col-span-2">
                 <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 lg:p-8">
-                  <PaymentForm
-                    onSubmit={handleSubmitPayment}
-                    isLoading={isSubmitting}
-                  />
+                  {clientSecret ? (
+                    <StripePaymentForm
+                      clientSecret={clientSecret}
+                      paymentMethod={paymentMethod}
+                      onPaymentMethodChange={handlePaymentMethodChange}
+                      onSubmit={handleCardPaymentSuccess}
+                      isLoading={confirmPayment.isPending || createPaymentIntent.isPending}
+                      onCashPayment={handleCashPayment}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center py-12">
+                      <p className="text-gray-600">Setting up payment...</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

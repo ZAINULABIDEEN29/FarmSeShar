@@ -5,3 +5,7 @@ export { default as ProductGridCard } from "./ProductGridCard";
 export { default as FilterSidebar } from "./FilterSidebar";
 export { default as Pagination } from "./Pagination";
 export { default as Breadcrumbs } from "./Breadcrumbs";
+export { default as ProductImageGallery } from "./ProductImageGallery";
+export { default as ProductInfo } from "./ProductInfo";
+export { default as ProductTabs } from "./ProductTabs";
+export { default as RelatedProductsSection } from "./RelatedProductsSection";

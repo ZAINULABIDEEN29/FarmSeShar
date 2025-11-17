@@ -1,4 +1,14 @@
 // Product Types
+export interface FarmerInfo {
+  _id: string;
+  fullName: {
+    firstName: string;
+    lastName: string;
+  };
+  farmName: string;
+  farmLocation: string;
+}
+
 export interface Product {
   _id: string;
   name: string;
@@ -10,9 +20,15 @@ export interface Product {
   image?: string;
   images?: string[];
   farmerId: string;
+  farmer?: FarmerInfo; // Farmer info for public products
   isAvailable: boolean;
   createdAt?: string;
   updatedAt?: string;
+  // Legacy fields for compatibility with existing components
+  sellerName?: string;
+  farmerImage?: string;
+  location?: string;
+  rating?: number;
 }
 
 export interface CreateProductInput {

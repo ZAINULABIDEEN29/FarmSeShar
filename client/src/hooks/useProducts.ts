@@ -5,6 +5,7 @@ import type {
   CreateProductInput,
   UpdateProductInput,
   ProductFilters,
+  Product,
 } from "@/types/product.types";
 
 // Query Keys
@@ -14,6 +15,11 @@ export const productKeys = {
   list: (filters?: ProductFilters) => [...productKeys.lists(), filters] as const,
   details: () => [...productKeys.all, "detail"] as const,
   detail: (id: string) => [...productKeys.details(), id] as const,
+  public: ["public-products"] as const,
+  publicLists: () => [...productKeys.public, "list"] as const,
+  publicList: (filters?: ProductFilters) => [...productKeys.publicLists(), filters] as const,
+  publicDetails: () => [...productKeys.public, "detail"] as const,
+  publicDetail: (id: string) => [...productKeys.publicDetails(), id] as const,
 };
 
 // Get all products for farmer
@@ -107,5 +113,71 @@ export const useToggleProductAvailability = () => {
       toast.error(errorMessage);
     },
   });
+};
+
+// Public product hooks (for customers browsing)
+export const useGetPublicProducts = (filters?: ProductFilters) => {
+  return useQuery({
+    queryKey: productKeys.publicList(filters),
+    queryFn: () => productService.getPublicProducts(filters),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+export const useGetPublicProduct = (productId: string, enabled = true) => {
+  return useQuery({
+    queryKey: productKeys.publicDetail(productId),
+    queryFn: () => productService.getPublicProductById(productId),
+    enabled: enabled && !!productId,
+  });
+};
+
+// Helper function to transform API product to match ProductGridCard format
+export const transformProductForCard = (product: Product): Product & { 
+  sellerName: string; 
+  rating: number;
+  location?: string;
+  farmerImage?: string;
+} => {
+  // If product already has all required legacy fields, return as is
+  if (product.sellerName && product.rating !== undefined) {
+    return {
+      ...product,
+      sellerName: product.sellerName,
+      rating: product.rating,
+      location: product.location || product.farmer?.farmLocation || "Unknown Location",
+      farmerImage: product.farmerImage || (product.farmer 
+        ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${product.farmer.fullName.firstName}${product.farmer.fullName.lastName}`
+        : undefined),
+    };
+  }
+
+  // Transform farmer info to legacy format
+  if (product.farmer) {
+    const firstName = product.farmer.fullName?.firstName || "";
+    const lastName = product.farmer.fullName?.lastName || "";
+    const sellerName = firstName && lastName 
+      ? `${firstName} ${lastName}`.trim()
+      : product.farmer.farmName || "Unknown Farmer";
+    
+    return {
+      ...product,
+      sellerName,
+      location: product.farmer.farmLocation || product.location || "Unknown Location",
+      farmerImage: product.farmerImage || (firstName || lastName
+        ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${firstName}${lastName}`
+        : undefined),
+      rating: product.rating || 4.5, // Default rating, can be enhanced later
+    };
+  }
+
+  // Fallback if no farmer info
+  return {
+    ...product,
+    sellerName: product.sellerName || "Unknown Farmer",
+    location: product.location || "Unknown Location",
+    rating: product.rating || 4.0,
+    farmerImage: product.farmerImage,
+  };
 };
 

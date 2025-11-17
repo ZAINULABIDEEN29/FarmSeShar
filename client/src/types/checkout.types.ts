@@ -7,6 +7,9 @@ export interface CheckoutAddress {
   postalCode: string;
 }
 
+// Alias for backend compatibility
+export type ShippingAddress = CheckoutAddress;
+
 export interface CheckoutFormData {
   address: CheckoutAddress;
 }

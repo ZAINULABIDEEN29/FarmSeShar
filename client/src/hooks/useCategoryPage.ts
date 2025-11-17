@@ -53,8 +53,13 @@ const SORT_FUNCTIONS: Record<string, (a: Product, b: Product) => number> = {
   "Name Z-A": (a, b) => b.name.localeCompare(a.name),
   "Price: Low to High": (a, b) => a.price - b.price,
   "Price: High to Low": (a, b) => b.price - a.price,
-  Popularity: (a, b) => b.rating - a.rating,
-  Newest: () => 0, // Keep original order for mock data
+  Popularity: (a, b) => (b.rating || 0) - (a.rating || 0),
+  Newest: (a, b) => {
+    // Sort by createdAt if available, otherwise keep original order
+    const dateA = (a as any).createdAt ? new Date((a as any).createdAt).getTime() : 0;
+    const dateB = (b as any).createdAt ? new Date((b as any).createdAt).getTime() : 0;
+    return dateB - dateA;
+  },
 };
 
 export const useCategoryPage = ({
@@ -64,7 +69,7 @@ export const useCategoryPage = ({
   const [sortBy, setSortBy] = useState("Name A-Z");
   const [category, setCategory] = useState("All Categories");
   const [priceRange, setPriceRange] = useState("Any Price");
-  const [quickFilters, setQuickFilters] = useState<string[]>(["Organic Only", "In Stock"]);
+  const [quickFilters, setQuickFilters] = useState<string[]>([]); // No filters active by default
   const [currentPage, setCurrentPage] = useState(1);
 
   const toggleQuickFilter = useCallback((filter: string) => {

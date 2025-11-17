@@ -24,6 +24,28 @@ export const productService = {
     return response.data.products || [];
   },
 
+  // Get public products (for customers browsing - no auth required)
+  getPublicProducts: async (filters?: ProductFilters): Promise<Product[]> => {
+    const params = new URLSearchParams();
+    if (filters?.category) params.append("category", filters.category);
+    if (filters?.minPrice) params.append("minPrice", filters.minPrice.toString());
+    if (filters?.maxPrice) params.append("maxPrice", filters.maxPrice.toString());
+    if (filters?.search) params.append("search", filters.search);
+
+    const queryString = params.toString();
+    const url = `/public/products${queryString ? `?${queryString}` : ""}`;
+    const response = await api.get<{ success: boolean; products: Product[] }>(url);
+    return response.data.products || [];
+  },
+
+  // Get a single public product by ID
+  getPublicProductById: async (productId: string): Promise<Product> => {
+    const response = await api.get<{ success: boolean; product: Product }>(
+      `/public/products/${productId}`
+    );
+    return response.data.product;
+  },
+
   // Get a single product by ID
   getProductById: async (productId: string): Promise<Product> => {
     const response = await api.get<{ success: boolean; product: Product }>(

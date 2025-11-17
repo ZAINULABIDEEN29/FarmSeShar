@@ -3,33 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type { CartItem, CartState } from "@/types/cart.types";
 
 const initialState: CartState = {
-  items: [
-    // Sample cart items for development
-    {
-      id: "1",
-      name: "Chaunsa Mangoes",
-      price: 250,
-      quantity: 1,
-      unit: "Kg",
-      category: "Fruits",
-    },
-    {
-      id: "2",
-      name: "Organic Tomatoes",
-      price: 80,
-      quantity: 1,
-      unit: "Kg",
-      category: "Vegetables",
-    },
-    {
-      id: "3",
-      name: "Mixed Fresh Herbs",
-      price: 50,
-      quantity: 1,
-      unit: "Bunch",
-      category: "Herbs",
-    },
-  ],
+  items: [], // Start with empty cart - will be synced from API
   discount: 5, // 5% discount
   promoCode: undefined,
   freeDeliveryThreshold: 3000,
@@ -39,6 +13,10 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    // Set entire cart from API (sync with backend)
+    setCart: (state, action: PayloadAction<CartItem[]>) => {
+      state.items = action.payload;
+    },
     addItem: (state, action: PayloadAction<CartItem>) => {
       const existingItem = state.items.find(
         (item) => item.id === action.payload.id
@@ -85,6 +63,7 @@ const cartSlice = createSlice({
 });
 
 export const {
+  setCart,
   addItem,
   removeItem,
   updateQuantity,

@@ -25,6 +25,7 @@ import VegetablesPage from './pages/VegetablesPage';
 import FruitsPage from './pages/FruitsPage';
 import DairyPage from './pages/DairyPage';
 import HerbsPage from './pages/HerbsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -143,6 +144,10 @@ const router = createBrowserRouter([
   {
     path: "/herbs",
     element: <HerbsPage />,
+  },
+  {
+    path: "/product/:productId",
+    element: <ProductDetailPage />,
   },
   {
     path: "*",
