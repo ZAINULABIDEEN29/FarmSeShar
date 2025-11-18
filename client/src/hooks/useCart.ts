@@ -1,8 +1,9 @@
+import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { cartService, type AddToCartInput, type UpdateCartItemInput } from "@/services/cart.service";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { clearCart as clearCartAction, setCart, removeItem, updateQuantity } from "@/store/slices/cartSlice";
+import { clearCart as clearCartAction, setCart } from "@/store/slices/cartSlice";
 import type { CartItem } from "@/types/cart.types";
 
 // Query Keys
@@ -149,4 +150,75 @@ export const useClearCart = () => {
     },
   });
 };
+
+/**
+ * Hook to restore cart state on app load
+ * Fetches cart from API and syncs to Redux store when user is authenticated
+ * Waits for auth restoration to complete before restoring cart
+ */
+export const useCartRestore = () => {
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, userType, isRestoring } = useAppSelector((state) => state.auth);
+  const isRestoredRef = React.useRef(false);
+  const lastAuthStateRef = React.useRef<{ isAuthenticated: boolean; userType: string | null }>({
+    isAuthenticated: false,
+    userType: null,
+  });
+
+  React.useEffect(() => {
+    // Reset restoration flag if auth state changed (user logged out/in)
+    const currentAuthState = { isAuthenticated, userType };
+    if (
+      lastAuthStateRef.current.isAuthenticated !== isAuthenticated ||
+      lastAuthStateRef.current.userType !== userType
+    ) {
+      isRestoredRef.current = false;
+      lastAuthStateRef.current = currentAuthState;
+    }
+
+    // Wait for auth restoration to complete
+    if (isRestoring) {
+      return;
+    }
+
+    // Only restore once per auth session and only for authenticated users
+    if (isRestoredRef.current || !isAuthenticated || userType !== "user") {
+      if (!isAuthenticated) {
+        // Clear cart if user is not authenticated
+        dispatch(setCart([]));
+      }
+      return;
+    }
+
+    const restoreCart = async () => {
+      isRestoredRef.current = true;
+      
+      try {
+        const cartData = await cartService.getCart();
+        
+        if (cartData?.items && cartData.items.length > 0) {
+          const cartItems: CartItem[] = cartData.items.map((item) => ({
+            id: item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            unit: item.unit,
+            image: item.image,
+          }));
+          dispatch(setCart(cartItems));
+        } else {
+          // Clear cart if API returns empty cart
+          dispatch(setCart([]));
+        }
+      } catch (error) {
+        // Silently fail - cart will be empty until user visits cart page
+        console.error("Failed to restore cart:", error);
+        dispatch(setCart([]));
+      }
+    };
+
+    restoreCart();
+  }, [isAuthenticated, userType, isRestoring, dispatch]);
+};
+
 

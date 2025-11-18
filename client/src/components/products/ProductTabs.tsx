@@ -20,6 +20,10 @@ interface ProductTabsProps {
   productDetails: {
     description: string;
     category: string;
+    type?: string;
+    tasteTexture?: string;
+    bestFor?: string;
+    shelfLife?: string;
   };
   reviews?: Review[];
   totalReviews?: number;
@@ -355,7 +359,9 @@ const ProductTabs: React.FC<ProductTabsProps> = ({
           <ul className="space-y-2.5 sm:space-y-3 text-sm sm:text-base text-[#83798E] list-disc pl-4 sm:pl-6">
             <li>
               <span className="font-bold text-[#83798E]">Type:</span>{" "}
-              <span className="font-regular text-[#83798E]">Fresh Seasonal {productDetails.category}</span>
+              <span className="font-regular text-[#83798E]">
+                {productDetails.type || `Fresh Seasonal ${productDetails.category}`}
+              </span>
             </li>
             <li>
               <span className="font-bold text-[#83798E]">Source:</span>{" "}
@@ -363,15 +369,21 @@ const ProductTabs: React.FC<ProductTabsProps> = ({
             </li>
             <li>
               <span className="font-bold text-[#83798E]">Taste & Texture:</span>{" "}
-              <span className="font-regular text-[#83798E]">Sweet, tender, and crisp</span>
+              <span className="font-regular text-[#83798E]">
+                {productDetails.tasteTexture || "Sweet, tender, and crisp"}
+              </span>
             </li>
             <li>
               <span className="font-bold text-[#83798E]">Best For:</span>{" "}
-              <span className="font-regular text-[#83798E]">Curries, pulao, salads, soups, and freezing</span>
+              <span className="font-regular text-[#83798E]">
+                {productDetails.bestFor || "Curries, pulao, salads, soups, and freezing"}
+              </span>
             </li>
             <li>
               <span className="font-bold text-[#83798E]">Shelf Life:</span>{" "}
-              <span className="font-regular text-[#83798E]">Stays fresh for 3-5 days when refrigerated</span>
+              <span className="font-regular text-[#83798E]">
+                {productDetails.shelfLife || "Stays fresh for 3-5 days when refrigerated"}
+              </span>
             </li>
           </ul>
         </div>

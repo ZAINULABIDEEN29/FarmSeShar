@@ -233,7 +233,7 @@ const ProductDetailPage: React.FC = () => {
   };
 
   const categoryContent = getCategorySpecificContent(product.category, product.name);
-  
+
   // Enhanced description for product details tab
   const enhancedDescription = categoryContent.description;
 
@@ -264,3 +264,77 @@ const ProductDetailPage: React.FC = () => {
             >
               {product.category}
             </button>
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <span className="text-gray-900 font-medium">{product.name}</span>
+          </nav>
+
+          {/* Product Details Section - Two Column Layout (1/3 and 2/3 split) */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 lg:gap-8 mb-12">
+            {/* Left: Product Images (1/3 width) */}
+            <div className="w-full">
+              <ProductImageGallery 
+                images={productImages} 
+                productName={product.name} 
+              />
+            </div>
+
+            {/* Right: Product Info (2/3 width) */}
+            <div className="w-full">
+              <ProductInfo
+                product={{
+                  _id: product._id,
+                  name: product.name,
+                  price: product.price,
+                  originalPrice: originalPrice > product.price ? originalPrice : undefined,
+                  discountPercentage: originalPrice > product.price ? discountPercentage : undefined,
+                  rating: product.rating || 4.5,
+                  description: product.description || categoryContent.description.split('.')[0] + '.',
+                  sellerName: transformedProduct.sellerName,
+                  farmerImage: transformedProduct.farmerImage,
+                  location: transformedProduct.location,
+                }}
+                selectedWeight={selectedWeight}
+                onWeightChange={setSelectedWeight}
+                quantity={quantity}
+                onQuantityChange={handleQuantityChange}
+                onQuantityInputChange={handleQuantityInputChange}
+                onAddToCart={handleAddToCart}
+                onCheckout={handleCheckout}
+                isAddingToCart={addToCart.isPending}
+              />
+            </div>
+          </div>
+
+          {/* Product Information Tabs */}
+          <div className="mb-12">
+            <ProductTabs
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              productDetails={{
+                description: enhancedDescription,
+                category: product.category,
+                type: categoryContent.type,
+                tasteTexture: categoryContent.tasteTexture,
+                bestFor: categoryContent.bestFor,
+                shelfLife: categoryContent.shelfLife,
+              }}
+              isAuthenticated={isAuthenticated}
+              productId={productId}
+            />
+          </div>
+
+          {/* Related Products Section */}
+            <RelatedProductsSection
+              products={filteredRelatedProducts}
+              onAddToCart={handleRelatedProductAddToCart}
+              isAuthenticated={isAuthenticated}
+            />
+        </Container>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default ProductDetailPage;

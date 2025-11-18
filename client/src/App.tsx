@@ -30,6 +30,7 @@ import NotFoundPage from './pages/NotFoundPage';
 
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
+import { useCartRestore } from './hooks/useCart';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 const router = createBrowserRouter([
@@ -160,6 +161,10 @@ const App:React.FC = () => {
   // Restore authentication state on app load (non-blocking)
   // This allows the app to render immediately, auth restoration happens in background
   useAuthRestore();
+  
+  // Restore cart state on app load (non-blocking)
+  // This fetches cart from API and syncs to Redux store when user is authenticated
+  useCartRestore();
 
   return (
     <ErrorBoundary
