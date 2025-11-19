@@ -8,8 +8,10 @@ interface AccountCartProps {
   onAccountClick?: () => void;
   onCartClick?: () => void;
   onLogout?: () => void;
+  onDashboardClick?: () => void;
   userName?: string;
   isLoggedIn?: boolean;
+  isFarmer?: boolean;
 }
 const AccountCart: React.FC<AccountCartProps> = ({
   cartCount = 0,
@@ -17,8 +19,10 @@ const AccountCart: React.FC<AccountCartProps> = ({
   onAccountClick,
   onCartClick,
   onLogout,
+  onDashboardClick,
   userName,
   isLoggedIn = false,
+  isFarmer = false,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const accountLabel = userName || "Account";
@@ -68,7 +72,9 @@ const AccountCart: React.FC<AccountCartProps> = ({
             isOpen={isDropdownOpen}
             onClose={() => setIsDropdownOpen(false)}
             onLogout={handleLogout}
+            onDashboardClick={onDashboardClick}
             userName={userName}
+            isFarmer={isFarmer}
           />
         )}
       </div>

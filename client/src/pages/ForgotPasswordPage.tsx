@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import FormField from "@/components/auth/FormField";
@@ -12,7 +11,7 @@ const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email address").required("Email is required"),
 });
 const ForgotPasswordPage: React.FC = () => {
-  const navigate = useNavigate();
+  
   const forgotPasswordMutation = useForgotPassword();
   const formik = useFormik({
     initialValues: {

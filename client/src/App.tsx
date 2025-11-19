@@ -26,6 +26,7 @@ import FruitsPage from './pages/FruitsPage';
 import DairyPage from './pages/DairyPage';
 import HerbsPage from './pages/HerbsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import SearchResultsPage from './pages/SearchResultsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
@@ -147,6 +148,10 @@ const router = createBrowserRouter([
   {
     path: "/product/:productId",
     element: <ProductDetailPage />,
+  },
+  {
+    path: "/search",
+    element: <SearchResultsPage />,
   },
   {
     path: "*",

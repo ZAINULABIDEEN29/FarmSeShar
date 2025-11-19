@@ -23,6 +23,11 @@ const LandingPage:React.FC = () => {
       const handleLogoClick = () => {
         navigate('/')
       }
+      const handleSearch = (searchQuery: string) => {
+        if (searchQuery.trim()) {
+          navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+        }
+      }
       const handleCategoryClick = (category: unknown) => {
         console.log('Category clicked:', category)
       }
@@ -39,6 +44,7 @@ const LandingPage:React.FC = () => {
       onAccountClick={handleAccountClick}
       onCartClick={handleCartClick}
       onLogoClick={handleLogoClick}
+      onSearch={handleSearch}
     />
     <main className="w-full flex-1">
       <HeroSection

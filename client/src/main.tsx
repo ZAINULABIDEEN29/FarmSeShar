@@ -9,10 +9,12 @@ import App from './App.tsx'
 import { store } from './store'
 import { queryClient } from './lib/react-query'
 import { PageLoader } from './components/common/Loader'
+import GlobalLoader from './components/common/GlobalLoader'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
+        <GlobalLoader />
         <Suspense fallback={<PageLoader message="Loading application..." />}>
           <App />
         </Suspense>

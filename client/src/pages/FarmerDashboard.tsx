@@ -8,6 +8,7 @@ import {
   CustomersSection,
   OrdersSection,
   ShipmentsSection,
+  AccountSettingsSection,
   HelpSection,
   type DashboardView,
 } from "@/components/dashboard";
@@ -177,6 +178,7 @@ const FarmerDashboard: React.FC = () => {
                 isLoading={isShipmentsLoading}
               />
             )}
+            {activeView === "settings" && <AccountSettingsSection />}
             {activeView === "help" && <HelpSection />}
           </div>
         </main>

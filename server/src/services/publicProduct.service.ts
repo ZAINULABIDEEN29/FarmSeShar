@@ -61,7 +61,7 @@ export const getPublicProductsService = async (
   const products = await Product.find(query)
     .populate({
       path: "farmerId",
-      select: "fullName farmName farmLocation",
+      select: "fullName farmName farmLocation profileImage",
       match: { isVerified: true },
     })
     .sort({ createdAt: -1 })
@@ -92,6 +92,7 @@ export const getPublicProductsService = async (
           fullName: product.farmerId.fullName || { firstName: "", lastName: "" },
           farmName: product.farmerId.farmName || "",
           farmLocation: product.farmerId.farmLocation || "",
+          profileImage: product.farmerId.profileImage || undefined,
         }
       : undefined;
     
@@ -103,9 +104,9 @@ export const getPublicProductsService = async (
     // Get location from farmer
     const location = farmer?.farmLocation || "Unknown Location";
     
-    // Generate farmer image URL (using dicebear or placeholder)
+    // Use farmer's actual profile image if available, otherwise generate with DiceBear
     const farmerImage = farmer
-      ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`
+      ? (farmer.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`)
       : undefined;
     
     // Get actual rating from reviews
@@ -147,7 +148,7 @@ export const getPublicProductByIdService = async (
   })
     .populate({
       path: "farmerId",
-      select: "fullName farmName farmLocation",
+      select: "fullName farmName farmLocation profileImage",
       match: { isVerified: true },
     })
     .lean();
@@ -164,6 +165,7 @@ export const getPublicProductByIdService = async (
         fullName: (product as any).farmerId.fullName || { firstName: "", lastName: "" },
         farmName: (product as any).farmerId.farmName || "",
         farmLocation: (product as any).farmerId.farmLocation || "",
+        profileImage: (product as any).farmerId.profileImage || undefined,
       }
     : undefined;
   
@@ -175,9 +177,9 @@ export const getPublicProductByIdService = async (
   // Get location from farmer
   const location = farmer?.farmLocation || "Unknown Location";
   
-  // Generate farmer image URL (using dicebear or placeholder)
+  // Use farmer's actual profile image if available, otherwise generate with DiceBear
   const farmerImage = farmer
-    ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`
+    ? (farmer.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`)
     : undefined;
   
   // Get actual rating from reviews

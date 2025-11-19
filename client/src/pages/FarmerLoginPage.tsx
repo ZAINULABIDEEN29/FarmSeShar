@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 import FormField from "@/components/auth/FormField";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ const validationSchema = Yup.object({
     .required("Password is required"),
 });
 const FarmerLoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const loginFarmerMutation = useLoginFarmer();
   const formik = useFormik({
@@ -46,6 +47,16 @@ const FarmerLoginPage: React.FC = () => {
               <div className="w-10 h-10 bg-gray-200 shrink-0" />
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
+          </div>
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="inline-flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Back to Home</span>
+            </button>
           </div>
           {}
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">

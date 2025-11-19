@@ -21,6 +21,7 @@ export interface IFARMER extends Document{
     verifyCodeExpire?:Date;
     resetPasswordToken?: string;
     resetPasswordExpire?: Date;
+    profileImage?: string;
     comparePassword:(password:string) => Promise<boolean>;
 }
 const farmerSchema:Schema<IFARMER> = new Schema({
@@ -119,6 +120,11 @@ const farmerSchema:Schema<IFARMER> = new Schema({
     resetPasswordExpire:{
         type:Date,
         default:null
+    },
+    profileImage:{
+        type:String,
+        default:null,
+        trim:true
     }
 },{timestamps:true})
 farmerSchema.pre("save", async function (next) {

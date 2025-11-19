@@ -1,18 +1,22 @@
 import React, { useRef, useEffect } from "react";
-import { LogOut } from "lucide-react";
+import { LogOut, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface AccountDropdownProps {
   isOpen: boolean;
   onClose: () => void;
   onLogout: () => void;
+  onDashboardClick?: () => void;
   userName?: string;
+  isFarmer?: boolean;
   className?: string;
 }
 const AccountDropdown: React.FC<AccountDropdownProps> = ({
   isOpen,
   onClose,
   onLogout,
+  onDashboardClick,
   userName,
+  isFarmer = false,
   className,
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -62,6 +66,21 @@ const AccountDropdown: React.FC<AccountDropdownProps> = ({
             {userName}
           </p>
         </div>
+      )}
+      {}
+      {isFarmer && onDashboardClick && (
+        <button
+          onClick={() => {
+            onDashboardClick();
+            onClose();
+          }}
+          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
+          role="menuitem"
+          aria-label="Dashboard"
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          <span>Dashboard</span>
+        </button>
       )}
       {}
       <button

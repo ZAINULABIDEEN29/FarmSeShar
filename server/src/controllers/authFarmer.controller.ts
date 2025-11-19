@@ -23,8 +23,10 @@ export const registerFarmer = asyncHandler(
             await farmer.save();
                const emailResponse = await sendVerificationEmail(email,fullName.firstName,verifyCode);
                if(!emailResponse.success){
-                throw new ApiError(400,emailResponse.message)
+                console.error("❌ Failed to resend verification email:", emailResponse.message);
+                throw new ApiError(500,emailResponse.message)
                }
+               console.log("✅ Verification email resent successfully to:", email);
                return res.status(200).json({
                 success:true,
                 message:"Verification code resent. Please verify your email."
@@ -48,14 +50,46 @@ export const registerFarmer = asyncHandler(
         })
      const emailResponse = await sendVerificationEmail(email,fullName.firstName,verifyCode)
      if(!emailResponse.success){
-        throw new ApiError(400,emailResponse.message)
+        console.error("❌ Failed to send verification email:", emailResponse.message);
+        throw new ApiError(500,emailResponse.message)
      }
+     console.log("✅ Verification email sent successfully to:", email);
      const {password:_,...farmerResponse} = farmerRegistered.toObject();
      res.status(201).json({
         success:true,
         message:"Farmer registered successfully. Please verify your email.",
         farmer:farmerResponse
      })
+    }
+)
+export const resendVerificationCodeForFarmer = asyncHandler(
+    async(req:Request, res:Response):Promise<any>=>{
+        const {email} = req.body;
+        if(!email){
+            throw new ApiError(400,"Email is required")
+        }
+        const farmerFound = await findFarmerByEmail(email,true);
+        if(!farmerFound){
+            throw new ApiError(404,"Farmer not found")
+        }
+        if(farmerFound.isVerified){
+            throw new ApiError(400,"Farmer is already verified")
+        }
+        const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const verifyCodeExpire = new Date(Date.now() + 3600000);
+        farmerFound.verifyCode = verifyCode;
+        farmerFound.verifyCodeExpire = verifyCodeExpire;
+        await farmerFound.save();
+        const emailResponse = await sendVerificationEmail(email,farmerFound.fullName.firstName,verifyCode);
+        if(!emailResponse.success){
+            console.error("❌ Failed to resend verification email:", emailResponse.message);
+            throw new ApiError(500,emailResponse.message)
+        }
+        console.log("✅ Verification code resent successfully to:", email);
+        return res.status(200).json({
+            success:true,
+            message:"Verification code resent. Please check your email."
+        })
     }
 )
 export const verifyCodeForFarmer = asyncHandler(

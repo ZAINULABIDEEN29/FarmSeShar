@@ -2,6 +2,7 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import config from "@/conf/conf";
 import { store } from "@/store";
 import { logout } from "@/store/slices/authSlice";
+import { showLoader, hideLoader } from "@/store/slices/loaderSlice";
 import { handleApiError, handleNetworkError, logError } from "@/utils/errorHandler";
 let isRestoringAuth = false;
 const getBaseURL = () => {
@@ -24,38 +25,58 @@ if (import.meta.env.DEV) {
 }
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    if (
+    // Don't show loader for auth restoration requests
+    const isAuthRestoreRequest =
       config.url?.includes("/users/me") ||
       config.url?.includes("/farmers/farmer") ||
       config.url?.includes("/users/refresh") ||
-      config.url?.includes("/farmers/refresh")
-    ) {
+      config.url?.includes("/farmers/refresh");
+
+    if (isAuthRestoreRequest) {
       isRestoringAuth = true;
+    } else {
+      // Show loader for all other requests
+      store.dispatch(showLoader());
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    // Hide loader on request error
+    store.dispatch(hideLoader());
+    return Promise.reject(error);
+  }
 );
 api.interceptors.response.use(
   (response) => {
-    if (
+    const isAuthRestoreRequest =
       response.config.url?.includes("/users/me") ||
       response.config.url?.includes("/farmers/farmer") ||
       response.config.url?.includes("/users/refresh") ||
-      response.config.url?.includes("/farmers/refresh")
-    ) {
+      response.config.url?.includes("/farmers/refresh");
+
+    if (isAuthRestoreRequest) {
       isRestoringAuth = false;
+    } else {
+      // Hide loader on successful response
+      store.dispatch(hideLoader());
     }
     return response;
   },
   async (error: AxiosError) => {
-    if (
+    const isAuthRestoreRequest =
       error.config?.url?.includes("/users/me") ||
       error.config?.url?.includes("/farmers/farmer") ||
       error.config?.url?.includes("/users/refresh") ||
-      error.config?.url?.includes("/farmers/refresh")
-    ) {
+      error.config?.url?.includes("/farmers/refresh");
+
+    if (isAuthRestoreRequest) {
       isRestoringAuth = false;
+    } else {
+      // Hide loader on error response (but not for retry attempts)
+      const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+      if (!originalRequest?._retry) {
+        store.dispatch(hideLoader());
+      }
     }
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
     const isAuthError = error.response?.status === 401 || error.response?.status === 403;
@@ -98,8 +119,10 @@ api.interceptors.response.use(
             ? await api.post<{ success: boolean }>("/farmers/refresh")
             : await api.post<{ success: boolean }>("/users/refresh");
           if (refreshResponse.data.success) {
+            // Retry the original request - loader will be managed by interceptors
             return api(originalRequest);
           } else {
+            store.dispatch(hideLoader());
             store.dispatch(logout());
             const redirectTo = currentPath.startsWith("/farmer") 
               ? "/farmer-login" 
@@ -110,6 +133,7 @@ api.interceptors.response.use(
             return Promise.reject(new Error("Refresh token invalid or expired"));
           }
         } catch (refreshError) {
+          store.dispatch(hideLoader());
           store.dispatch(logout());
           const redirectTo = currentPath.startsWith("/farmer") 
             ? "/farmer-login" 
@@ -125,6 +149,7 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
     if (!error.response) {
+      store.dispatch(hideLoader());
       logError(error, "Network Error");
       handleNetworkError(error);
       return Promise.reject(error);

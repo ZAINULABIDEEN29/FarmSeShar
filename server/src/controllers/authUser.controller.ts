@@ -27,8 +27,10 @@ export const registerUser = asyncHandler(
         verifyCode
       );
       if (!emailResponse.success) {
-        throw new ApiError(400, emailResponse.message);
+        console.error("❌ Failed to resend verification email:", emailResponse.message);
+        throw new ApiError(500, emailResponse.message);
       }
+      console.log("✅ Verification email resent successfully to:", email);
       return res.status(200).json({
         success: true,
         message: "Verification code resent. Please verify your email."
@@ -50,13 +52,49 @@ export const registerUser = asyncHandler(
       verifyCode
     );
     if (!emailResponse.success) {
-      throw new ApiError(400, emailResponse.message);
+      console.error("❌ Failed to send verification email:", emailResponse.message);
+      throw new ApiError(500, emailResponse.message);
     }
+    console.log("✅ Verification email sent successfully to:", email);
     const { password: _, ...userResponse } = user.toObject();
     return res.status(201).json({
       success: true,
       message: "User registered successfully. Please verify your email.",
       user: userResponse
+    });
+  }
+);
+export const resendVerificationCode = asyncHandler(
+  async (req: Request, res: Response): Promise<any> => {
+    const { email } = req.body;
+    if (!email) {
+      throw new ApiError(400, "Email is required");
+    }
+    const user = await findUserByEmail(email);
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    if (user.isVerified) {
+      throw new ApiError(400, "User is already verified");
+    }
+    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiryDate = new Date(Date.now() + 3600000);
+    user.verifyCode = verifyCode;
+    user.verifyCodeExpire = expiryDate;
+    await user.save();
+    const emailResponse = await sendVerificationEmail(
+      email,
+      user.fullName.firstName,
+      verifyCode
+    );
+    if (!emailResponse.success) {
+      console.error("❌ Failed to resend verification email:", emailResponse.message);
+      throw new ApiError(500, emailResponse.message);
+    }
+    console.log("✅ Verification code resent successfully to:", email);
+    return res.status(200).json({
+      success: true,
+      message: "Verification code resent. Please check your email.",
     });
   }
 );

@@ -84,7 +84,7 @@ export const useForgotPassword = () => {
     mutationFn: (data: ForgotPasswordInput) => userService.forgotPassword(data),
     onSuccess: (response) => {
       toast.success(response.message || "Password reset link sent to your email.");
-      navigate("/set-password");
+      navigate("/reset-password");
     },
     onError: (error: any) => {
       const errorMessage =

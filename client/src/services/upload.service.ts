@@ -22,9 +22,12 @@ export const uploadService = {
   /**
    * Upload a single image
    */
-  uploadImage: async (file: File): Promise<UploadImageResponse> => {
+  uploadImage: async (file: File, folder?: string): Promise<UploadImageResponse> => {
     const formData = new FormData();
     formData.append("image", file);
+    if (folder) {
+      formData.append("folder", folder);
+    }
 
     const response = await api.post<UploadImageResponse>("/upload/image", formData, {
       headers: {

@@ -9,6 +9,8 @@ import type {
   LoginFarmerResponse,
   GetFarmerResponse,
   Farmer,
+  UpdateFarmerProfileInput,
+  UpdateFarmerProfileResponse,
 } from "@/types/farmer.types";
 export const farmerService = {
   register: async (data: RegisterFarmerInput): Promise<RegisterFarmerResponse> => {
@@ -56,6 +58,10 @@ export const farmerService = {
   },
   logout: async (): Promise<{ success: boolean; message: string }> => {
     const response = await api.get<{ success: boolean; message: string }>("/farmers/logout");
+    return response.data;
+  },
+  updateProfile: async (data: UpdateFarmerProfileInput): Promise<UpdateFarmerProfileResponse> => {
+    const response = await api.put<UpdateFarmerProfileResponse>("/farmers/profile", data);
     return response.data;
   },
 };

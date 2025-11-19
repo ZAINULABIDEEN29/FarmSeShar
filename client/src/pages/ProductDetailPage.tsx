@@ -43,7 +43,15 @@ const ProductDetailPage: React.FC = () => {
     return products
       .filter((p) => p._id !== productId)
       .slice(0, 4)
-      .map(transformProductForCard);
+      .map((p) => {
+        const transformed = transformProductForCard(p);
+        return {
+          ...transformed,
+          sellerName: transformed.sellerName || transformed.farmer?.farmName || "Unknown Farmer",
+          rating: transformed.rating || 4.5,
+          unit: transformed.unit || "piece",
+        };
+      });
   }, [relatedProducts, allProducts, productId]);
   const originalPrice = transformedProduct ? Math.round(transformedProduct.price * 1.43) : 0;
   const discountPercentage = 30;
@@ -246,9 +254,9 @@ const ProductDetailPage: React.FC = () => {
                   discountPercentage: originalPrice > product.price ? discountPercentage : undefined,
                   rating: product.rating || 4.5,
                   description: product.description || categoryContent.description.split('.')[0] + '.',
-                  sellerName: transformedProduct.sellerName,
-                  farmerImage: transformedProduct.farmerImage,
-                  location: transformedProduct.location,
+                  sellerName: transformedProduct?.sellerName || product.farmer?.farmName || "Unknown Farmer",
+                  farmerImage: transformedProduct?.farmerImage,
+                  location: transformedProduct?.location,
                 }}
                 selectedWeight={selectedWeight}
                 onWeightChange={setSelectedWeight}

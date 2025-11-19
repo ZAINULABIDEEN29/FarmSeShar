@@ -27,6 +27,7 @@ const validationSchema = Yup.object({
 });
 const FarmerRegistrationPage: React.FC = () => {
   const navigate = useNavigate();
+  
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -56,10 +57,13 @@ const FarmerRegistrationPage: React.FC = () => {
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
         <div className="max-w-sm w-full mx-auto lg:mx-0">
-          <div className="mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-200 shrink-0" />
-              <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
+          <div className="mb-4 lg:mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-200 shrink-0" />
+                <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
+              </div>
+            
             </div>
           </div>
           <StepIndicator currentStep={1} totalSteps={3} backTo="/" />

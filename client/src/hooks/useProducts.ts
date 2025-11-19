@@ -1,153 +1,131 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productService } from "@/services/product.service";
-import type {
-  CreateProductInput,
-  UpdateProductInput,
-  ProductFilters,
-  Product,
-} from "@/types/product.types";
+import type { ProductFilters, Product, CreateProductInput, UpdateProductInput } from "@/types/product.types";
+import { toast } from "react-toastify";
+
 export const productKeys = {
   all: ["products"] as const,
-  lists: () => [...productKeys.all, "list"] as const,
-  list: (filters?: ProductFilters) => [...productKeys.lists(), filters] as const,
-  details: () => [...productKeys.all, "detail"] as const,
-  detail: (id: string) => [...productKeys.details(), id] as const,
-  public: ["public-products"] as const,
-  publicLists: () => [...productKeys.public, "list"] as const,
-  publicList: (filters?: ProductFilters) => [...productKeys.publicLists(), filters] as const,
-  publicDetails: () => [...productKeys.public, "detail"] as const,
-  publicDetail: (id: string) => [...productKeys.publicDetails(), id] as const,
+  my: (filters?: ProductFilters) => [...productKeys.all, "my", filters] as const,
+  public: (filters?: ProductFilters) => [...productKeys.all, "public", filters] as const,
+  search: (query: string) => [...productKeys.all, "search", query] as const,
+  category: (category: string) => [...productKeys.all, "category", category] as const,
+  detail: (id: string) => [...productKeys.all, "detail", id] as const,
 };
-export const useGetMyProducts = (filters?: ProductFilters) => {
+
+// Alias exports for backward compatibility
+export const useGetPublicProducts = (filters?: ProductFilters) => usePublicProducts(filters);
+export const useGetPublicProduct = (productId: string) => useProductById(productId);
+export const useGetMyProducts = (filters?: ProductFilters) => useMyProducts(filters);
+
+// Public product hooks
+export const usePublicProducts = (filters?: ProductFilters) => {
   return useQuery({
-    queryKey: productKeys.list(filters),
-    queryFn: () => productService.getMyProducts(filters),
-    staleTime: 2 * 60 * 1000,
+    queryKey: productKeys.public(filters),
+    queryFn: () => productService.getPublicProducts(filters),
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
-export const useGetProduct = (productId: string, enabled = true) => {
+
+export const useSearchProducts = (query: string) => {
+  return useQuery({
+    queryKey: productKeys.search(query),
+    queryFn: () => productService.getPublicProducts({ search: query }),
+    enabled: query.trim().length > 0,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  });
+};
+
+export const useProductByCategory = (category: string) => {
+  return useQuery({
+    queryKey: productKeys.category(category),
+    queryFn: () => productService.getPublicProducts({ category }),
+    enabled: !!category,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+export const useProductById = (productId: string) => {
   return useQuery({
     queryKey: productKeys.detail(productId),
-    queryFn: () => productService.getProductById(productId),
-    enabled: enabled && !!productId,
+    queryFn: () => productService.getPublicProductById(productId),
+    enabled: !!productId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
+
+// Farmer product hooks
+export const useMyProducts = (filters?: ProductFilters) => {
+  return useQuery({
+    queryKey: productKeys.my(filters),
+    queryFn: () => productService.getMyProducts(filters),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+// Product mutations
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateProductInput) => productService.createProduct(data),
-    onSuccess: (response) => {
-      toast.success(response.message || "Product created successfully!");
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+      toast.success("Product created successfully!");
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Failed to create product.";
-      toast.error(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to create product");
     },
   });
 };
+
 export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ productId, data }: { productId: string; data: UpdateProductInput }) =>
       productService.updateProduct(productId, data),
-    onSuccess: (response, variables) => {
-      toast.success(response.message || "Product updated successfully!");
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
       queryClient.invalidateQueries({ queryKey: productKeys.detail(variables.productId) });
+      toast.success("Product updated successfully!");
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Failed to update product.";
-      toast.error(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to update product");
     },
   });
 };
+
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (productId: string) => productService.deleteProduct(productId),
-    onSuccess: (response) => {
-      toast.success(response.message || "Product deleted successfully!");
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
+      toast.success("Product deleted successfully!");
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Failed to delete product.";
-      toast.error(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to delete product");
     },
   });
 };
+
 export const useToggleProductAvailability = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (productId: string) => productService.toggleAvailability(productId),
-    onSuccess: (response, productId) => {
-      toast.success(response.message || "Product availability updated!");
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    onSuccess: (_, productId) => {
+      queryClient.invalidateQueries({ queryKey: productKeys.all });
       queryClient.invalidateQueries({ queryKey: productKeys.detail(productId) });
+      toast.success("Product availability updated!");
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Failed to update availability.";
-      toast.error(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to update product availability");
     },
   });
 };
-export const useGetPublicProducts = (filters?: ProductFilters) => {
-  return useQuery({
-    queryKey: productKeys.publicList(filters),
-    queryFn: () => productService.getPublicProducts(filters),
-    staleTime: 2 * 60 * 1000,
-  });
-};
-export const useGetPublicProduct = (productId: string, enabled = true) => {
-  return useQuery({
-    queryKey: productKeys.publicDetail(productId),
-    queryFn: () => productService.getPublicProductById(productId),
-    enabled: enabled && !!productId,
-  });
-};
-export const transformProductForCard = (product: Product): Product & { 
-  sellerName: string; 
-  rating: number;
-  location?: string;
-  farmerImage?: string;
-} => {
-  if (product.sellerName && product.rating !== undefined) {
-    return {
-      ...product,
-      sellerName: product.sellerName,
-      rating: product.rating,
-      location: product.location || product.farmer?.farmLocation || "Unknown Location",
-      farmerImage: product.farmerImage || (product.farmer 
-        ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${product.farmer.fullName.firstName}${product.farmer.fullName.lastName}`
-        : undefined),
-    };
-  }
-  if (product.farmer) {
-    const firstName = product.farmer.fullName?.firstName || "";
-    const lastName = product.farmer.fullName?.lastName || "";
-    const sellerName = firstName && lastName 
-      ? `${firstName} ${lastName}`.trim()
-      : product.farmer.farmName || "Unknown Farmer";
-    return {
-      ...product,
-      sellerName,
-      location: product.farmer.farmLocation || product.location || "Unknown Location",
-      farmerImage: product.farmerImage || (firstName || lastName
-        ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${firstName}${lastName}`
-        : undefined),
-      rating: product.rating || 4.5,
-    };
-  }
-  return {
-    ...product,
-    sellerName: product.sellerName || "Unknown Farmer",
-    location: product.location || "Unknown Location",
-    rating: product.rating || 4.0,
-    farmerImage: product.farmerImage,
-  };
+
+// Transform function for product cards
+// Since the backend already returns products with sellerName, location, farmerImage, and rating,
+// we just return the product as-is
+export const transformProductForCard = (product: Product): Product => {
+  // The backend already provides all necessary fields, so we just return it
+  return product;
 };

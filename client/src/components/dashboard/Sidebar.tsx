@@ -6,9 +6,10 @@ import {
   ShoppingCart,
   Truck,
   HelpCircle,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-export type DashboardView = "overview" | "products" | "customers" | "orders" | "shipments" | "help";
+export type DashboardView = "overview" | "products" | "customers" | "orders" | "shipments" | "settings" | "help";
 interface SidebarProps {
   activeView: DashboardView;
   onViewChange: (view: DashboardView) => void;
@@ -44,6 +45,11 @@ const menuItems: MenuItem[] = [
     id: "shipments",
     label: "Shipments",
     icon: <Truck className="h-5 w-5" />,
+  },
+  {
+    id: "settings",
+    label: "Account Settings",
+    icon: <Settings className="h-5 w-5" />,
   },
   {
     id: "help",

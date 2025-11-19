@@ -14,6 +14,7 @@ export interface Farmer {
   accountHolderName: string;
   bankAccountNumber: string;
   isVerified: boolean;
+  profileImage?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -56,5 +57,21 @@ export interface LoginFarmerResponse {
 }
 export interface GetFarmerResponse {
   success: boolean;
+  farmer: Farmer;
+}
+export interface UpdateFarmerProfileInput {
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  farmName?: string;
+  farmLocation?: string;
+  farmDescription?: string;
+  accountHolderName?: string;
+  bankAccountNumber?: string;
+  profileImage?: string;
+}
+export interface UpdateFarmerProfileResponse {
+  success: boolean;
+  message: string;
   farmer: Farmer;
 }

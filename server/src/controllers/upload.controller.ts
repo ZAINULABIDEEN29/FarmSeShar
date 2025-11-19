@@ -15,7 +15,11 @@ export const uploadSingleImage = asyncHandler(
     // Convert buffer to base64
     const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
 
-    const result = await uploadImage(base64Image);
+    // Use farmers-app/profile folder for profile images, otherwise products
+    const folder = req.body?.folder === "profile" 
+      ? "farmers-app/profile" 
+      : "farmers-app/products";
+    const result = await uploadImage(base64Image, folder);
 
     return res.status(200).json({
       success: true,
