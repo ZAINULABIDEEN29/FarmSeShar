@@ -9,7 +9,6 @@ import App from './App.tsx'
 import { store } from './store'
 import { queryClient } from './lib/react-query'
 import { PageLoader } from './components/common/Loader'
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>

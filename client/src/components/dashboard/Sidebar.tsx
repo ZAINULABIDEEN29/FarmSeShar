@@ -8,21 +8,17 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 export type DashboardView = "overview" | "products" | "customers" | "orders" | "shipments" | "help";
-
 interface SidebarProps {
   activeView: DashboardView;
   onViewChange: (view: DashboardView) => void;
   className?: string;
 }
-
 interface MenuItem {
   id: DashboardView;
   label: string;
   icon: React.ReactNode;
 }
-
 const menuItems: MenuItem[] = [
   {
     id: "overview",
@@ -55,7 +51,6 @@ const menuItems: MenuItem[] = [
     icon: <HelpCircle className="h-5 w-5" />,
   },
 ];
-
 const Sidebar: React.FC<SidebarProps> = ({
   activeView,
   onViewChange,
@@ -64,13 +59,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 z-40 overflow-y-auto",
-        "lg:static lg:h-screen lg:z-auto",
+        " fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 z-40 overflow-y-auto",
+        "lg:sticky lg:h-screen lg:z-auto",
         className
       )}
     >
-      <div className="h-full flex flex-col">
-        {/* Sidebar Header (Optional - can add logo/branding here) */}
+      <div className="h-full  flex flex-col">
+        {}
         <div className="p-6 border-b border-gray-200 hidden lg:block">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
@@ -81,8 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Navigation Menu */}
+        {}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => (
             <button
@@ -113,6 +107,4 @@ const Sidebar: React.FC<SidebarProps> = ({
     </aside>
   );
 };
-
 export default Sidebar;
-

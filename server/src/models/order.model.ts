@@ -1,8 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-
 export type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
 export type PaymentMethod = "card" | "cash";
-
 export interface IOrderItem {
   productId: mongoose.Types.ObjectId;
   productName: string;
@@ -11,7 +9,6 @@ export interface IOrderItem {
   price: number;
   total: number;
 }
-
 export interface IShippingAddress {
   streetAddress: string;
   houseNo: string;
@@ -20,21 +17,19 @@ export interface IShippingAddress {
   country: string;
   postalCode: string;
 }
-
 export interface IORDER extends Document {
   _id: mongoose.Types.ObjectId;
-  orderId: string; // Display ID (e.g., "ORD-001")
+  orderId: string;
   customerId: mongoose.Types.ObjectId;
   items: IOrderItem[];
   totalAmount: number;
   status: OrderStatus;
   shippingAddress: IShippingAddress;
   paymentMethod: PaymentMethod;
-  farmerId?: mongoose.Types.ObjectId; // For filtering orders by farmer's products
+  farmerId?: mongoose.Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 const orderItemSchema = new Schema<IOrderItem>({
   productId: {
     type: Schema.Types.ObjectId,
@@ -67,7 +62,6 @@ const orderItemSchema = new Schema<IOrderItem>({
     min: [0, "Total cannot be negative"],
   },
 }, { _id: false });
-
 const shippingAddressSchema = new Schema<IShippingAddress>({
   streetAddress: {
     type: String,
@@ -100,7 +94,6 @@ const shippingAddressSchema = new Schema<IShippingAddress>({
     trim: true,
   },
 }, { _id: false });
-
 const orderSchema: Schema<IORDER> = new Schema(
   {
     orderId: {
@@ -151,32 +144,23 @@ const orderSchema: Schema<IORDER> = new Schema(
   },
   { timestamps: true }
 );
-
-// Indexes for efficient queries
 orderSchema.index({ customerId: 1 });
 orderSchema.index({ farmerId: 1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ orderId: 1 });
 orderSchema.index({ createdAt: -1 });
-
 const Order = mongoose.model<IORDER>("Order", orderSchema);
-
-// Generate orderId before saving (only for new documents)
 orderSchema.pre("save", async function (next) {
   if (this.isNew) {
-    // If orderId starts with TEMP-, replace it with a proper order ID
     if (!this.orderId || this.orderId.startsWith("TEMP-")) {
       try {
         const count = await Order.countDocuments();
         this.orderId = `ORD-${String(count + 1).padStart(6, "0")}`;
       } catch (error) {
-        // Fallback to timestamp-based ID if count fails
         this.orderId = `ORD-${Date.now().toString().slice(-6)}`;
       }
     }
   }
   next();
 });
-
 export default Order;
-

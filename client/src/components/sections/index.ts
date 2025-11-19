@@ -4,4 +4,3 @@ export { default as FeaturedProductsSection } from "./FeaturedProductsSection";
 export { default as WhyChooseUsSection } from "./WhyChooseUsSection";
 export type { Category } from "./ShopByCategorySection";
 export type { Product } from "./FeaturedProductsSection";
-

@@ -9,7 +9,6 @@ import SocialLoginButton from "@/components/auth/SocialLoginButton";
 import Divider from "@/components/auth/Divider";
 import StepIndicator from "@/components/auth/StepIndicator";
 import { storage } from "@/utils/storage";
-
 const validationSchema = Yup.object({
   firstName: Yup.string()
     .min(2, "First name must be at least 2 characters")
@@ -26,10 +25,8 @@ const validationSchema = Yup.object({
     .length(13, "CNIC must be exactly 13 digits"),
   agreeToTerms: Yup.boolean().oneOf([true], "You must agree to the terms and conditions"),
 });
-
 const FarmerRegistrationPage: React.FC = () => {
   const navigate = useNavigate();
-
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -52,11 +49,9 @@ const FarmerRegistrationPage: React.FC = () => {
       navigate("/farm-details");
     },
   });
-
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
     console.log(`Sign up with ${provider}`);
   };
-
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
@@ -67,16 +62,13 @@ const FarmerRegistrationPage: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
           <StepIndicator currentStep={1} totalSteps={3} backTo="/" />
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Join as a Farmer
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             Register to sell your organic products directly to consumers
           </p>
-
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -110,7 +102,6 @@ const FarmerRegistrationPage: React.FC = () => {
                 )}
               </div>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <FormField
@@ -143,7 +134,6 @@ const FarmerRegistrationPage: React.FC = () => {
                 )}
               </div>
             </div>
-
             <div>
               <FormField
                 label="CNIC"
@@ -159,7 +149,6 @@ const FarmerRegistrationPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.cnic}</p>
               )}
             </div>
-
             <div className="flex items-start gap-2">
               <Checkbox
                 id="agreeToTerms"
@@ -181,7 +170,6 @@ const FarmerRegistrationPage: React.FC = () => {
             {formik.touched.agreeToTerms && formik.errors.agreeToTerms && (
               <p className="text-sm text-red-600">{formik.errors.agreeToTerms}</p>
             )}
-
             <Button
               type="submit"
               className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-base"
@@ -189,7 +177,6 @@ const FarmerRegistrationPage: React.FC = () => {
               Next
             </Button>
           </form>
-
           <div className="mt-6 text-center">
             <span className="text-sm text-gray-600">
               Already have an account?{" "}
@@ -201,9 +188,7 @@ const FarmerRegistrationPage: React.FC = () => {
               </Link>
             </span>
           </div>
-
           <Divider text="Or Sign up with" className="my-8" />
-
           <div className="grid grid-cols-3 gap-4">
             <SocialLoginButton
               provider="facebook"
@@ -220,12 +205,10 @@ const FarmerRegistrationPage: React.FC = () => {
           </div>
         </div>
       </div>
-
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default FarmerRegistrationPage;

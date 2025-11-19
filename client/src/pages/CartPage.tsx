@@ -16,7 +16,6 @@ import { useGetCart, useUpdateCartItem, useRemoveFromCart } from "@/hooks/useCar
 import { ShoppingBag } from "lucide-react";
 import { toast } from "react-toastify";
 import Loader from "@/components/common/Loader";
-
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -26,13 +25,9 @@ const CartPage: React.FC = () => {
   const discountPercentage = useAppSelector((state) => state.cart.discount);
   const promoCode = useAppSelector((state) => state.cart.promoCode);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
-
-  // Fetch cart from API if user is authenticated
   const { data: cartData, isLoading: isLoadingCart } = useGetCart();
   const updateCartItem = useUpdateCartItem();
   const removeFromCart = useRemoveFromCart();
-
-  // Sync cart from API to Redux store
   useEffect(() => {
     if (isAuthenticated && cartData?.items) {
       const cartItems = cartData.items.map((item) => ({
@@ -45,78 +40,62 @@ const CartPage: React.FC = () => {
       }));
       dispatch(setCart(cartItems));
     } else if (!isAuthenticated) {
-      // Clear cart if user is not authenticated
       dispatch(setCart([]));
     }
   }, [cartData, isAuthenticated, dispatch]);
-
   const handleUpdateQuantity = (id: string, quantity: number) => {
     if (!isAuthenticated) {
       toast.error("Please login to update cart");
       navigate("/login", { state: { from: "/cart" } });
       return;
     }
-
     if (quantity <= 0) {
       handleRemoveItem(id);
       return;
     }
-
     updateCartItem.mutate(
       { productId: id, data: { quantity } },
       {
         onError: () => {
-          // Error is handled in the hook
         },
       }
     );
   };
-
   const handleRemoveItem = (id: string) => {
     if (!isAuthenticated) {
       toast.error("Please login to remove items from cart");
       navigate("/login", { state: { from: "/cart" } });
       return;
     }
-
     removeFromCart.mutate(id, {
       onError: () => {
-        // Error is handled in the hook
       },
     });
   };
-
   const handleApplyPromoCode = (code: string) => {
     dispatch(applyPromoCode(code));
   };
-
   const handleCheckout = () => {
     if (!isAuthenticated) {
       toast.error("Please login to continue with checkout");
       navigate("/login", { state: { from: "/cart" } });
       return;
     }
-
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       return;
     }
-
     navigate("/checkout");
   };
-
   const handleLogoClick = () => {
     navigate("/");
   };
-
   const handleAccountClick = () => {
     navigate("/login");
   };
-
   const handleCartClick = () => {
     navigate("/cart");
   };
-
   return (
     <div className="w-full flex flex-col min-h-screen bg-white">
       <Header
@@ -125,7 +104,6 @@ const CartPage: React.FC = () => {
         onCartClick={handleCartClick}
         onLogoClick={handleLogoClick}
       />
-
       <main className="flex-1 py-8 sm:py-12 bg-white">
         <Container>
           <div className="mb-6 sm:mb-8">
@@ -133,7 +111,6 @@ const CartPage: React.FC = () => {
               Your Cart
             </h1>
           </div>
-
           {isLoadingCart && isAuthenticated ? (
             <div className="flex justify-center items-center py-12">
               <Loader />
@@ -158,7 +135,7 @@ const CartPage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-              {/* Cart Items */}
+              {}
               <div className="lg:col-span-2 space-y-4">
                 {cartItems.map((item) => (
                   <CartItem
@@ -169,8 +146,7 @@ const CartPage: React.FC = () => {
                   />
                 ))}
               </div>
-
-              {/* Order Summary */}
+              {}
               <div className="lg:col-span-1">
                 <OrderSummary
                   subtotal={cartTotals.subtotal}
@@ -187,11 +163,8 @@ const CartPage: React.FC = () => {
           )}
         </Container>
       </main>
-
       <Footer />
     </div>
   );
 };
-
 export default CartPage;
-

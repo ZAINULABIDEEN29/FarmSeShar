@@ -3,13 +3,12 @@ import { Search, Calendar, DollarSign, Package } from "lucide-react";
 import type { Order, OrderStatus } from "@/types/dashboard.types";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-
+import { useUpdateOrderStatus } from "@/hooks/useOrders";
 interface OrdersSectionProps {
   orders: Order[];
   isLoading?: boolean;
   className?: string;
 }
-
 const OrdersSection: React.FC<OrdersSectionProps> = ({
   orders,
   isLoading = false,
@@ -17,7 +16,8 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
-
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const updateOrderStatus = useUpdateOrderStatus();
   const getStatusColor = (status: OrderStatus): string => {
     const colors: Record<OrderStatus, string> = {
       pending: "bg-yellow-100 text-yellow-800",
@@ -29,7 +29,6 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
     };
     return colors[status] || "bg-gray-100 text-gray-800";
   };
-
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -37,7 +36,6 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
     const matchesStatus = statusFilter === "all" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -48,6 +46,26 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
     });
   };
 
+  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    setUpdatingOrderId(orderId);
+    try {
+      await updateOrderStatus.mutateAsync({ orderId, status: newStatus });
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
+  const getNextStatuses = (currentStatus: OrderStatus): OrderStatus[] => {
+    const statusFlow: Record<OrderStatus, OrderStatus[]> = {
+      pending: ["confirmed", "cancelled"],
+      confirmed: ["processing", "cancelled"],
+      processing: ["shipped", "cancelled"],
+      shipped: ["delivered"],
+      delivered: [],
+      cancelled: [],
+    };
+    return statusFlow[currentStatus] || [];
+  };
   if (isLoading) {
     return (
       <div className={cn("flex items-center justify-center py-12", className)}>
@@ -58,7 +76,6 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
       </div>
     );
   }
-
   return (
     <div className={cn("space-y-6", className)}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -67,8 +84,7 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
           <p className="text-gray-600 mt-1">View and manage all customer orders</p>
         </div>
       </div>
-
-      {/* Filters */}
+      {}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
@@ -96,8 +112,7 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
           </select>
         </div>
       </div>
-
-      {/* Orders Table */}
+      {}
       {filteredOrders.length === 0 ? (
         <div className="bg-white p-8 sm:p-12 rounded-lg shadow-sm border border-gray-200 text-center">
           <Package className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-4" />
@@ -164,9 +179,26 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
                       </div>
                     </td>
                     <td className="px-3 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
-                      <Badge className={cn("capitalize text-xs", getStatusColor(order.status))}>
-                        {order.status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className={cn("capitalize text-xs", getStatusColor(order.status))}>
+                          {order.status}
+                        </Badge>
+                        {getNextStatuses(order.status).length > 0 && (
+                          <select
+                            value={order.status}
+                            onChange={(e) => handleStatusChange(order._id, e.target.value as OrderStatus)}
+                            disabled={updatingOrderId === order._id || updateOrderStatus.isPending}
+                            className="text-xs px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option value={order.status}>{order.status}</option>
+                            {getNextStatuses(order.status).map((status) => (
+                              <option key={status} value={status}>
+                                {status}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 sm:px-4 py-3 sm:py-4 whitespace-nowrap">
                       <div className="text-xs sm:text-sm text-gray-500 flex items-center gap-1">
@@ -190,6 +222,4 @@ const OrdersSection: React.FC<OrdersSectionProps> = ({
     </div>
   );
 };
-
 export default OrdersSection;
-

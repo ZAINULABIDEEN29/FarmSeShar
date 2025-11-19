@@ -6,4 +6,3 @@ export { default as FooterContact } from "./FooterContact";
 export { default as FooterCopyright } from "./FooterCopyright";
 export type { FooterLink } from "./FooterLinks";
 export type { ContactItem } from "./FooterContact";
-

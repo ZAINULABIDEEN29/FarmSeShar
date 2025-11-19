@@ -21,46 +21,33 @@ import {
   useDashboardShipments,
 } from "@/hooks/useDashboard";
 import { cn } from "@/lib/utils";
-
+import { useNavigate } from "react-router-dom";
 const FarmerDashboard: React.FC = () => {
   const farmer = useAppSelector((state) => state.auth.farmer);
   const [activeView, setActiveView] = useState<DashboardView>("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const navigate = useNavigate();
   const logoutMutation = useLogoutFarmer();
-
-  // Get products for stats
   const { data: products = [] } = useGetMyProducts();
-
-  // Get dashboard statistics
   const { data: statsData, isLoading: isStatsLoading } = useDashboardStats();
-
-  // Get customers (only when customers view is active)
   const { data: customersData, isLoading: isCustomersLoading } = useDashboardCustomers(
     undefined,
     { enabled: activeView === "customers" }
   );
-
-  // Get orders (only when orders view is active)
   const { data: ordersData, isLoading: isOrdersLoading } = useDashboardOrders(
     undefined,
     { enabled: activeView === "orders" }
   );
-
-  // Get shipments (only when shipments view is active)
   const { data: shipmentsData, isLoading: isShipmentsLoading } = useDashboardShipments(
     undefined,
     { enabled: activeView === "shipments" }
   );
-
-  // Compute stats from API data and products
   const stats = useMemo(() => {
     const totalProducts = products.length;
     const availableProducts = statsData?.availableProducts || 0;
     const totalOrders = statsData?.totalOrders || 0;
     const pendingShipments = statsData?.pendingShipments || 0;
     const totalCustomers = statsData?.totalCustomers || 0;
-
     return {
       totalProducts,
       availableProducts,
@@ -69,34 +56,28 @@ const FarmerDashboard: React.FC = () => {
       totalCustomers,
     };
   }, [products, statsData]);
-
   const handleLogout = useCallback(() => {
     logoutMutation.mutate();
   }, [logoutMutation]);
-
   const handleViewChange = useCallback((view: DashboardView) => {
     setActiveView(view);
-    // Close sidebar on mobile when selecting a view
     if (window.innerWidth < 1024) {
       setIsSidebarOpen(false);
     }
   }, []);
-
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);
   }, []);
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
-      {/* Mobile Sidebar Overlay */}
+      {}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-transparent bg-opacity-10 z-30 lg:hidden transition-opacity duration-300"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
-
-      {/* Sidebar */}
+      {}
       <Sidebar
         activeView={activeView}
         onViewChange={handleViewChange}
@@ -106,10 +87,9 @@ const FarmerDashboard: React.FC = () => {
           "lg:translate-x-0"
         )}
       />
-
-      {/* Main Content Area */}
+      {}
       <div className="flex-1 flex flex-col ">
-        {/* Header */}
+        {}
         <header className="bg-white shadow-sm border-b sticky top-0 z-20">
           <div className="px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
             <div className="flex items-center justify-between gap-4">
@@ -141,6 +121,14 @@ const FarmerDashboard: React.FC = () => {
               </div>
               <Button
                 variant="outline"
+                onClick={() => navigate("/")}
+                disabled={logoutMutation.isPending}
+                className="hidden sm:flex shrink-0"
+              >
+                Home
+              </Button>
+              <Button
+                variant="outline"
                 onClick={handleLogout}
                 disabled={logoutMutation.isPending}
                 className="hidden sm:flex shrink-0"
@@ -158,8 +146,7 @@ const FarmerDashboard: React.FC = () => {
             </div>
           </div>
         </header>
-
-        {/* Main Content */}
+        {}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto bg-gray-50">
           <div className="max-w-7xl mx-auto w-full">
             {activeView === "overview" && (
@@ -171,30 +158,25 @@ const FarmerDashboard: React.FC = () => {
                 isLoading={isStatsLoading}
               />
             )}
-
             {activeView === "products" && <ProductsSection />}
-
             {activeView === "customers" && (
               <CustomersSection
                 customers={customersData?.customers || []}
                 isLoading={isCustomersLoading}
               />
             )}
-
             {activeView === "orders" && (
               <OrdersSection
                 orders={ordersData?.orders || []}
                 isLoading={isOrdersLoading}
               />
             )}
-
             {activeView === "shipments" && (
               <ShipmentsSection
                 shipments={shipmentsData?.shipments || []}
                 isLoading={isShipmentsLoading}
               />
             )}
-
             {activeView === "help" && <HelpSection />}
           </div>
         </main>
@@ -202,5 +184,4 @@ const FarmerDashboard: React.FC = () => {
     </div>
   );
 };
-
 export default FarmerDashboard;

@@ -8,7 +8,6 @@ import AccountCart from "./AccountCart";
 import TopInfoBar from "./TopInfoBar";
 import { useAppSelector } from "@/store/hooks";
 import { useLogoutUser, useLogoutFarmer } from "@/hooks/useAuth";
-
 interface HeaderProps {
   cartCount?: number;
   onSearch?: (value: string) => void;
@@ -16,7 +15,6 @@ interface HeaderProps {
   onCartClick?: () => void;
   onLogoClick?: () => void;
 }
-
 const Header: React.FC<HeaderProps> = ({
   cartCount = 0,
   onSearch,
@@ -30,23 +28,17 @@ const Header: React.FC<HeaderProps> = ({
   );
   const logoutUserMutation = useLogoutUser();
   const logoutFarmerMutation = useLogoutFarmer();
-
-  // Get user name based on authentication type
   const getUserName = (): string | undefined => {
     if (user && user.fullName) {
-      // For users, combine first and last name
       const { firstName, lastName } = user.fullName;
       return `${firstName} ${lastName}`.trim();
     }
     if (farmer && farmer.fullName) {
-      // For farmers, combine first and last name
       const { firstName, lastName } = farmer.fullName;
       return `${firstName} ${lastName}`.trim();
     }
     return undefined;
   };
-
-  // Handle logout based on user type
   const handleLogout = () => {
     if (userType === "user") {
       logoutUserMutation.mutate();
@@ -54,15 +46,12 @@ const Header: React.FC<HeaderProps> = ({
       logoutFarmerMutation.mutate();
     }
   };
-
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
-
   const handleMobileNavClick = () => {
     setIsMobileMenuOpen(false);
   };
-
   return (
     <header className="w-full sticky top-0 z-50 bg-white shadow-sm">
       <div className="border-b border-gray-100">
@@ -140,6 +129,4 @@ const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
 export default Header;
-

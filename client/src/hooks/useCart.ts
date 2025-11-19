@@ -5,33 +5,24 @@ import { cartService, type AddToCartInput, type UpdateCartItemInput } from "@/se
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { clearCart as clearCartAction, setCart } from "@/store/slices/cartSlice";
 import type { CartItem } from "@/types/cart.types";
-
-// Query Keys
 export const cartKeys = {
   all: ["cart"] as const,
   cart: () => [...cartKeys.all, "user"] as const,
 };
-
-// Get user's cart
 export const useGetCart = () => {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-  
   return useQuery({
     queryKey: cartKeys.cart(),
     queryFn: () => cartService.getCart(),
-    enabled: isAuthenticated, // Only fetch if user is authenticated
-    staleTime: 0, // Always fetch fresh cart data
+    enabled: isAuthenticated,
+    staleTime: 0,
   });
 };
-
-// Add to cart mutation
 export const useAddToCart = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
-
   return useMutation({
     mutationFn: (data: AddToCartInput) => {
-      // Validate productId
       if (!data.productId) {
         throw new Error("Product ID is required");
       }
@@ -39,8 +30,6 @@ export const useAddToCart = () => {
     },
     onSuccess: async (response) => {
       toast.success(response.message || "Item added to cart!");
-      
-      // Sync entire cart with Redux store immediately from response
       if (response.cart && response.cart.items) {
         const cartItems: CartItem[] = response.cart.items.map((item) => ({
           id: item.productId,
@@ -52,8 +41,6 @@ export const useAddToCart = () => {
         }));
         dispatch(setCart(cartItems));
       }
-      
-      // Invalidate and refetch cart query to ensure consistency
       await queryClient.invalidateQueries({ queryKey: cartKeys.cart() });
       await queryClient.refetchQueries({ queryKey: cartKeys.cart() });
     },
@@ -67,20 +54,15 @@ export const useAddToCart = () => {
     },
   });
 };
-
-// Update cart item mutation
 export const useUpdateCartItem = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
-
   return useMutation({
     mutationFn: ({ productId, data }: { productId: string; data: UpdateCartItemInput }) =>
       cartService.updateCartItem(productId, data),
     onSuccess: (response) => {
       toast.success(response.message || "Cart updated!");
       queryClient.invalidateQueries({ queryKey: cartKeys.cart() });
-      
-      // Sync entire cart with Redux store
       const cartItems: CartItem[] = response.cart.items.map((item) => ({
         id: item.productId,
         name: item.name,
@@ -98,19 +80,14 @@ export const useUpdateCartItem = () => {
     },
   });
 };
-
-// Remove from cart mutation
 export const useRemoveFromCart = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
-
   return useMutation({
     mutationFn: (productId: string) => cartService.removeFromCart(productId),
     onSuccess: (response) => {
       toast.success(response.message || "Item removed from cart!");
       queryClient.invalidateQueries({ queryKey: cartKeys.cart() });
-      
-      // Sync entire cart with Redux store
       const cartItems: CartItem[] = response.cart.items.map((item) => ({
         id: item.productId,
         name: item.name,
@@ -128,19 +105,14 @@ export const useRemoveFromCart = () => {
     },
   });
 };
-
-// Clear cart mutation
 export const useClearCart = () => {
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
-
   return useMutation({
     mutationFn: () => cartService.clearCart(),
     onSuccess: (response) => {
       toast.success(response.message || "Cart cleared!");
       queryClient.invalidateQueries({ queryKey: cartKeys.cart() });
-      
-      // Sync with Redux store
       dispatch(clearCartAction());
     },
     onError: (error: any) => {
@@ -150,12 +122,6 @@ export const useClearCart = () => {
     },
   });
 };
-
-/**
- * Hook to restore cart state on app load
- * Fetches cart from API and syncs to Redux store when user is authenticated
- * Waits for auth restoration to complete before restoring cart
- */
 export const useCartRestore = () => {
   const dispatch = useAppDispatch();
   const { isAuthenticated, userType, isRestoring } = useAppSelector((state) => state.auth);
@@ -164,9 +130,7 @@ export const useCartRestore = () => {
     isAuthenticated: false,
     userType: null,
   });
-
   React.useEffect(() => {
-    // Reset restoration flag if auth state changed (user logged out/in)
     const currentAuthState = { isAuthenticated, userType };
     if (
       lastAuthStateRef.current.isAuthenticated !== isAuthenticated ||
@@ -175,27 +139,19 @@ export const useCartRestore = () => {
       isRestoredRef.current = false;
       lastAuthStateRef.current = currentAuthState;
     }
-
-    // Wait for auth restoration to complete
     if (isRestoring) {
       return;
     }
-
-    // Only restore once per auth session and only for authenticated users
     if (isRestoredRef.current || !isAuthenticated || userType !== "user") {
       if (!isAuthenticated) {
-        // Clear cart if user is not authenticated
         dispatch(setCart([]));
       }
       return;
     }
-
     const restoreCart = async () => {
       isRestoredRef.current = true;
-      
       try {
         const cartData = await cartService.getCart();
-        
         if (cartData?.items && cartData.items.length > 0) {
           const cartItems: CartItem[] = cartData.items.map((item) => ({
             id: item.productId,
@@ -207,18 +163,13 @@ export const useCartRestore = () => {
           }));
           dispatch(setCart(cartItems));
         } else {
-          // Clear cart if API returns empty cart
           dispatch(setCart([]));
         }
       } catch (error) {
-        // Silently fail - cart will be empty until user visits cart page
         console.error("Failed to restore cart:", error);
         dispatch(setCart([]));
       }
     };
-
     restoreCart();
   }, [isAuthenticated, userType, isRestoring, dispatch]);
 };
-
-

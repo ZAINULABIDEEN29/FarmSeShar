@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 export const createProductSchema = z.object({
   name: z
     .string()
@@ -23,14 +22,25 @@ export const createProductSchema = z.object({
   ]),
   quantity: z.number().int("Quantity must be a whole number").min(0, "Quantity cannot be negative"),
   unit: z.enum(["kg", "g", "lb", "piece", "box", "bunch", "dozen", "liter", "ml"]),
-  image: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  images: z.array(z.string().url("Must be a valid URL")).optional(),
+  images: z
+    .array(z.string().url("Must be a valid URL"))
+    .min(1, "At least one product image is required"),
 });
-
 export const updateProductSchema = createProductSchema.partial().extend({
   isAvailable: z.boolean().optional(),
-});
-
+}).refine(
+  (data) => {
+    // If images are provided, ensure at least one image
+    if (data.images !== undefined) {
+      return Array.isArray(data.images) && data.images.length > 0;
+    }
+    return true;
+  },
+  {
+    message: "At least one product image is required when updating images",
+    path: ["images"],
+  }
+);
 export const productQuerySchema = z.object({
   category: z
     .enum([
@@ -49,9 +59,7 @@ export const productQuerySchema = z.object({
   maxPrice: z.coerce.number().positive().optional(),
   isAvailable: z.coerce.boolean().optional(),
   search: z.string().optional(),
-}).passthrough(); // Allow additional query parameters
-
+}).passthrough();
 export type CreateProductInput = z.infer<typeof createProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type ProductQueryInput = z.infer<typeof productQuerySchema>;
-

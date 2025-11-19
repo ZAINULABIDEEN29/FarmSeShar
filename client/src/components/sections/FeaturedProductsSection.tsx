@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import Container from "../container/Container";
-
 export interface Product {
   id: string;
   name: string;
@@ -13,13 +12,11 @@ export interface Product {
   image?: string;
   isNew?: boolean;
 }
-
 interface FeaturedProductsSectionProps {
   products?: Product[];
   onViewAll?: () => void;
   onAddToCart?: (product: Product) => void;
 }
-
 const defaultProducts: Product[] = [
   {
     id: "1",
@@ -27,6 +24,7 @@ const defaultProducts: Product[] = [
     price: "Rs. 1,200 / kg",
     rating: 4.5,
     isNew: true,
+    image: "./src/assets/dairy.jpg",
   },
   {
     id: "2",
@@ -34,6 +32,7 @@ const defaultProducts: Product[] = [
     price: "Rs. 800 / kg",
     rating: 4.8,
     isNew: true,
+    image: "./src/assets/mushrooms.jpg",
   },
   {
     id: "3",
@@ -41,6 +40,7 @@ const defaultProducts: Product[] = [
     price: "Rs. 600 / kg",
     rating: 4.7,
     isNew: true,
+    image: "./src/assets/tomatoe.jpg",
   },
   {
     id: "4",
@@ -48,9 +48,9 @@ const defaultProducts: Product[] = [
     price: "Rs. 1,500 / kg",
     rating: 4.9,
     isNew: true,
+    image: "./src/assets/microgreen-herb.jpg",
   },
 ];
-
 const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
   products = defaultProducts,
   onViewAll,
@@ -59,7 +59,6 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
-
     return (
       <div className="flex items-center gap-1">
         {[...Array(5)].map((_, index) => {
@@ -87,11 +86,10 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
       </div>
     );
   };
-
   return (
     <section className="w-full bg-white py-12 md:py-16 lg:py-20">
       <Container>
-        {/* Section Header */}
+        {}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-10 md:mb-12 lg:mb-16 gap-4">
           <div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
@@ -109,15 +107,14 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
             View All →
           </Button>
         </div>
-
-        {/* Products Grid */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {products.map((product) => (
             <Card
               key={product.id}
               className="overflow-hidden hover:shadow-lg transition-shadow duration-300 relative"
             >
-              {/* NEW Badge */}
+              {}
               {product.isNew && (
                 <Badge
                   variant="secondary"
@@ -126,12 +123,14 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
                   NEW
                 </Badge>
               )}
-
-              {/* Image Placeholder */}
-              <div className="w-full h-48 bg-gray-200 flex items-center justify-center relative">
-                <span className="text-gray-400 text-sm">Product Image</span>
+              {}
+              <div className="w-full h-48 bg-gray-200 relative overflow-hidden">
+                <img
+                  src={product.image || ""}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
                   {product.name}
@@ -141,7 +140,6 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
                 </p>
                 {renderStars(product.rating)}
               </CardContent>
-
               <div className="px-6 pb-6">
                 <Button
                   onClick={() => onAddToCart?.(product)}
@@ -157,6 +155,4 @@ const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = ({
     </section>
   );
 };
-
 export default FeaturedProductsSection;
-

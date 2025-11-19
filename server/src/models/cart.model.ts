@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-
 export interface ICartItem {
   productId: mongoose.Types.ObjectId;
   name: string;
@@ -8,7 +7,6 @@ export interface ICartItem {
   unit: string;
   image?: string;
 }
-
 export interface ICART extends Document {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
@@ -16,7 +14,6 @@ export interface ICART extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 const cartItemSchema = new Schema<ICartItem>(
   {
     productId: {
@@ -52,14 +49,13 @@ const cartItemSchema = new Schema<ICartItem>(
   },
   { _id: false }
 );
-
 const cartSchema: Schema<ICART> = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // One cart per user
+      unique: true,
     },
     items: {
       type: [cartItemSchema],
@@ -68,10 +64,6 @@ const cartSchema: Schema<ICART> = new Schema(
   },
   { timestamps: true }
 );
-
-// Index for faster queries
 cartSchema.index({ userId: 1 });
-
 export const Cart = mongoose.model<ICART>("Cart", cartSchema);
 export default Cart;
-

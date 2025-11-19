@@ -1,17 +1,14 @@
 export type PaymentMethod = "card" | "cash";
-
 export interface CardPaymentDetails {
   cardNumber: string;
   cardHolderName: string;
-  expiryDate: string; // MM/YY format
+  expiryDate: string;
   cvv: string;
 }
-
 export interface PaymentData {
   paymentMethod: PaymentMethod;
   cardDetails?: CardPaymentDetails;
 }
-
 export interface OrderData {
   address: {
     streetAddress: string;
@@ -23,4 +20,3 @@ export interface OrderData {
   };
   payment: PaymentData;
 }
-

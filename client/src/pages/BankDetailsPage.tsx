@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import StepIndicator from "@/components/auth/StepIndicator";
 import { useRegisterFarmer } from "@/hooks/useAuth";
 import { storage } from "@/utils/storage";
-
 const validationSchema = Yup.object({
   accountHolderName: Yup.string()
     .min(2, "Account holder name must be at least 2 characters")
@@ -23,13 +22,11 @@ const validationSchema = Yup.object({
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Please confirm your password"),
 });
-
 const BankDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const registerFarmerMutation = useRegisterFarmer();
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-
   useEffect(() => {
     const step1Data = storage.get("farmer_registration_step1");
     const step2Data = storage.get("farmer_registration_step2");
@@ -37,7 +34,6 @@ const BankDetailsPage: React.FC = () => {
       navigate("/farmer-registration");
     }
   }, [navigate]);
-
   const formik = useFormik({
     initialValues: {
       accountHolderName: "",
@@ -49,12 +45,10 @@ const BankDetailsPage: React.FC = () => {
     onSubmit: (values) => {
       const step1Data = storage.get("farmer_registration_step1");
       const step2Data = storage.get("farmer_registration_step2");
-
       if (!step1Data || !step2Data) {
         navigate("/farmer-registration");
         return;
       }
-
       const registrationData = {
         fullName: {
           firstName: step1Data.firstName,
@@ -70,7 +64,6 @@ const BankDetailsPage: React.FC = () => {
         bankAccountNumber: values.accountNumber,
         password: values.password,
       };
-
       registerFarmerMutation.mutate(registrationData, {
         onSuccess: () => {
           storage.remove("farmer_registration_step1");
@@ -79,7 +72,6 @@ const BankDetailsPage: React.FC = () => {
       });
     },
   });
-
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
@@ -90,16 +82,13 @@ const BankDetailsPage: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
           <StepIndicator currentStep={3} totalSteps={3} backTo="/farm-details" />
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Bank Details
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             This secure step ensures you receive timely payments for your sales and sets up your account login
           </p>
-
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div>
               <FormField
@@ -116,7 +105,6 @@ const BankDetailsPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.accountHolderName}</p>
               )}
             </div>
-
             <div>
               <FormField
                 label="Account Number"
@@ -132,7 +120,6 @@ const BankDetailsPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.accountNumber}</p>
               )}
             </div>
-
             <div>
               <FormField
                 label="Password"
@@ -162,7 +149,6 @@ const BankDetailsPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.password}</p>
               )}
             </div>
-
             <div>
               <FormField
                 label="Confirm Password"
@@ -192,7 +178,6 @@ const BankDetailsPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.confirmPassword}</p>
               )}
             </div>
-
             <Button
               type="submit"
               disabled={registerFarmerMutation.isPending}
@@ -203,12 +188,10 @@ const BankDetailsPage: React.FC = () => {
           </form>
         </div>
       </div>
-
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default BankDetailsPage;

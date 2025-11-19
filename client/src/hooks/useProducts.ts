@@ -7,8 +7,6 @@ import type {
   ProductFilters,
   Product,
 } from "@/types/product.types";
-
-// Query Keys
 export const productKeys = {
   all: ["products"] as const,
   lists: () => [...productKeys.all, "list"] as const,
@@ -21,17 +19,13 @@ export const productKeys = {
   publicDetails: () => [...productKeys.public, "detail"] as const,
   publicDetail: (id: string) => [...productKeys.publicDetails(), id] as const,
 };
-
-// Get all products for farmer
 export const useGetMyProducts = (filters?: ProductFilters) => {
   return useQuery({
     queryKey: productKeys.list(filters),
     queryFn: () => productService.getMyProducts(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 };
-
-// Get single product
 export const useGetProduct = (productId: string, enabled = true) => {
   return useQuery({
     queryKey: productKeys.detail(productId),
@@ -39,11 +33,8 @@ export const useGetProduct = (productId: string, enabled = true) => {
     enabled: enabled && !!productId,
   });
 };
-
-// Create product mutation
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: CreateProductInput) => productService.createProduct(data),
     onSuccess: (response) => {
@@ -57,11 +48,8 @@ export const useCreateProduct = () => {
     },
   });
 };
-
-// Update product mutation
 export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({ productId, data }: { productId: string; data: UpdateProductInput }) =>
       productService.updateProduct(productId, data),
@@ -77,11 +65,8 @@ export const useUpdateProduct = () => {
     },
   });
 };
-
-// Delete product mutation
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (productId: string) => productService.deleteProduct(productId),
     onSuccess: (response) => {
@@ -95,11 +80,8 @@ export const useDeleteProduct = () => {
     },
   });
 };
-
-// Toggle product availability mutation
 export const useToggleProductAvailability = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (productId: string) => productService.toggleAvailability(productId),
     onSuccess: (response, productId) => {
@@ -114,16 +96,13 @@ export const useToggleProductAvailability = () => {
     },
   });
 };
-
-// Public product hooks (for customers browsing)
 export const useGetPublicProducts = (filters?: ProductFilters) => {
   return useQuery({
     queryKey: productKeys.publicList(filters),
     queryFn: () => productService.getPublicProducts(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
   });
 };
-
 export const useGetPublicProduct = (productId: string, enabled = true) => {
   return useQuery({
     queryKey: productKeys.publicDetail(productId),
@@ -131,15 +110,12 @@ export const useGetPublicProduct = (productId: string, enabled = true) => {
     enabled: enabled && !!productId,
   });
 };
-
-// Helper function to transform API product to match ProductGridCard format
 export const transformProductForCard = (product: Product): Product & { 
   sellerName: string; 
   rating: number;
   location?: string;
   farmerImage?: string;
 } => {
-  // If product already has all required legacy fields, return as is
   if (product.sellerName && product.rating !== undefined) {
     return {
       ...product,
@@ -151,15 +127,12 @@ export const transformProductForCard = (product: Product): Product & {
         : undefined),
     };
   }
-
-  // Transform farmer info to legacy format
   if (product.farmer) {
     const firstName = product.farmer.fullName?.firstName || "";
     const lastName = product.farmer.fullName?.lastName || "";
     const sellerName = firstName && lastName 
       ? `${firstName} ${lastName}`.trim()
       : product.farmer.farmName || "Unknown Farmer";
-    
     return {
       ...product,
       sellerName,
@@ -167,11 +140,9 @@ export const transformProductForCard = (product: Product): Product & {
       farmerImage: product.farmerImage || (firstName || lastName
         ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${firstName}${lastName}`
         : undefined),
-      rating: product.rating || 4.5, // Default rating, can be enhanced later
+      rating: product.rating || 4.5,
     };
   }
-
-  // Fallback if no farmer info
   return {
     ...product,
     sellerName: product.sellerName || "Unknown Farmer",
@@ -180,4 +151,3 @@ export const transformProductForCard = (product: Product): Product & {
     farmerImage: product.farmerImage,
   };
 };
-

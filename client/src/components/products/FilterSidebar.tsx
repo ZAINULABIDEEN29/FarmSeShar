@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { ChevronDown, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
 interface FilterSidebarProps {
   sortBy: string;
   onSortChange: (value: string) => void;
@@ -14,7 +13,6 @@ interface FilterSidebarProps {
   activeQuickFilters: string[];
   onQuickFilterToggle: (filter: string) => void;
 }
-
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
   sortBy,
   onSortChange,
@@ -29,8 +27,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false); // Mobile expand/collapse state
-
+  const [isExpanded, setIsExpanded] = useState(false);
   const sortOptions = ["Name A-Z", "Name Z-A", "Price: Low to High", "Price: High to Low", "Newest", "Popularity"];
   const categories = ["All Categories", "Vegetables", "Fruits", "Dairy", "Herbs"];
   const priceRanges = [
@@ -44,34 +41,25 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     "Rs. 750 - Rs. 1000",
     "Rs. 1000+"
   ];
-
-  // Count active filters for display
   const activeFiltersCount = activeQuickFilters.length + 
     (category !== "All Categories" ? 1 : 0) + 
     (sortBy !== "Name A-Z" ? 1 : 0) + 
     (priceRange !== "Any Price" ? 1 : 0);
-
-  // Close dropdowns when clicking outside
   React.useEffect(() => {
     if (!isSortOpen && !isCategoryOpen && !isPriceOpen) return;
-
     const handleClickOutside = () => {
       setIsSortOpen(false);
       setIsCategoryOpen(false);
       setIsPriceOpen(false);
     };
-
-    // Use setTimeout to avoid immediate closure
     const timeoutId = setTimeout(() => {
       document.addEventListener("click", handleClickOutside);
     }, 0);
-
     return () => {
       clearTimeout(timeoutId);
       document.removeEventListener("click", handleClickOutside);
     };
   }, [isSortOpen, isCategoryOpen, isPriceOpen]);
-
   return (
     <aside className={cn(
       "w-full lg:w-64 xl:w-72 bg-white rounded-lg shadow-sm border border-gray-100",
@@ -79,7 +67,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
       "mb-4 lg:mb-0",
       "overflow-visible"
     )}>
-      {/* Collapsible Header - Mobile Only */}
+      {}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
@@ -104,16 +92,14 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
           isExpanded && "rotate-180"
         )} />
       </button>
-
-      {/* Filters Heading - Desktop Only with Filter Icon */}
+      {}
       <div className="hidden lg:flex items-center gap-2 p-4 sm:p-5 lg:p-6 pb-4 lg:pb-6">
         <Filter className="h-5 w-5 text-gray-700" />
         <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">
           Filters
         </h2>
       </div>
-
-          {/* Filter Content - Collapsible on Mobile */}
+          {}
       <div className={cn(
         "transition-all duration-300 ease-in-out",
         "lg:block",
@@ -122,7 +108,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         "relative overflow-visible"
       )}>
         <div className="px-4 sm:px-5 lg:px-6 pb-4 sm:pb-5 lg:pb-6 pt-0 lg:pt-0 overflow-visible">
-          {/* Sort By */}
+          {}
           <div className="mb-4 sm:mb-5 lg:mb-6">
             <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
               Sort By
@@ -176,8 +162,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               )}
             </div>
           </div>
-
-          {/* Category */}
+          {}
           <div className="mb-4 sm:mb-5 lg:mb-6">
             <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
               Category
@@ -231,8 +216,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               )}
             </div>
           </div>
-
-          {/* Price Range - Dropdown */}
+          {}
           <div className="mb-4 sm:mb-5 lg:mb-6">
             <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
               Price Range
@@ -311,8 +295,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               )}
             </div>
           </div>
-
-          {/* Quick Filters */}
+          {}
           <div>
             <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-3">
               Quick Filters
@@ -345,5 +328,4 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
     </aside>
   );
 };
-
 export default FilterSidebar;

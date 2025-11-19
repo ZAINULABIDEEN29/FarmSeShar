@@ -1,8 +1,5 @@
 import mongoose, {Schema,Document} from "mongoose";
 import bcrypt from "bcryptjs";
-
-
-
 export interface IFARMER extends Document{
     _id:mongoose.Types.ObjectId;
     fullName:{
@@ -24,11 +21,8 @@ export interface IFARMER extends Document{
     verifyCodeExpire?:Date;
     resetPasswordToken?: string;
     resetPasswordExpire?: Date;
-
     comparePassword:(password:string) => Promise<boolean>;
 }
-
-
 const farmerSchema:Schema<IFARMER> = new Schema({
     fullName:{
         firstName:{
@@ -37,7 +31,6 @@ const farmerSchema:Schema<IFARMER> = new Schema({
             trim:true,
             minlength:[2,"First name must be at least 2 characters"],
             maxlength:[40,"First name must be at most 40 characters"],
-         
         },
         lastName:{
             type:String,
@@ -45,7 +38,6 @@ const farmerSchema:Schema<IFARMER> = new Schema({
             trim:true,
             minlength:[2,"Last name must be at least 2 characters"],
             maxlength:[40,"Last name must be at most 40 characters"],
-            
         }
     },
     email:{
@@ -129,19 +121,13 @@ const farmerSchema:Schema<IFARMER> = new Schema({
         default:null
     }
 },{timestamps:true})
-
 farmerSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
-  
     this.password = await bcrypt.hash(this.password, 10);
     next();
   })
-
 farmerSchema.methods.comparePassword  = async function(password:string){
     return await bcrypt.compare(password,this.password)
 }
-
-
 export const Farmer = mongoose.model<IFARMER>("Farmer", farmerSchema)
-
 export default Farmer;

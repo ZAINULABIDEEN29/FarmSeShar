@@ -6,22 +6,13 @@ import { authUser } from "../middlewares/auth.middleware.js";
 import { createOrder } from "../controllers/order.controller.js";
 import { createOrderSchema } from "../validator/order.schema.js";
 const router = express.Router();
-
-
-
 router.post("/create",validate(registerSchema),registerUser)
 router.post("/verify",validate(verifyCode),verifyOtp);
 router.post("/forgot-password",validate(forgotPasswordSchema),forgotPassword);
 router.post("/reset-password",validate(resetPasswordSchema),resetPassword);
 router.post("/login",validate(loginSchema),loginUser)
-
-router.post("/refresh", refreshToken); // Public route - uses refresh token from cookie
+router.post("/refresh", refreshToken);
 router.get("/me", authUser, getUser);
 router.get("/logout", authUser, logoutUser);
-
-// Order routes (protected - requires user authentication)
 router.post("/orders", authUser, validate(createOrderSchema), createOrder);
-
-
-
 export default router;

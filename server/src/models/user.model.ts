@@ -1,8 +1,5 @@
 import mongoose, {Schema,Document} from "mongoose";
 import bcrypt from "bcryptjs";
-
-
-
 export interface IUSER extends Document{
     _id:mongoose.Types.ObjectId;
    fullName:{
@@ -18,14 +15,9 @@ export interface IUSER extends Document{
    verifyCodeExpire?:Date;
    resetPasswordToken?: string;
    resetPasswordExpire?: Date;
-
-
    comparePassword:(password:string) => Promise<boolean>;
 }
-
-
 const userSchema:Schema<IUSER>  = new Schema({
-
     fullName:{
         firstName:{
             type:String,
@@ -59,13 +51,11 @@ const userSchema:Schema<IUSER>  = new Schema({
         unique:true,
         trim:true,
         match: [/^[0-9]{10,15}$/g, "Enter valid phone number"],
-        
     },
     password:{
         type:String,
         required:[true,"Password is required"],
         minlength:[8,"Password must be at least 8 characters"],
-       
     },
     isVerified:{
         type:Boolean,
@@ -77,47 +67,28 @@ const userSchema:Schema<IUSER>  = new Schema({
     },
     verifyCode:{
         type:String,
-        // required:[false,"Verification code is required"],
-        // default:null
     },
     verifyCodeExpire:{
         type:Date,
-        // required:[false,"Verification code expire is required"],
-        // default:null
     },
     resetPasswordToken:{
         type:String,
-        // required:true,
         default:null,
     },
     resetPasswordExpire:{
         type:Date,
-        // required:true,
         default:null
     }
-
 },{timestamps:true})
-
-
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-
   this.password = await bcrypt.hash(this.password, 10);
-
   next();
 })
-
 userSchema.methods.comparePassword = async function(
     password:string
  ):Promise<boolean>{
-    
     return await bcrypt.compare(password,this.password)
 }
-
-
-
 const User = mongoose.model<IUSER>("User",userSchema)
-
-
 export default User;
-

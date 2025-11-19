@@ -6,7 +6,6 @@ import { Eye, EyeOff } from "lucide-react";
 import FormField from "@/components/auth/FormField";
 import { Button } from "@/components/ui/button";
 import { useResetPassword } from "@/hooks/useAuth";
-
 const validationSchema = Yup.object({
   createPassword: Yup.string()
     .min(8, "Password must be at least 8 characters long")
@@ -15,21 +14,17 @@ const validationSchema = Yup.object({
     .oneOf([Yup.ref("createPassword")], "Passwords must match")
     .required("Please confirm your password"),
 });
-
 const SetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const resetPasswordMutation = useResetPassword();
-
   const token = searchParams.get("token");
   const userId = searchParams.get("userId");
-
   useEffect(() => {
     if (!token || !userId) {
       navigate("/forgot-password");
     }
   }, [token, userId, navigate]);
-
   const formik = useFormik({
     initialValues: {
       createPassword: "",
@@ -47,10 +42,8 @@ const SetPasswordPage: React.FC = () => {
       });
     },
   });
-
   const [showCreatePassword, setShowCreatePassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
@@ -61,14 +54,12 @@ const SetPasswordPage: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Set a password
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             Please set a new password for your account
           </p>
-
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div>
               <FormField
@@ -99,7 +90,6 @@ const SetPasswordPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.createPassword}</p>
               )}
             </div>
-
             <div>
               <FormField
                 label="Confirm Password"
@@ -129,7 +119,6 @@ const SetPasswordPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.confirmPassword}</p>
               )}
             </div>
-
             <Button
               type="submit"
               disabled={resetPasswordMutation.isPending || !token || !userId}
@@ -140,12 +129,10 @@ const SetPasswordPage: React.FC = () => {
           </form>
         </div>
       </div>
-
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default SetPasswordPage;

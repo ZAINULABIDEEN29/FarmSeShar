@@ -13,7 +13,6 @@ import {
 import type { CheckoutAddress } from "@/types/checkout.types";
 import { toast } from "react-toastify";
 import { ShoppingBag } from "lucide-react";
-
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,23 +20,18 @@ const CheckoutPage: React.FC = () => {
   const cartTotals = useAppSelector(selectCartTotal);
   const cartItemCount = useAppSelector(selectCartItemCount);
   const discountPercentage = useAppSelector((state) => state.cart.discount);
-
   const handleLogoClick = () => {
     navigate("/");
   };
-
   const handleAccountClick = () => {
     navigate("/login");
   };
-
   const handleCartClick = () => {
     navigate("/cart");
   };
-
   const handleSubmitAddress = async (address: CheckoutAddress) => {
     setIsSubmitting(true);
     try {
-      // Navigate to payment page with address data
       navigate("/payment", {
         state: {
           address,
@@ -50,15 +44,12 @@ const CheckoutPage: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
-  // Redirect if cart is empty
   React.useEffect(() => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       navigate("/cart");
     }
   }, [cartItems.length, navigate]);
-
   return (
     <div className="w-full flex flex-col min-h-screen bg-white">
       <Header
@@ -67,7 +58,6 @@ const CheckoutPage: React.FC = () => {
         onCartClick={handleCartClick}
         onLogoClick={handleLogoClick}
       />
-
       <main className="flex-1 py-8 sm:py-12 bg-white">
         <Container>
           <div className="mb-6 sm:mb-8">
@@ -78,7 +68,6 @@ const CheckoutPage: React.FC = () => {
               Please provide your shipping address to continue
             </p>
           </div>
-
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 sm:py-24">
               <ShoppingBag className="h-16 w-16 sm:h-24 sm:w-24 text-gray-400 mb-4" />
@@ -97,7 +86,7 @@ const CheckoutPage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-              {/* Checkout Form - Left Side */}
+              {}
               <div className="lg:col-span-2">
                 <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 lg:p-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
@@ -109,8 +98,7 @@ const CheckoutPage: React.FC = () => {
                   />
                 </div>
               </div>
-
-              {/* Cart Summary - Right Side */}
+              {}
               <div className="lg:col-span-1">
                 <div className="sticky top-24">
                   <CartSummary
@@ -127,11 +115,8 @@ const CheckoutPage: React.FC = () => {
           )}
         </Container>
       </main>
-
       <Footer />
     </div>
   );
 };
-
 export default CheckoutPage;
-

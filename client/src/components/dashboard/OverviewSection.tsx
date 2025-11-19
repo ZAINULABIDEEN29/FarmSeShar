@@ -1,7 +1,6 @@
 import React from "react";
 import { Package, ShoppingCart, Truck, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface OverviewSectionProps {
   totalProducts: number;
   totalOrders: number;
@@ -10,7 +9,6 @@ interface OverviewSectionProps {
   isLoading?: boolean;
   className?: string;
 }
-
 interface StatCardProps {
   title: string;
   value: number | string;
@@ -18,7 +16,6 @@ interface StatCardProps {
   color?: "blue" | "green" | "yellow" | "purple";
   className?: string;
 }
-
 const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
@@ -32,7 +29,6 @@ const StatCard: React.FC<StatCardProps> = ({
     yellow: "bg-yellow-50 text-yellow-600",
     purple: "bg-purple-50 text-purple-600",
   };
-
   return (
     <div
       className={cn(
@@ -54,7 +50,6 @@ const StatCard: React.FC<StatCardProps> = ({
     </div>
   );
 };
-
 const OverviewSection: React.FC<OverviewSectionProps> = ({
   totalProducts,
   totalOrders,
@@ -73,7 +68,6 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
       </div>
     );
   }
-
   return (
     <div className={cn("space-y-6", className)}>
       <div>
@@ -84,8 +78,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
           Welcome to your dashboard. Here's a summary of your business metrics.
         </p>
       </div>
-
-      {/* Stats Grid */}
+      {}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
         <StatCard
           title="Total Products"
@@ -112,8 +105,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
           color="purple"
         />
       </div>
-
-      {/* Additional Info Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
@@ -134,7 +126,6 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
             </div>
           </div>
         </div>
-
         <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
             Quick Actions
@@ -155,6 +146,4 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
     </div>
   );
 };
-
 export default OverviewSection;
-

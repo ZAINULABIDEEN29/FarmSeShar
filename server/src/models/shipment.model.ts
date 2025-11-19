@@ -1,7 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-
 export type ShipmentStatus = "pending" | "preparing" | "in_transit" | "out_for_delivery" | "delivered" | "cancelled";
-
 export interface ICustomerAddress {
   streetAddress: string;
   houseNo: string;
@@ -10,10 +8,9 @@ export interface ICustomerAddress {
   country: string;
   postalCode: string;
 }
-
 export interface ISHIPMENT extends Document {
   _id: mongoose.Types.ObjectId;
-  shipmentId: string; // Display ID (e.g., "SHIP-001")
+  shipmentId: string;
   orderId: mongoose.Types.ObjectId;
   customerName: string;
   customerAddress: ICustomerAddress;
@@ -26,7 +23,6 @@ export interface ISHIPMENT extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 const customerAddressSchema = new Schema<ICustomerAddress>({
   streetAddress: {
     type: String,
@@ -59,7 +55,6 @@ const customerAddressSchema = new Schema<ICustomerAddress>({
     trim: true,
   },
 }, { _id: false });
-
 const shipmentSchema: Schema<ISHIPMENT> = new Schema(
   {
     shipmentId: {
@@ -115,38 +110,28 @@ const shipmentSchema: Schema<ISHIPMENT> = new Schema(
   },
   { timestamps: true }
 );
-
-// Indexes for efficient queries
 shipmentSchema.index({ farmerId: 1 });
 shipmentSchema.index({ orderId: 1 });
 shipmentSchema.index({ status: 1 });
 shipmentSchema.index({ shipmentId: 1 });
 shipmentSchema.index({ createdAt: -1 });
 shipmentSchema.index({ expectedDeliveryDate: 1 });
-
 const Shipment = mongoose.model<ISHIPMENT>("Shipment", shipmentSchema);
-
-// Generate shipmentId before saving (only for new documents)
 shipmentSchema.pre("save", async function (next) {
   if (this.isNew && !this.shipmentId) {
     try {
       const count = await Shipment.countDocuments();
       this.shipmentId = `SHIP-${String(count + 1).padStart(6, "0")}`;
     } catch (error) {
-      // Fallback to timestamp-based ID if count fails
       this.shipmentId = `SHIP-${Date.now().toString().slice(-6)}`;
     }
   }
   next();
 });
-
-// Auto-update actualDeliveryDate when status changes to delivered
 shipmentSchema.pre("save", function (next) {
   if (this.status === "delivered" && !this.actualDeliveryDate) {
     this.actualDeliveryDate = new Date();
   }
   next();
 });
-
 export default Shipment;
-

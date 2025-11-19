@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Edit2, Trash2, Eye, EyeOff } from "lucide-react";
 import type { Product } from "@/types/product.types";
 import { cn } from "@/lib/utils";
-
 interface ProductCardProps {
   product: Product;
   onEdit?: (product: Product) => void;
@@ -12,7 +11,6 @@ interface ProductCardProps {
   onToggleAvailability?: (productId: string) => void;
   isLoading?: boolean;
 }
-
 const ProductCard: React.FC<ProductCardProps> = memo(({
   product,
   onEdit,
@@ -23,20 +21,21 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
   return (
     <div className="bg-white p-4 rounded-lg border shadow-sm hover:shadow-lg transition-shadow">
       <div className="flex flex-col h-full">
-        {/* Product Image */}
+        {}
         <div className="w-full h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-          {product.image ? (
+          {product.images && product.images.length > 0 ? (
             <img
-              src={product.image}
+              src={product.images[0]}
               alt={product.name}
               className="w-full h-full object-cover"
             />
           ) : (
-            <span className="text-gray-400 text-sm">No Image</span>
+            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+              <span>No image</span>
+            </div>
           )}
         </div>
-
-        {/* Product Info */}
+        {}
         <div className="flex-1 flex flex-col">
           <div className="flex items-start justify-between mb-2">
             <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
@@ -54,11 +53,9 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
               {product.isAvailable ? "Available" : "Unavailable"}
             </Badge>
           </div>
-
           <p className="text-sm text-gray-600 mb-3 line-clamp-2 flex-1">
             {product.description}
           </p>
-
           <div className="flex items-center justify-between mb-3">
             <div>
               <span className="text-2xl font-bold text-green-600">
@@ -70,14 +67,12 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
               Qty: <span className="font-medium">{product.quantity}</span>
             </div>
           </div>
-
           <div className="mb-3">
             <Badge variant="outline" className="text-xs">
               {product.category}
             </Badge>
           </div>
-
-          {/* Action Buttons */}
+          {}
           <div className="flex gap-2 mt-auto">
             {onToggleAvailability && (
               <Button
@@ -130,8 +125,5 @@ const ProductCard: React.FC<ProductCardProps> = memo(({
     </div>
   );
 });
-
 ProductCard.displayName = "ProductCard";
-
 export default ProductCard;
-

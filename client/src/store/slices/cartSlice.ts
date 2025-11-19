@@ -1,19 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { CartItem, CartState } from "@/types/cart.types";
-
 const initialState: CartState = {
-  items: [], // Start with empty cart - will be synced from API
-  discount: 5, // 5% discount
+  items: [],
+  discount: 5,
   promoCode: undefined,
   freeDeliveryThreshold: 3000,
 };
-
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // Set entire cart from API (sync with backend)
     setCart: (state, action: PayloadAction<CartItem[]>) => {
       state.items = action.payload;
     },
@@ -21,7 +18,6 @@ const cartSlice = createSlice({
       const existingItem = state.items.find(
         (item) => item.id === action.payload.id
       );
-
       if (existingItem) {
         existingItem.quantity += action.payload.quantity;
       } else {
@@ -61,7 +57,6 @@ const cartSlice = createSlice({
     },
   },
 });
-
 export const {
   setCart,
   addItem,
@@ -72,8 +67,6 @@ export const {
   removePromoCode,
   setDiscount,
 } = cartSlice.actions;
-
-// Selectors
 export const selectCartItems = (state: { cart: CartState }) => state.cart.items;
 export const selectCartTotal = (state: { cart: CartState }) => {
   const subtotal = state.cart.items.reduce(
@@ -82,7 +75,7 @@ export const selectCartTotal = (state: { cart: CartState }) => {
   );
   const discountAmount = (subtotal * state.cart.discount) / 100;
   const deliveryFee =
-    subtotal >= state.cart.freeDeliveryThreshold ? 0 : 0; // Currently free delivery
+    subtotal >= state.cart.freeDeliveryThreshold ? 0 : 0;
   return {
     subtotal,
     discount: discountAmount,
@@ -92,6 +85,4 @@ export const selectCartTotal = (state: { cart: CartState }) => {
 };
 export const selectCartItemCount = (state: { cart: CartState }) =>
   state.cart.items.reduce((total, item) => total + item.quantity, 0);
-
 export default cartSlice.reducer;
-

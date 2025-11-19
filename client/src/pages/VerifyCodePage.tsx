@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import BackLink from "@/components/auth/BackLink";
 import { useVerifyUserCode, useVerifyFarmerCode } from "@/hooks/useAuth";
 import { storage, STORAGE_KEYS } from "@/utils/storage";
-
 const VerifyCodePage: React.FC = () => {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
@@ -15,10 +14,8 @@ const VerifyCodePage: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [farmerId, setFarmerId] = useState<string | null>(null);
   const [isFarmer, setIsFarmer] = useState(false);
-
   const verifyUserMutation = useVerifyUserCode();
   const verifyFarmerMutation = useVerifyFarmerCode();
-
   useEffect(() => {
     const storedFarmerId = storage.get<string>(STORAGE_KEYS.FARMER_ID);
     if (storedFarmerId) {
@@ -26,31 +23,25 @@ const VerifyCodePage: React.FC = () => {
       setIsFarmer(true);
       return;
     }
-
     const storedUserId = storage.get<string>(STORAGE_KEYS.USER_ID);
     if (storedUserId) {
       setUserId(storedUserId);
       setIsFarmer(false);
       return;
     }
-
     navigate("/signup");
   }, [navigate]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     if (!code) {
       setError("Please enter the verification code");
       return;
     }
-
     if (code.length !== 6) {
       setError("Code must be 6 digits");
       return;
     }
-
     if (isFarmer && farmerId) {
       verifyFarmerMutation.mutate({ farmerId, code });
     } else if (userId) {
@@ -60,15 +51,12 @@ const VerifyCodePage: React.FC = () => {
       navigate("/signup");
     }
   };
-
   const handleResend = () => {
     console.log("Resend code");
     setError("");
     setCode("");
   };
-
   const isLoading = verifyUserMutation.isPending || verifyFarmerMutation.isPending;
-
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
@@ -79,16 +67,13 @@ const VerifyCodePage: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
           <BackLink to="/login" />
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Verify Code
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             An authentication code has been sent to your email
           </p>
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormField
               label="Code"
@@ -116,7 +101,6 @@ const VerifyCodePage: React.FC = () => {
                 </button>
               }
             />
-
             <div className="text-sm text-gray-600">
               Didn't receive a code?{" "}
               <button
@@ -127,13 +111,11 @@ const VerifyCodePage: React.FC = () => {
                 Resend
               </button>
             </div>
-
             {error && (
               <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
                 {error}
               </div>
             )}
-
             <Button
               type="submit"
               disabled={isLoading || (!userId && !farmerId)}
@@ -144,12 +126,10 @@ const VerifyCodePage: React.FC = () => {
           </form>
         </div>
       </div>
-
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default VerifyCodePage;

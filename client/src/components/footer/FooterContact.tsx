@@ -1,13 +1,11 @@
 import React from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 export interface ContactItem {
   icon: React.ReactNode;
   text: string;
   href?: string;
 }
-
 interface FooterContactProps {
   title?: string;
   email?: string;
@@ -15,7 +13,6 @@ interface FooterContactProps {
   address?: string;
   className?: string;
 }
-
 const FooterContact: React.FC<FooterContactProps> = ({
   title = "Contact Us",
   email = "admin@localharvest.com",
@@ -39,7 +36,6 @@ const FooterContact: React.FC<FooterContactProps> = ({
       text: address,
     },
   ];
-
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       <h3 className="text-white font-bold text-base">{title}</h3>
@@ -51,7 +47,6 @@ const FooterContact: React.FC<FooterContactProps> = ({
               <span className="text-sm text-gray-400">{item.text}</span>
             </div>
           );
-
           return (
             <li key={index}>
               {item.href ? (
@@ -71,6 +66,4 @@ const FooterContact: React.FC<FooterContactProps> = ({
     </div>
   );
 };
-
 export default FooterContact;
-

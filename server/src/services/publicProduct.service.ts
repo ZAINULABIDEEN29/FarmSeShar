@@ -3,8 +3,8 @@ import Farmer from "../models/farmer.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import type { ProductQueryInput } from "../validator/product.schema.js";
 import type { IPRODUCT } from "../models/product.model.js";
+import { getProductRatingStatsService } from "./review.service.js";
 import mongoose from "mongoose";
-
 export interface PublicProduct {
   _id: string;
   name: string;
@@ -16,8 +16,8 @@ export interface PublicProduct {
   image?: string;
   images?: string[];
   isAvailable: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string;
+  updatedAt?: string;
   farmerId: string;
   farmer?: {
     _id: string;
@@ -28,21 +28,21 @@ export interface PublicProduct {
     farmName: string;
     farmLocation: string;
   };
+  sellerName?: string;
+  location?: string;
+  farmerImage?: string;
+  rating?: number;
 }
-
 export const getPublicProductsService = async (
   filters?: ProductQueryInput
 ): Promise<PublicProduct[]> => {
-  // Build query - only show available products with quantity > 0
   const query: any = {
     isAvailable: true,
-    quantity: { $gt: 0 }, // Only show products with stock available
+    quantity: { $gt: 0 },
   };
-
   if (filters?.category) {
     query.category = filters.category;
   }
-
   if (filters?.minPrice !== undefined || filters?.maxPrice !== undefined) {
     query.price = {};
     if (filters.minPrice !== undefined) {
@@ -52,94 +52,111 @@ export const getPublicProductsService = async (
       query.price.$lte = filters.maxPrice;
     }
   }
-
   if (filters?.search) {
     query.$or = [
       { name: { $regex: filters.search, $options: "i" } },
       { description: { $regex: filters.search, $options: "i" } },
     ];
   }
-
-  // Get products with farmer information
-  // Only populate if farmerId exists and is a valid ObjectId
   const products = await Product.find(query)
     .populate({
       path: "farmerId",
       select: "fullName farmName farmLocation",
-      match: { isVerified: true }, // Only show products from verified farmers
+      match: { isVerified: true },
     })
     .sort({ createdAt: -1 })
     .lean();
+  const filteredProducts = products.filter((product: any) => {
+    return product.farmerId && 
+           (product.farmerId._id || product.farmerId.toString());
+  });
 
-  // Filter out products where farmer population failed (null farmerId after populate)
-  // and transform products to include farmer info
-  const transformedProducts: PublicProduct[] = products
-    .filter((product: any) => {
-      // Only include products with valid farmer information
-      return product.farmerId && 
-             (product.farmerId._id || product.farmerId.toString());
-    })
-    .map((product: any): PublicProduct => {
-      const farmerId = product.farmerId?._id?.toString() || product.farmerId?.toString() || "";
-      const farmer = product.farmerId && typeof product.farmerId === 'object'
-        ? {
-            _id: product.farmerId._id?.toString() || product.farmerId.toString(),
-            fullName: product.farmerId.fullName || { firstName: "", lastName: "" },
-            farmName: product.farmerId.farmName || "",
-            farmLocation: product.farmerId.farmLocation || "",
-          }
-        : undefined;
+  // Fetch ratings for all products in parallel
+  const productIds = filteredProducts.map((p: any) => p._id.toString());
+  const ratingPromises = productIds.map(async (id: string) => {
+    try {
+      const stats = await getProductRatingStatsService(id);
+      return { productId: id, rating: stats.totalReviews > 0 ? stats.averageRating : 4.5 };
+    } catch (error) {
+      return { productId: id, rating: 4.5 };
+    }
+  });
+  const ratings = await Promise.all(ratingPromises);
+  const ratingMap = new Map(ratings.map(r => [r.productId, r.rating]));
 
-      return {
-        _id: product._id.toString(),
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        category: product.category,
-        quantity: product.quantity,
-        unit: product.unit,
-        image: product.image,
-        images: product.images || [],
-        isAvailable: product.isAvailable,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
-        farmerId,
-        farmer,
-      };
-    });
-
+  const transformedProducts: PublicProduct[] = filteredProducts.map((product: any): PublicProduct => {
+    const farmerId = product.farmerId?._id?.toString() || product.farmerId?.toString() || "";
+    const farmer = product.farmerId && typeof product.farmerId === 'object'
+      ? {
+          _id: product.farmerId._id?.toString() || product.farmerId.toString(),
+          fullName: product.farmerId.fullName || { firstName: "", lastName: "" },
+          farmName: product.farmerId.farmName || "",
+          farmLocation: product.farmerId.farmLocation || "",
+        }
+      : undefined;
+    
+    // Generate seller name from farmer info
+    const sellerName = farmer
+      ? `${farmer.fullName.firstName} ${farmer.fullName.lastName}`.trim() || farmer.farmName || "Unknown Farmer"
+      : "Unknown Farmer";
+    
+    // Get location from farmer
+    const location = farmer?.farmLocation || "Unknown Location";
+    
+    // Generate farmer image URL (using dicebear or placeholder)
+    const farmerImage = farmer
+      ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`
+      : undefined;
+    
+    // Get actual rating from reviews
+    const rating = ratingMap.get(product._id.toString()) || 4.5;
+    
+    return {
+      _id: product._id.toString(),
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      quantity: product.quantity,
+      unit: product.unit,
+      image: product.image,
+      images: product.images || [],
+      isAvailable: product.isAvailable,
+      createdAt: product.createdAt ? new Date(product.createdAt).toISOString() : undefined as string | undefined,
+      updatedAt: product.updatedAt ? new Date(product.updatedAt).toISOString() : undefined as string | undefined,
+      farmerId,
+      farmer,
+      sellerName,
+      location,
+      farmerImage,
+      rating,
+    } as PublicProduct;
+  });
   return transformedProducts;
 };
-
 export const getPublicProductByIdService = async (
   productId: string
 ): Promise<PublicProduct> => {
   if (!productId) {
     throw new ApiError(400, "Product ID is required");
   }
-
   const product = await Product.findOne({
     _id: new mongoose.Types.ObjectId(productId),
     isAvailable: true,
-    quantity: { $gt: 0 }, // Only show products with stock available
+    quantity: { $gt: 0 },
   })
     .populate({
       path: "farmerId",
       select: "fullName farmName farmLocation",
-      match: { isVerified: true }, // Only show products from verified farmers
+      match: { isVerified: true },
     })
     .lean();
-
   if (!product) {
     throw new ApiError(404, "Product not found or not available");
   }
-
-  // Check if farmer was populated (verified farmer exists)
   if (!product.farmerId || (typeof product.farmerId === 'object' && !product.farmerId._id)) {
     throw new ApiError(404, "Product not available");
   }
-
-  // Transform product to include farmer info
   const farmerId = (product as any).farmerId?._id?.toString() || (product as any).farmerId?.toString() || "";
   const farmer = (product as any).farmerId && typeof (product as any).farmerId === 'object'
     ? {
@@ -149,11 +166,36 @@ export const getPublicProductByIdService = async (
         farmLocation: (product as any).farmerId.farmLocation || "",
       }
     : undefined;
-
+  
+  // Generate seller name from farmer info
+  const sellerName = farmer
+    ? `${farmer.fullName.firstName} ${farmer.fullName.lastName}`.trim() || farmer.farmName || "Unknown Farmer"
+    : "Unknown Farmer";
+  
+  // Get location from farmer
+  const location = farmer?.farmLocation || "Unknown Location";
+  
+  // Generate farmer image URL (using dicebear or placeholder)
+  const farmerImage = farmer
+    ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`
+    : undefined;
+  
+  // Get actual rating from reviews
+  let rating = 4.5; // Default fallback
+  try {
+    const ratingStats = await getProductRatingStatsService(productId);
+    if (ratingStats.totalReviews > 0) {
+      rating = ratingStats.averageRating;
+    }
+  } catch (error) {
+    // If rating service fails, use default
+    console.error("Error fetching rating:", error);
+  }
+  
   const transformedProduct: PublicProduct = {
     _id: product._id.toString(),
     name: product.name,
-    description: product.description,
+    description: product.description || "",
     price: product.price,
     category: product.category,
     quantity: product.quantity,
@@ -161,12 +203,14 @@ export const getPublicProductByIdService = async (
     image: product.image,
     images: product.images || [],
     isAvailable: product.isAvailable,
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
+    createdAt: product.createdAt ? new Date(product.createdAt).toISOString() : undefined as string | undefined,
+    updatedAt: product.updatedAt ? new Date(product.updatedAt).toISOString() : undefined as string | undefined,
     farmerId,
     farmer,
+    sellerName,
+    location,
+    farmerImage,
+    rating,
   };
-
   return transformedProduct;
 };
-

@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import ProductCard from "./ProductCard";
 import type { Product } from "@/types/product.types";
-
 interface ProductListProps {
   products: Product[];
   onEdit?: (product: Product) => void;
@@ -10,7 +9,6 @@ interface ProductListProps {
   isLoading?: boolean;
   emptyMessage?: string;
 }
-
 const ProductList: React.FC<ProductListProps> = memo(({
   products,
   onEdit,
@@ -31,7 +29,6 @@ const ProductList: React.FC<ProductListProps> = memo(({
       </div>
     );
   }
-
   if (products.length === 0) {
     return (
       <div className="text-center py-12">
@@ -39,7 +36,6 @@ const ProductList: React.FC<ProductListProps> = memo(({
       </div>
     );
   }
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
@@ -55,8 +51,5 @@ const ProductList: React.FC<ProductListProps> = memo(({
     </div>
   );
 });
-
 ProductList.displayName = "ProductList";
-
 export default ProductList;
-

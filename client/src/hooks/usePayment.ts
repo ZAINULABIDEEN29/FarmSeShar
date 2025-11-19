@@ -4,8 +4,6 @@ import { paymentService, type CreatePaymentIntentInput, type ConfirmPaymentInput
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@/store/hooks";
 import { clearCart } from "@/store/slices/cartSlice";
-
-// Create payment intent mutation
 export const useCreatePaymentIntent = () => {
   return useMutation({
     mutationFn: (data: CreatePaymentIntentInput) =>
@@ -17,26 +15,26 @@ export const useCreatePaymentIntent = () => {
     },
   });
 };
-
-// Confirm payment mutation
 export const useConfirmPayment = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   return useMutation({
     mutationFn: (data: ConfirmPaymentInput) =>
       paymentService.confirmPayment(data),
     onSuccess: (response) => {
-      toast.success(response.message || "Payment confirmed!");
       dispatch(clearCart());
-      // Navigate to order confirmation page
-      navigate(`/order-confirmation/${response.order._id}`);
+      // Don't navigate here - let the component handle navigation with order data
+      return response;
     },
     onError: (error: any) => {
       const errorMessage =
-        error.response?.data?.message || error.message || "Payment confirmation failed.";
+        error.response?.data?.message || 
+        (error.response?.data?.errors && Array.isArray(error.response.data.errors)
+          ? error.response.data.errors.map((e: any) => e.message).join(", ")
+          : null) ||
+        error.message || 
+        "Payment confirmation failed.";
       toast.error(errorMessage);
     },
   });
 };
-

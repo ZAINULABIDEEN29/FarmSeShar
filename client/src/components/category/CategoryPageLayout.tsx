@@ -11,13 +11,11 @@ import { useAppSelector } from "@/store/hooks";
 import { selectCartItemCount } from "@/store/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
 interface CategoryPageLayoutProps {
   products: Product[];
   categoryName: string;
   itemsPerPage?: number;
 }
-
 const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
   products,
   categoryName,
@@ -25,7 +23,6 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
 }) => {
   const navigate = useNavigate();
   const cartItemCount = useAppSelector(selectCartItemCount);
-
   const {
     sortBy,
     setSortBy,
@@ -43,24 +40,18 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
     endIndex,
     totalProducts,
   } = useCategoryPage({ products, itemsPerPage });
-
   const handleAccountClick = () => {
     navigate("/login");
   };
-
   const handleCartClick = () => {
     navigate("/cart");
   };
-
   const handleLogoClick = () => {
     navigate("/");
   };
-
   const handleAddToCart = (productId: string) => {
     toast.success("Product added to cart!");
-    // TODO: Add to cart logic
   };
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header
@@ -69,14 +60,12 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
         onCartClick={handleCartClick}
         onLogoClick={handleLogoClick}
       />
-
       <main className="flex-1 w-full py-6 sm:py-8 lg:py-10">
         <Container>
-          {/* Breadcrumbs */}
+          {}
           <Breadcrumbs currentPage={categoryName} />
-
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mt-6 relative">
-            {/* Left Sidebar - Filters */}
+            {}
             <div className="lg:w-64 xl:w-72 shrink-0 relative z-0">
               <FilterSidebar
                 sortBy={sortBy}
@@ -90,10 +79,9 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
                 onQuickFilterToggle={toggleQuickFilter}
               />
             </div>
-
-            {/* Main Content Area */}
+            {}
             <div className="flex-1">
-              {/* Header with title and product count */}
+              {}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-0">
                   {categoryName}
@@ -102,8 +90,7 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
                   Showing {startIndex + 1} - {Math.min(endIndex, totalProducts)} of {totalProducts} Products
                 </p>
               </div>
-
-              {/* Product Grid */}
+              {}
               {currentProducts.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-600">No products found in this category.</p>
@@ -119,8 +106,7 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
                   ))}
                 </div>
               )}
-
-              {/* Pagination */}
+              {}
               {totalPages > 1 && (
                 <Pagination
                   currentPage={currentPage}
@@ -132,11 +118,8 @@ const CategoryPageLayout: React.FC<CategoryPageLayoutProps> = ({
           </div>
         </Container>
       </main>
-
       <Footer />
     </div>
   );
 };
-
 export default CategoryPageLayout;
-

@@ -1,12 +1,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-
 interface TopInfoBarProps {
   deliveryText?: string;
   supportText?: string;
   className?: string;
 }
-
 const TopInfoBar: React.FC<TopInfoBarProps> = ({
   deliveryText = "Free Delivery over Rs.3000",
   supportText = "Support: (0)-2047-1008",
@@ -25,6 +23,4 @@ const TopInfoBar: React.FC<TopInfoBarProps> = ({
     </div>
   );
 };
-
 export default TopInfoBar;
-

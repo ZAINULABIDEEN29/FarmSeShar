@@ -1,4 +1,3 @@
-// Customer Types
 export interface Customer {
   _id: string;
   fullName: {
@@ -12,13 +11,10 @@ export interface Customer {
   lastOrderDate?: string;
   createdAt?: string;
 }
-
-// Order Types
 export type OrderStatus = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
-
 export interface Order {
   _id: string;
-  orderId: string; // Display ID for customer
+  orderId: string;
   customerId: string;
   customerName: string;
   items: OrderItem[];
@@ -36,7 +32,6 @@ export interface Order {
   createdAt: string;
   updatedAt?: string;
 }
-
 export interface OrderItem {
   productId: string;
   productName: string;
@@ -45,13 +40,10 @@ export interface OrderItem {
   price: number;
   total: number;
 }
-
-// Shipment Types
 export type ShipmentStatus = "pending" | "preparing" | "in_transit" | "out_for_delivery" | "delivered" | "cancelled";
-
 export interface Shipment {
   _id: string;
-  shipmentId: string; // Tracking ID
+  shipmentId: string;
   orderId: string;
   customerName: string;
   customerAddress: {
@@ -70,8 +62,6 @@ export interface Shipment {
   createdAt: string;
   updatedAt?: string;
 }
-
-// Dashboard Statistics Types
 export interface DashboardStats {
   totalProducts: number;
   availableProducts: number;
@@ -84,19 +74,15 @@ export interface DashboardStats {
   deliveredShipments: number;
   totalCustomers: number;
 }
-
-// Query Types
 export interface DashboardStatsQuery {
   startDate?: string;
   endDate?: string;
 }
-
 export interface DashboardCustomersQuery {
   search?: string;
   page?: number;
   limit?: number;
 }
-
 export interface DashboardOrdersQuery {
   search?: string;
   status?: OrderStatus;
@@ -105,7 +91,6 @@ export interface DashboardOrdersQuery {
   startDate?: string;
   endDate?: string;
 }
-
 export interface DashboardShipmentsQuery {
   search?: string;
   status?: ShipmentStatus;

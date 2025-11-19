@@ -2,25 +2,20 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { User } from "@/types/user.types";
 import type { Farmer } from "@/types/farmer.types";
-
 interface AuthState {
   user: User | null;
   farmer: Farmer | null;
   isAuthenticated: boolean;
   userType: "user" | "farmer" | null;
-  isRestoring: boolean; // Flag to track if auth is being restored
-  // Tokens are stored in HTTP-only cookies (secure, not accessible to JavaScript)
-  // No need to store them in Redux state
+  isRestoring: boolean;
 }
-
 const initialState: AuthState = {
   user: null,
   farmer: null,
   isAuthenticated: false,
   userType: null,
-  isRestoring: true, // Start with true, will be set to false after restoration attempt
+  isRestoring: true,
 };
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -58,7 +53,5 @@ const authSlice = createSlice({
     },
   },
 });
-
 export const { setUser, setFarmer, setRestoring, logout, clearAuth } = authSlice.actions;
 export default authSlice.reducer;
-

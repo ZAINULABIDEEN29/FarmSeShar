@@ -6,10 +6,6 @@ import {
 } from "../controllers/publicProduct.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { productQuerySchema } from "../validator/product.schema.js";
-
-// Public product routes (no authentication required)
 router.get("/products", validate(productQuerySchema, "query"), getPublicProducts);
 router.get("/products/:id", getPublicProductById);
-
 export default router;
-

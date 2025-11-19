@@ -2,19 +2,16 @@ import React, { useMemo } from "react";
 import { useGetPublicProducts, transformProductForCard } from "./useProducts";
 import type { Product } from "@/types/product.types";
 import Loader from "@/components/common/Loader";
-
 export interface TransformedProduct extends Product {
   sellerName: string;
   rating: number;
   location?: string;
   farmerImage?: string;
 }
-
 interface UseCategoryProductsOptions {
   category: string;
   itemsPerPage?: number;
 }
-
 interface UseCategoryProductsReturn {
   products: TransformedProduct[];
   isLoading: boolean;
@@ -24,36 +21,23 @@ interface UseCategoryProductsReturn {
   ErrorComponent: React.ReactNode;
   EmptyComponent: React.ReactNode;
 }
-
-/**
- * Custom hook for fetching and transforming category products
- * Handles API calls, data transformation, and provides UI components
- */
 export const useCategoryProducts = ({
   category,
   itemsPerPage = 12,
 }: UseCategoryProductsOptions): UseCategoryProductsReturn => {
-  // Fetch products from API
   const { data: products = [], isLoading, error } = useGetPublicProducts({ category });
-
-  // Transform products to match ProductGridCard format
   const transformedProducts = useMemo(() => {
     if (!products || products.length === 0) {
       return [];
     }
-    
     return products.map(transformProductForCard) as TransformedProduct[];
   }, [products]);
-
   const isEmpty = !isLoading && !error && transformedProducts.length === 0;
-
-  // Reusable UI components
   const LoaderComponent = (
     <div className="flex justify-center items-center py-12">
       <Loader />
     </div>
   );
-
   const ErrorComponent = (
     <div className="text-center py-12">
       <p className="text-red-600">Error loading products. Please try again later.</p>
@@ -64,7 +48,6 @@ export const useCategoryProducts = ({
       )}
     </div>
   );
-
   const EmptyComponent = (
     <div className="text-center py-12">
       <p className="text-gray-600">No products found in this category.</p>
@@ -73,7 +56,6 @@ export const useCategoryProducts = ({
       </p>
     </div>
   );
-
   return {
     products: transformedProducts,
     isLoading,
@@ -84,4 +66,3 @@ export const useCategoryProducts = ({
     EmptyComponent,
   };
 };
-

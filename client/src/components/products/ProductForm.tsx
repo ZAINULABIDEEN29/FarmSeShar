@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import FormField from "@/components/auth/FormField";
 import TextAreaField from "@/components/auth/TextAreaField";
 import { Button } from "@/components/ui/button";
-import type { Product, CreateProductInput, UpdateProductInput } from "@/types/product.types";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { uploadService } from "@/services/upload.service";
+import { toast } from "react-toastify";
+import type { CreateProductInput, UpdateProductInput } from "@/types/product.types";
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -24,7 +27,10 @@ const validationSchema = Yup.object({
     .min(0, "Quantity cannot be negative")
     .required("Quantity is required"),
   unit: Yup.string().required("Unit is required"),
-  image: Yup.string().url("Must be a valid URL").optional(),
+  images: Yup.array()
+    .of(Yup.string().url("Must be a valid URL"))
+    .min(1, "At least one product image is required")
+    .required("Product images are required"),
 });
 
 interface ProductFormProps {
@@ -38,13 +44,8 @@ interface ProductFormProps {
 const categories = [
   "Vegetables",
   "Fruits",
-  "Grains",
   "Dairy",
-  "Meat",
-  "Poultry",
   "Herbs",
-  "Spices",
-  "Other",
 ];
 
 const units = ["kg", "g", "lb", "piece", "box", "bunch", "dozen", "liter", "ml"];
@@ -56,6 +57,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
   isLoading = false,
   submitLabel = "Save Product",
 }) => {
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState<string[]>(
+    initialValues.images || []
+  );
+
   const formik = useFormik({
     initialValues: {
       name: initialValues.name || "",
@@ -64,7 +70,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       category: initialValues.category || "",
       quantity: initialValues.quantity || 0,
       unit: initialValues.unit || "kg",
-      image: initialValues.image || "",
+      images: initialValues.images || [],
       isAvailable: initialValues.isAvailable ?? true,
     },
     validationSchema,
@@ -73,6 +79,56 @@ const ProductForm: React.FC<ProductFormProps> = ({
       onSubmit(productData);
     },
   });
+
+  const handleImageSelect = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+
+      const validFiles = Array.from(files).filter((file) => {
+        if (!file.type.startsWith("image/")) {
+          toast.error(`${file.name} is not an image file`);
+          return false;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`${file.name} is too large. Maximum size is 5MB`);
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length === 0) return;
+
+      setUploadingImages(true);
+      try {
+        const uploadPromises = validFiles.map((file) => uploadService.uploadImage(file));
+        const results = await Promise.all(uploadPromises);
+        const newImageUrls = results.map((result) => result.image.url);
+        const updatedImages = [...imagePreviews, ...newImageUrls];
+        
+        setImagePreviews(updatedImages);
+        formik.setFieldValue("images", updatedImages);
+        toast.success(`${validFiles.length} image(s) uploaded successfully`);
+      } catch (error: any) {
+        console.error("Image upload error:", error);
+        toast.error(error.response?.data?.message || "Failed to upload images");
+      } finally {
+        setUploadingImages(false);
+        // Reset input
+        event.target.value = "";
+      }
+    },
+    [imagePreviews, formik]
+  );
+
+  const handleRemoveImage = useCallback(
+    (index: number) => {
+      const updatedImages = imagePreviews.filter((_, i) => i !== index);
+      setImagePreviews(updatedImages);
+      formik.setFieldValue("images", updatedImages);
+    },
+    [imagePreviews, formik]
+  );
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
@@ -194,19 +250,92 @@ const ProductForm: React.FC<ProductFormProps> = ({
           )}
         </div>
 
-        {/* Image URL */}
+        {/* Product Images */}
         <div className="md:col-span-2">
-          <FormField
-            label="Image URL (Optional)"
-            id="image"
-            type="url"
-            placeholder="https://example.com/image.jpg"
-            value={formik.values.image}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.image && formik.errors.image && (
-            <p className="text-sm text-red-600 mt-1">{formik.errors.image}</p>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Product Images <span className="text-red-500">*</span>
+          </label>
+          
+          {/* Image Upload Area */}
+          <div className="mb-4">
+            <label
+              htmlFor="image-upload"
+              className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                uploadingImages
+                  ? "border-gray-300 bg-gray-50"
+                  : "border-gray-300 hover:border-green-500 hover:bg-green-50"
+              }`}
+            >
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                {uploadingImages ? (
+                  <>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-2"></div>
+                    <p className="text-sm text-gray-600">Uploading images...</p>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-10 h-10 mb-3 text-gray-400" />
+                    <p className="mb-2 text-sm text-gray-500">
+                      <span className="font-semibold">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB (Max 10 images)</p>
+                  </>
+                )}
+              </div>
+              <input
+                id="image-upload"
+                type="file"
+                className="hidden"
+                accept="image/*"
+                multiple
+                onChange={handleImageSelect}
+                disabled={uploadingImages || imagePreviews.length >= 10}
+              />
+            </label>
+          </div>
+
+          {/* Image Previews */}
+          {imagePreviews.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {imagePreviews.map((imageUrl, index) => (
+                <div
+                  key={index}
+                  className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200"
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`Product image ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                    aria-label="Remove image"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 text-center">
+                    Image {index + 1}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {formik.touched.images && formik.errors.images && (
+            <p className="text-sm text-red-600 mt-1">
+              {typeof formik.errors.images === "string"
+                ? formik.errors.images
+                : "At least one product image is required"}
+            </p>
+          )}
+
+          {imagePreviews.length === 0 && !uploadingImages && (
+            <div className="flex items-center gap-2 text-sm text-amber-600 mt-2">
+              <ImageIcon className="w-4 h-4" />
+              <span>Please upload at least one product image</span>
+            </div>
           )}
         </div>
       </div>
@@ -218,7 +347,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isLoading}
+            disabled={isLoading || uploadingImages}
             className="flex-1"
           >
             Cancel
@@ -226,7 +355,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         )}
         <Button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || uploadingImages || imagePreviews.length === 0}
           className="flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? "Saving..." : submitLabel}
@@ -237,4 +366,3 @@ const ProductForm: React.FC<ProductFormProps> = ({
 };
 
 export default ProductForm;
-

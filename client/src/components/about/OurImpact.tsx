@@ -1,12 +1,10 @@
 import React from "react";
 import Container from "@/components/container/Container";
 import { cn } from "@/lib/utils";
-
 interface ImpactStat {
   value: string;
   label: string;
 }
-
 const impactStats: ImpactStat[] = [
   {
     value: "40%+",
@@ -25,19 +23,17 @@ const impactStats: ImpactStat[] = [
     label: "Local Farmers Empowered",
   },
 ];
-
 const OurImpact: React.FC = () => {
   return (
     <section className="py-16 sm:py-20 lg:py-24 xl:py-28 bg-white">
       <Container>
-        {/* Centered heading */}
+        {}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
           <h2 className="text-3xl sm:text-3xl lg:text-4xl tracking-tight leading-tight font-semibold text-gray-900 mb-4">
             Our Impact
           </h2>
         </div>
-
-        {/* Impact Statistics Cards */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto px-4 sm:px-6">
           {impactStats.map((stat, index) => (
             <div
@@ -49,11 +45,11 @@ const OurImpact: React.FC = () => {
                 "transition-shadow duration-300 hover:shadow-md"
               )}
             >
-              {/* Large green value */}
+              {}
               <span className="text-4xl sm:text-5xl lg:text-6xl font-bold text-green-600 mb-4 sm:mb-5 lg:mb-6">
                 {stat.value}
               </span>
-              {/* Dark gray label */}
+              {}
               <p className="text-base sm:text-lg text-gray-900 font-normal leading-relaxed">
                 {stat.label}
               </p>
@@ -64,6 +60,4 @@ const OurImpact: React.FC = () => {
     </section>
   );
 };
-
 export default OurImpact;
-

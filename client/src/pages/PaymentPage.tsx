@@ -15,17 +15,17 @@ import type { CheckoutAddress } from "@/types/checkout.types";
 import { toast } from "react-toastify";
 import { ShoppingBag } from "lucide-react";
 import { useCreatePaymentIntent, useConfirmPayment } from "@/hooks/usePayment";
-import { useAppDispatch } from "@/store/hooks";
-
 interface LocationState {
   address?: CheckoutAddress;
 }
-
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useAppDispatch();
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">("card");
+  // Check if Stripe is configured, default to cash if not
+  const hasStripeConfig = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">(
+    hasStripeConfig ? "card" : "cash"
+  );
   const [clientSecret, setClientSecret] = useState<string>("");
   const [paymentIntentId, setPaymentIntentId] = useState<string>("");
   const cartItems = useAppSelector(selectCartItems);
@@ -33,26 +33,39 @@ const PaymentPage: React.FC = () => {
   const cartItemCount = useAppSelector(selectCartItemCount);
   const discountPercentage = useAppSelector((state) => state.cart.discount);
   const address = (location.state as LocationState)?.address;
-  
   const createPaymentIntent = useCreatePaymentIntent();
   const confirmPayment = useConfirmPayment();
-
   const handleLogoClick = () => {
     navigate("/");
   };
-
   const handleAccountClick = () => {
     navigate("/login");
   };
-
   const handleCartClick = () => {
     navigate("/cart");
   };
-
-  // Create payment intent when component mounts or payment method changes
   useEffect(() => {
-    if (!address || cartItems.length === 0) return;
-
+    if (!address || cartItems.length === 0) {
+      setClientSecret("");
+      setPaymentIntentId("");
+      return;
+    }
+    // Validate address structure before sending
+    const requiredFields = ['streetAddress', 'houseNo', 'town', 'city', 'country', 'postalCode'];
+    const missingFields = requiredFields.filter(field => !address[field as keyof CheckoutAddress]);
+    if (missingFields.length > 0) {
+      console.error("Invalid address - missing fields:", missingFields);
+      toast.error(`Please complete all address fields. Missing: ${missingFields.join(", ")}`);
+      setClientSecret("");
+      setPaymentIntentId("");
+      return;
+    }
+    
+    // Don't create a new intent if we already have one for the current payment method
+    if (clientSecret && paymentIntentId) {
+      return;
+    }
+    
     const createIntent = async () => {
       try {
         const response = await createPaymentIntent.mutateAsync({
@@ -63,64 +76,102 @@ const PaymentPage: React.FC = () => {
         setPaymentIntentId(response.paymentIntentId);
       } catch (error: any) {
         console.error("Error creating payment intent:", error);
-        // Error is already handled by the hook
+        const errorMessage = error.response?.data?.message || 
+          (error.response?.data?.errors && Array.isArray(error.response.data.errors)
+            ? error.response.data.errors.map((e: any) => e.message).join(", ")
+            : null) ||
+          "Failed to setup payment. Please try again.";
+        toast.error(errorMessage);
+        setClientSecret("");
+        setPaymentIntentId("");
       }
     };
-
+    
+    // Only create intent if we don't already have one
     createIntent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address, paymentMethod, cartItems.length]);
-
+  }, [address, paymentMethod]);
+  
+  // Reset payment intent when payment method changes
+  useEffect(() => {
+    if (clientSecret && paymentIntentId) {
+      setClientSecret("");
+      setPaymentIntentId("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paymentMethod]);
   const handlePaymentMethodChange = (method: "card" | "cash") => {
     setPaymentMethod(method);
   };
-
   const handleCashPayment = async () => {
     if (!address || !paymentIntentId) {
       toast.error("Payment setup incomplete. Please try again.");
       return;
     }
-
     try {
-      await confirmPayment.mutateAsync({
+      const response = await confirmPayment.mutateAsync({
         paymentIntentId,
         shippingAddress: address,
       });
+      toast.success("Order placed successfully! You will pay cash on delivery.");
+      // Navigate to order confirmation with order data
+      navigate("/order-confirmation", {
+        state: {
+          order: response.order,
+          address,
+          paymentMethod: "cash",
+        },
+      });
     } catch (error: any) {
-      // Error is already handled by the hook
+      console.error("Payment confirmation error:", error);
+      const errorMessage = error.response?.data?.message || 
+        (error.response?.data?.errors && Array.isArray(error.response.data.errors)
+          ? error.response.data.errors.map((e: any) => e.message).join(", ")
+          : null) ||
+        "Failed to place order. Please try again.";
+      toast.error(errorMessage);
     }
   };
-
   const handleCardPaymentSuccess = async () => {
     if (!address || !paymentIntentId) {
       toast.error("Payment setup incomplete. Please try again.");
       return;
     }
-
     try {
-      await confirmPayment.mutateAsync({
+      const response = await confirmPayment.mutateAsync({
         paymentIntentId,
         shippingAddress: address,
       });
+      toast.success("Payment successful! Order placed.");
+      // Navigate to order confirmation with order data
+      navigate("/order-confirmation", {
+        state: {
+          order: response.order,
+          address,
+          paymentMethod: "card",
+        },
+      });
     } catch (error: any) {
-      // Error is already handled by the hook
+      console.error("Payment confirmation error:", error);
+      const errorMessage = error.response?.data?.message || 
+        (error.response?.data?.errors && Array.isArray(error.response.data.errors)
+          ? error.response.data.errors.map((e: any) => e.message).join(", ")
+          : null) ||
+        "Failed to confirm payment. Please try again.";
+      toast.error(errorMessage);
     }
   };
-
-  // Redirect if no address or cart is empty
   React.useEffect(() => {
     if (!address) {
       toast.error("Please complete checkout first");
       navigate("/checkout");
       return;
     }
-
     if (cartItems.length === 0) {
       toast.error("Your cart is empty");
       navigate("/cart");
     }
   }, [address, cartItems.length, navigate]);
-
   return (
     <div className="w-full flex flex-col min-h-screen bg-white">
       <Header
@@ -129,7 +180,6 @@ const PaymentPage: React.FC = () => {
         onCartClick={handleCartClick}
         onLogoClick={handleLogoClick}
       />
-
       <main className="flex-1 py-8 sm:py-12 bg-white">
         <Container>
           <div className="mb-6 sm:mb-8">
@@ -140,7 +190,6 @@ const PaymentPage: React.FC = () => {
               Complete your payment to place the order
             </p>
           </div>
-
           {(!address || cartItems.length === 0) ? (
             <div className="flex flex-col items-center justify-center py-16 sm:py-24">
               <ShoppingBag className="h-16 w-16 sm:h-24 sm:w-24 text-gray-400 mb-4" />
@@ -161,7 +210,7 @@ const PaymentPage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-              {/* Payment Form - Left Side */}
+              {}
               <div className="lg:col-span-2">
                 <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 lg:p-8">
                   {clientSecret ? (
@@ -180,8 +229,7 @@ const PaymentPage: React.FC = () => {
                   )}
                 </div>
               </div>
-
-              {/* Cart Summary - Right Side */}
+              {}
               <div className="lg:col-span-1">
                 <div className="sticky top-24">
                   <CartSummary
@@ -198,11 +246,8 @@ const PaymentPage: React.FC = () => {
           )}
         </Container>
       </main>
-
       <Footer />
     </div>
   );
 };
-
 export default PaymentPage;
-

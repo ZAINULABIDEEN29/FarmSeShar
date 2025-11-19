@@ -1,15 +1,12 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import { Facebook, Chrome, Apple } from "lucide-react";
-
 export type SocialProvider = "facebook" | "google" | "apple";
-
 interface SocialLoginButtonProps {
   provider: SocialProvider;
   onClick?: () => void;
   className?: string;
 }
-
 const socialConfig: Record<
   SocialProvider,
   { icon: React.ComponentType<{ className?: string }>; label: string; iconColor: string }
@@ -30,7 +27,6 @@ const socialConfig: Record<
     iconColor: "text-gray-900",
   },
 };
-
 const SocialLoginButton: React.FC<SocialLoginButtonProps> = ({
   provider,
   onClick,
@@ -38,7 +34,6 @@ const SocialLoginButton: React.FC<SocialLoginButtonProps> = ({
 }) => {
   const config = socialConfig[provider];
   const Icon = config.icon;
-
   return (
     <button
       type="button"
@@ -53,6 +48,4 @@ const SocialLoginButton: React.FC<SocialLoginButtonProps> = ({
     </button>
   );
 };
-
 export default SocialLoginButton;
-

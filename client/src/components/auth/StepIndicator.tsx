@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface StepIndicatorProps {
   currentStep: number;
   totalSteps: number;
@@ -10,7 +9,6 @@ interface StepIndicatorProps {
   backTo?: string;
   className?: string;
 }
-
 const StepIndicator: React.FC<StepIndicatorProps> = ({
   currentStep,
   totalSteps,
@@ -19,7 +17,6 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
-
   const handleBack = () => {
     if (onBack) {
       onBack();
@@ -27,7 +24,6 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
       navigate(backTo);
     }
   };
-
   return (
     <div className={cn("flex items-center gap-2 mb-4", className)}>
       <button
@@ -43,6 +39,4 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
     </div>
   );
 };
-
 export default StepIndicator;
-

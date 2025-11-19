@@ -14,17 +14,12 @@ import {
   dashboardShipmentsQuerySchema,
 } from "../validator/dashboard.schema.js";
 import { ZodError } from "zod";
-
-// Get Dashboard Statistics
 export const getDashboardStats = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate query parameters
     let filters;
     try {
       filters = dashboardStatsQuerySchema.parse(req.query);
@@ -34,9 +29,7 @@ export const getDashboardStats = asyncHandler(
       }
       throw error;
     }
-
     const stats = await getDashboardStatsService(farmerId, filters);
-
     return res.status(200).json({
       success: true,
       message: "Dashboard statistics retrieved successfully",
@@ -44,17 +37,12 @@ export const getDashboardStats = asyncHandler(
     });
   }
 );
-
-// Get Customers
 export const getDashboardCustomers = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate query parameters
     let filters;
     try {
       filters = dashboardCustomersQuerySchema.parse(req.query);
@@ -64,9 +52,7 @@ export const getDashboardCustomers = asyncHandler(
       }
       throw error;
     }
-
     const result = await getDashboardCustomersService(farmerId, filters);
-
     return res.status(200).json({
       success: true,
       message: "Customers retrieved successfully",
@@ -80,17 +66,12 @@ export const getDashboardCustomers = asyncHandler(
     });
   }
 );
-
-// Get Orders
 export const getDashboardOrders = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate query parameters
     let filters;
     try {
       filters = dashboardOrdersQuerySchema.parse(req.query);
@@ -100,9 +81,7 @@ export const getDashboardOrders = asyncHandler(
       }
       throw error;
     }
-
     const result = await getDashboardOrdersService(farmerId, filters);
-
     return res.status(200).json({
       success: true,
       message: "Orders retrieved successfully",
@@ -116,17 +95,12 @@ export const getDashboardOrders = asyncHandler(
     });
   }
 );
-
-// Get Shipments
 export const getDashboardShipments = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate query parameters
     let filters;
     try {
       filters = dashboardShipmentsQuerySchema.parse(req.query);
@@ -136,9 +110,7 @@ export const getDashboardShipments = asyncHandler(
       }
       throw error;
     }
-
     const result = await getDashboardShipmentsService(farmerId, filters);
-
     return res.status(200).json({
       success: true,
       message: "Shipments retrieved successfully",
@@ -152,4 +124,3 @@ export const getDashboardShipments = asyncHandler(
     });
   }
 );
-

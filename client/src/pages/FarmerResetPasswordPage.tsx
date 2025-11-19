@@ -7,7 +7,6 @@ import FormField from "@/components/auth/FormField";
 import { Button } from "@/components/ui/button";
 import BackLink from "@/components/auth/BackLink";
 import { useResetPasswordFarmer } from "@/hooks/useAuth";
-
 const validationSchema = Yup.object({
   createPassword: Yup.string()
     .min(8, "Password must be at least 8 characters long")
@@ -16,21 +15,17 @@ const validationSchema = Yup.object({
     .oneOf([Yup.ref("createPassword")], "Passwords must match")
     .required("Please confirm your password"),
 });
-
 const FarmerResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const resetPasswordMutation = useResetPasswordFarmer();
-
   const token = searchParams.get("token");
   const farmerId = searchParams.get("farmerId");
-
   useEffect(() => {
     if (!token || !farmerId) {
       navigate("/farmer-forgot-password");
     }
   }, [token, farmerId, navigate]);
-
   const formik = useFormik({
     initialValues: {
       createPassword: "",
@@ -48,10 +43,8 @@ const FarmerResetPasswordPage: React.FC = () => {
       });
     },
   });
-
   const [showCreatePassword, setShowCreatePassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
@@ -62,16 +55,13 @@ const FarmerResetPasswordPage: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
           <BackLink to="/farmer-login" />
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Set a new password
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             Please set a new password for your farmer account
           </p>
-
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div>
               <FormField
@@ -102,7 +92,6 @@ const FarmerResetPasswordPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.createPassword}</p>
               )}
             </div>
-
             <div>
               <FormField
                 label="Confirm Password"
@@ -132,7 +121,6 @@ const FarmerResetPasswordPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.confirmPassword}</p>
               )}
             </div>
-
             <Button
               type="submit"
               disabled={resetPasswordMutation.isPending || !token || !farmerId}
@@ -143,13 +131,10 @@ const FarmerResetPasswordPage: React.FC = () => {
           </form>
         </div>
       </div>
-
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default FarmerResetPasswordPage;
-

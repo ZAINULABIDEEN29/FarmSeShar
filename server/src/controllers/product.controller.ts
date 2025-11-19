@@ -11,17 +11,13 @@ import {
 import { ApiError } from "../utils/ApiError.js";
 import { productQuerySchema } from "../validator/product.schema.js";
 import { ZodError } from "zod";
-
 export const createProduct = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
     const product = await createProductService(farmerId, req.body);
-
     return res.status(201).json({
       success: true,
       message: "Product created successfully",
@@ -29,16 +25,12 @@ export const createProduct = asyncHandler(
     });
   }
 );
-
 export const getProducts = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate query parameters
     let filters;
     try {
       filters = productQuerySchema.parse(req.query);
@@ -48,9 +40,7 @@ export const getProducts = asyncHandler(
       }
       throw error;
     }
-
     const products = await getProductsService(farmerId, filters);
-
     return res.status(200).json({
       success: true,
       products,
@@ -58,44 +48,34 @@ export const getProducts = asyncHandler(
     });
   }
 );
-
 export const getProductById = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
     const productId = req.params.id;
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
     if (!productId) {
       throw new ApiError(400, "Product ID is required");
     }
-
     const product = await getProductByIdService(productId, farmerId);
-
     return res.status(200).json({
       success: true,
       product,
     });
   }
 );
-
 export const updateProduct = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
     const productId = req.params.id;
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
     if (!productId) {
       throw new ApiError(400, "Product ID is required");
     }
-
     const product = await updateProductService(productId, farmerId, req.body);
-
     return res.status(200).json({
       success: true,
       message: "Product updated successfully",
@@ -103,44 +83,34 @@ export const updateProduct = asyncHandler(
     });
   }
 );
-
 export const deleteProduct = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
     const productId = req.params.id;
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
     if (!productId) {
       throw new ApiError(400, "Product ID is required");
     }
-
     await deleteProductService(productId, farmerId);
-
     return res.status(200).json({
       success: true,
       message: "Product deleted successfully",
     });
   }
 );
-
 export const toggleProductAvailability = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
     const productId = req.params.id;
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
     if (!productId) {
       throw new ApiError(400, "Product ID is required");
     }
-
     const product = await toggleProductAvailabilityService(productId, farmerId);
-
     return res.status(200).json({
       success: true,
       message: `Product ${product.isAvailable ? "activated" : "deactivated"} successfully`,
@@ -148,4 +118,3 @@ export const toggleProductAvailability = asyncHandler(
     });
   }
 );
-

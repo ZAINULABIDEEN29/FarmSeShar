@@ -16,89 +16,66 @@ import ProductInfo from "@/components/products/ProductInfo";
 import ProductTabs from "@/components/products/ProductTabs";
 import RelatedProductsSection from "@/components/products/RelatedProductsSection";
 
+
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const cartItemCount = useAppSelector(selectCartItemCount);
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-  
   const { data: product, isLoading, error } = useGetPublicProduct(productId || "");
   const addToCart = useAddToCart();
-  
   const [selectedWeight, setSelectedWeight] = useState("3 Kg");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
-
-  // Get related products (same category, excluding current product)
   const { data: relatedProducts = [] } = useGetPublicProducts({ 
     category: product?.category 
   });
-
-  // Get all products as fallback if no related products in same category
   const { data: allProducts = [] } = useGetPublicProducts({});
-
   const transformedProduct = useMemo(() => {
     return product ? transformProductForCard(product) : null;
   }, [product]);
-
   const filteredRelatedProducts = useMemo(() => {
-    // First try to get products from same category
     let products = relatedProducts || [];
-    
-    // If no products in same category or only current product, use all products
     if (products.length === 0 || (products.length === 1 && products[0]._id === productId)) {
       products = allProducts || [];
     }
-    
     if (!products || products.length === 0) return [];
-    
     return products
       .filter((p) => p._id !== productId)
       .slice(0, 4)
       .map(transformProductForCard);
   }, [relatedProducts, allProducts, productId]);
-
-  // Calculate discount (mock - you can add this to your product model)
   const originalPrice = transformedProduct ? Math.round(transformedProduct.price * 1.43) : 0;
   const discountPercentage = 30;
-
   const handleAccountClick = () => {
     navigate("/login");
   };
-
   const handleCartClick = () => {
     navigate("/cart");
   };
-
   const handleLogoClick = () => {
     navigate("/");
   };
-
   const handleQuantityChange = (delta: number) => {
     setQuantity((prev) => Math.max(1, prev + delta));
   };
-
   const handleQuantityInputChange = (value: number) => {
     setQuantity(Math.max(1, value));
   };
-
   const handleAddToCart = () => {
     if (!isAuthenticated) {
       toast.error("Please login to add items to cart");
       navigate("/login", { state: { from: window.location.pathname } });
       return;
     }
-
     if (!productId) {
       toast.error("Invalid product");
       return;
     }
-
     addToCart.mutate(
       { productId, quantity },
       {
         onSuccess: () => {
-          // Success is handled in the hook
         },
         onError: (error: any) => {
           console.error("Add to cart error:", error);
@@ -106,19 +83,16 @@ const ProductDetailPage: React.FC = () => {
       }
     );
   };
-
   const handleCheckout = () => {
     if (!isAuthenticated) {
       toast.error("Please login to checkout");
       navigate("/login", { state: { from: window.location.pathname } });
       return;
     }
-
     if (!productId) {
       toast.error("Invalid product");
       return;
     }
-
     addToCart.mutate(
       { productId, quantity },
       {
@@ -131,7 +105,6 @@ const ProductDetailPage: React.FC = () => {
       }
     );
   };
-
   const handleRelatedProductAddToCart = (relatedProductId: string) => {
     if (!isAuthenticated) {
       toast.error("Please login to add items to cart");
@@ -140,7 +113,6 @@ const ProductDetailPage: React.FC = () => {
     }
     addToCart.mutate({ productId: relatedProductId, quantity: 1 });
   };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
@@ -157,7 +129,6 @@ const ProductDetailPage: React.FC = () => {
       </div>
     );
   }
-
   if (error || !product || !transformedProduct) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
@@ -177,17 +148,13 @@ const ProductDetailPage: React.FC = () => {
       </div>
     );
   }
-
   const productImages = product.images && product.images.length > 0 
     ? product.images 
     : product.image 
       ? [product.image] 
       : [];
-
-  // Category-specific content
   const getCategorySpecificContent = (category: string, productName: string) => {
     const categoryLower = category.toLowerCase();
-    
     switch (categoryLower) {
       case "fruits":
         return {
@@ -198,7 +165,6 @@ const ProductDetailPage: React.FC = () => {
           bestFor: "Fresh eating, smoothies, desserts, juices, and salads",
           shelfLife: "Stays fresh for 3-7 days when refrigerated"
         };
-      
       case "dairy":
         return {
           description: product.description || 
@@ -208,7 +174,6 @@ const ProductDetailPage: React.FC = () => {
           bestFor: "Daily consumption, cooking, baking, beverages, and desserts",
           shelfLife: "Stays fresh for 5-7 days when refrigerated"
         };
-      
       case "herbs":
         return {
           description: product.description || 
@@ -218,7 +183,6 @@ const ProductDetailPage: React.FC = () => {
           bestFor: "Curries, soups, salads, garnishing, and traditional dishes",
           shelfLife: "Stays fresh for 3-5 days when refrigerated"
         };
-      
       case "vegetables":
       default:
         return {
@@ -231,12 +195,8 @@ const ProductDetailPage: React.FC = () => {
         };
     }
   };
-
   const categoryContent = getCategorySpecificContent(product.category, product.name);
-
-  // Enhanced description for product details tab
   const enhancedDescription = categoryContent.description;
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header
@@ -245,10 +205,9 @@ const ProductDetailPage: React.FC = () => {
         onCartClick={handleCartClick}
         onLogoClick={handleLogoClick}
       />
-
       <main className="flex-1 w-full py-6 sm:py-8 lg:py-10">
         <Container>
-          {/* Breadcrumbs */}
+          {}
           <nav className="flex items-center gap-2 text-sm sm:text-base text-gray-600 mb-6">
             <button
               onClick={() => navigate("/")}
@@ -267,18 +226,16 @@ const ProductDetailPage: React.FC = () => {
             <ChevronRight className="h-4 w-4 text-gray-400" />
             <span className="text-gray-900 font-medium">{product.name}</span>
           </nav>
-
-          {/* Product Details Section - Two Column Layout (1/3 and 2/3 split) */}
+          {}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 lg:gap-8 mb-12">
-            {/* Left: Product Images (1/3 width) */}
+            {}
             <div className="w-full">
               <ProductImageGallery 
                 images={productImages} 
                 productName={product.name} 
               />
             </div>
-
-            {/* Right: Product Info (2/3 width) */}
+            {}
             <div className="w-full">
               <ProductInfo
                 product={{
@@ -304,8 +261,7 @@ const ProductDetailPage: React.FC = () => {
               />
             </div>
           </div>
-
-          {/* Product Information Tabs */}
+          {}
           <div className="mb-12">
             <ProductTabs
               activeTab={activeTab}
@@ -322,8 +278,7 @@ const ProductDetailPage: React.FC = () => {
               productId={productId}
             />
           </div>
-
-          {/* Related Products Section */}
+          {}
             <RelatedProductsSection
               products={filteredRelatedProducts}
               onAddToCart={handleRelatedProductAddToCart}
@@ -331,10 +286,8 @@ const ProductDetailPage: React.FC = () => {
             />
         </Container>
       </main>
-
       <Footer />
     </div>
   );
 };
-
 export default ProductDetailPage;

@@ -13,24 +13,16 @@ import { toast } from "react-toastify";
 import { useCategoryProducts } from "@/hooks/useCategoryProducts";
 import { useCategoryPage } from "@/hooks/useCategoryPage";
 import { useAddToCart } from "@/hooks/useCart";
-
 interface CategoryProductsPageProps {
   categoryName: string;
   itemsPerPage?: number;
 }
-
-/**
- * Reusable component for category product pages
- * Handles product fetching, filtering, sorting, and pagination
- */
 const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
   categoryName,
   itemsPerPage = 12,
 }) => {
   const navigate = useNavigate();
   const cartItemCount = useAppSelector(selectCartItemCount);
-
-  // Fetch and transform products
   const {
     products,
     isLoading,
@@ -40,8 +32,6 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
     ErrorComponent,
     EmptyComponent,
   } = useCategoryProducts({ category: categoryName, itemsPerPage });
-
-  // Handle filtering, sorting, and pagination
   const {
     sortBy,
     setSortBy,
@@ -60,56 +50,43 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
     products: products as any, 
     itemsPerPage 
   });
-
   const handleAccountClick = () => {
     navigate("/login");
   };
-
   const handleCartClick = () => {
     navigate("/cart");
   };
-
   const handleLogoClick = () => {
     navigate("/");
   };
-
   const addToCart = useAddToCart();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
-
   const handleAddToCart = (productId: string) => {
-    // Validate productId
     if (!productId) {
       toast.error("Invalid product. Please try again.");
       console.error("Add to cart called with invalid productId:", productId);
       return;
     }
-
     if (!isAuthenticated) {
       toast.error("Please login to add items to cart");
       navigate("/login", { state: { from: window.location.pathname } });
       return;
     }
-
-    // Add to cart with loading state
     addToCart.mutate(
       { productId: String(productId), quantity: 1 },
       {
         onSuccess: () => {
-          // Success is handled in the hook with toast
         },
         onError: (error: any) => {
-          // Error is handled in the hook, but log for debugging
           console.error("Add to cart mutation error:", error);
         },
       }
     );
   };
-
   const handlePriceRangeChange = (range: string) => {
     setPriceRange(range);
     setCurrentPage(1);
   };
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header
@@ -118,11 +95,9 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
         onCartClick={handleCartClick}
         onLogoClick={handleLogoClick}
       />
-
       <main className="flex-1 w-full py-6 sm:py-8 lg:py-10">
         <Container>
           <Breadcrumbs currentPage={categoryName} />
-
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mt-6 relative">
             <div className="lg:w-64 xl:w-72 shrink-0 relative z-0">
               <FilterSidebar
@@ -137,7 +112,6 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
                 onQuickFilterToggle={toggleQuickFilter}
               />
             </div>
-
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-0">
@@ -149,7 +123,6 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
                   </p>
                 )}
               </div>
-
               {isLoading ? (
                 LoaderComponent
               ) : error ? (
@@ -160,7 +133,6 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {currentProducts.map((product) => {
-                      // Ensure product has _id
                       if (!product._id) {
                         console.error("Product missing _id:", product);
                         return null;
@@ -174,7 +146,6 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
                       );
                     })}
                   </div>
-
                   {totalPages > 1 && (
                     <Pagination
                       currentPage={currentPage}
@@ -188,11 +159,8 @@ const CategoryProductsPage: React.FC<CategoryProductsPageProps> = ({
           </div>
         </Container>
       </main>
-
       <Footer />
     </div>
   );
 };
-
 export default CategoryProductsPage;
-

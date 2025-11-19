@@ -1,4 +1,3 @@
-// Import and validate environment variables
 import "./config/env.config.js";
 import type { Request, Response, NextFunction } from "express";
 import express from "express";
@@ -13,26 +12,19 @@ import farmerRoutes from "./routes/farmer.routes.js";
 import publicProductRoutes from "./routes/publicProduct.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 import { stripeWebhook } from "./controllers/stripeWebhook.controller.js";
-
 const app = express();
-
 const PORT = process.env.PORT || 5000;
-
 connectDB();
-
-// Middleware
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
-
-// IMPORTANT: Stripe webhook must be before express.json() middleware
-// because Stripe needs the raw body to verify the webhook signature
 app.use(
   "/api/webhooks/stripe",
   express.raw({ type: "application/json" }),
   stripeWebhook
 );
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
@@ -46,19 +38,15 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     }
     next(err);
 });
-
-
 app.use("/api/users", userRoutes);
 app.use("/api/farmers", farmerRoutes);
 app.use("/api/public", publicProductRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/payment", paymentRoutes);
-
-
+app.use("/api/upload", uploadRoutes);
+app.use("/api", reviewRoutes);
 app.get("/", (_req, res) => res.json({ status: "OK" }));
-
 app.use(errorHandler);
-
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

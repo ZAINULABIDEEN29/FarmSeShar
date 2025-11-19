@@ -2,7 +2,6 @@ import React from "react";
 import { Star, User, MapPin, Plus, Minus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
 interface ProductInfoProps {
   product: {
     _id: string;
@@ -26,11 +25,6 @@ interface ProductInfoProps {
   isAddingToCart: boolean;
   weightOptions?: string[];
 }
-
-/**
- * Reusable product information component
- * Displays product details, pricing, seller info, weight selection, quantity, and action buttons
- */
 const ProductInfo: React.FC<ProductInfoProps> = ({
   product,
   selectedWeight,
@@ -46,15 +40,13 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
   const rating = product.rating || 4.5;
   const fullRating = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
-
   return (
     <div className="space-y-6">
-      {/* Product Title - Large, bold, black font */}
+      {}
       <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
         {product.name}
       </h1>
-
-      {/* Rating - 4.7/5 with yellow stars */}
+      {}
       <div className="flex items-center gap-2">
         <div className="flex items-center">
           {[...Array(5)].map((_, i) => (
@@ -75,8 +67,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
           {rating.toFixed(1)}/5
         </span>
       </div>
-
-      {/* Pricing - Rs.70 (large, bold), Rs.100 (struck through), -30% green badge */}
+      {}
       <div className="flex items-baseline gap-3 flex-wrap">
         <span className="text-4xl sm:text-5xl font-bold text-gray-900">
           Rs.{product.price}
@@ -94,16 +85,13 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
           </>
         )}
       </div>
-
-      {/* Short Description */}
+      {}
       <p className="text-base text-gray-700 leading-relaxed">
         {product.description}
       </p>
-
-      {/* Divider */}
+      {}
       <div className="border-t border-gray-200"></div>
-
-      {/* Seller Information */}
+      {}
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden shrink-0">
           {product.farmerImage ? (
@@ -126,8 +114,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
           )}
         </div>
       </div>
-
-      {/* Weight Selection - "Choose Weight" label, 5 buttons (3 Kg selected in green, others light gray) */}
+      {}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-3">
           Choose weight
@@ -149,10 +136,9 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
           ))}
         </div>
       </div>
-
-      {/* Quantity Selector and Action Buttons - Side by side */}
+      {}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 pt-4">
-        {/* Quantity Selector - Left side */}
+        {}
         <div className="flex items-center gap-4">
           <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Quantity:</label>
           <div className="flex items-center border border-gray-300 rounded-lg bg-gray-50">
@@ -178,8 +164,7 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Action Buttons - Right side, side by side */}
+        {}
         <div className="flex flex-row gap-3 w-full sm:w-auto">
           <Button
             onClick={onAddToCart}
@@ -201,6 +186,4 @@ const ProductInfo: React.FC<ProductInfoProps> = ({
     </div>
   );
 };
-
 export default ProductInfo;
-

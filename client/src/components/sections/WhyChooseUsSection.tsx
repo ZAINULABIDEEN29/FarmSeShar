@@ -7,11 +7,9 @@ import {
 } from "lucide-react";
 import Container from "../container/Container";
 import { cn } from "@/lib/utils";
-
 interface WhyChooseUsSectionProps {
   className?: string;
 }
-
 const WhyChooseUsSection: React.FC<WhyChooseUsSectionProps> = ({
   className,
 }) => {
@@ -37,18 +35,16 @@ const WhyChooseUsSection: React.FC<WhyChooseUsSectionProps> = ({
       description: "Fresh products delivered on the same day",
     },
   ];
-
   const stats = [
     { value: "10k+", label: "Happy Customers" },
     { value: "10 Years", label: "in Business" },
     { value: "10k+", label: "Products Available" },
     { value: "99%", label: "Customer Satisfaction" },
   ];
-
   return (
     <section className={cn("w-full bg-white py-12 md:py-16 lg:py-20", className)}>
       <Container>
-        {/* Section Header */}
+        {}
         <div className="text-center mb-10 md:mb-12 lg:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Why Choose LocalHarvest?
@@ -58,8 +54,7 @@ const WhyChooseUsSection: React.FC<WhyChooseUsSectionProps> = ({
             organic produce directly from local farmers
           </p>
         </div>
-
-        {/* Feature Blocks Grid */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 mb-12 md:mb-16">
           {features.map((feature, index) => (
             <div
@@ -76,8 +71,7 @@ const WhyChooseUsSection: React.FC<WhyChooseUsSectionProps> = ({
             </div>
           ))}
         </div>
-
-        {/* Statistics */}
+        {}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {stats.map((stat, index) => (
             <div
@@ -97,6 +91,4 @@ const WhyChooseUsSection: React.FC<WhyChooseUsSectionProps> = ({
     </section>
   );
 };
-
 export default WhyChooseUsSection;
-

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Container from "@/components/container/Container";
 import { cn } from "@/lib/utils";
-
 interface ContactFormValues {
   name: string;
   email: string;
@@ -15,10 +14,8 @@ interface ContactFormValues {
   subject: string;
   message: string;
 }
-
 const GetInTouch: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const validationSchema = Yup.object({
     name: Yup.string()
       .min(2, "Name must be at least 2 characters")
@@ -34,7 +31,6 @@ const GetInTouch: React.FC = () => {
       .min(10, "Message must be at least 10 characters")
       .required("Message is required"),
   });
-
   const formik = useFormik<ContactFormValues>({
     initialValues: {
       name: "",
@@ -58,7 +54,6 @@ const GetInTouch: React.FC = () => {
       }
     },
   });
-
   const contactInfo = [
     {
       label: "Phone Number",
@@ -76,33 +71,30 @@ const GetInTouch: React.FC = () => {
       href: undefined,
     },
   ];
-
   return (
     <section id="get-in-touch" className="py-16 sm:py-20 lg:py-24 xl:py-28 bg-white">
       <Container>
-        {/* Centered heading */}
+        {}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
           <h2 className="text-3xl sm:text-3xl lg:text-4xl tracking-tight leading-0 font-semibold text-gray-900 mb-4">
             Get In Touch With Us
           </h2>
         </div>
-
-        {/* Large white container with green header bar */}
+        {}
         <div className="bg-white  shadow-sm overflow-hidden border border-gray-100 max-w-6xl mx-auto">
-          {/* Vibrant green header bar */}
+          {}
           <div className="bg-green-600 h-10 sm:h-5 lg:h-20"></div>
-          
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-            {/* Left Column - Contact Information */}
+            {}
             <div className="bg-white p-8 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-center">
               <div className="space-y-8 sm:space-y-10 lg:space-y-12">
                 {contactInfo.map((info, index) => (
                   <div key={index}>
-                    {/* Bold dark gray label */}
+                    {}
                     <p className="text-base sm:text-lg font-bold text-gray-900 mb-2 sm:mb-3">
                       {info.label}
                     </p>
-                    {/* Lighter gray value - regular weight */}
+                    {}
                     {info.href ? (
                       <a
                         href={info.href}
@@ -115,7 +107,7 @@ const GetInTouch: React.FC = () => {
                         {info.value}
                       </p>
                     )}
-                    {/* Separator line - not last item */}
+                    {}
                     {index < contactInfo.length - 1 && (
                       <div className="mt-8 sm:mt-10 lg:mt-12 border-t border-gray-200"></div>
                     )}
@@ -123,24 +115,22 @@ const GetInTouch: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Right Column - Contact Form with white background */}
+            {}
             <div className="p-8 sm:p-10 lg:p-12 xl:p-14 bg-white">
-              {/* Sub-heading */}
+              {}
               <div className="mb-8 sm:mb-10">
                 <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
                   Send us a message
                 </h3>
-                {/* Description text - lighter gray */}
+                {}
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-normal">
                   Your questions matter to us. Send a message and we'll respond with care.
                 </p>
               </div>
-
               <form onSubmit={formik.handleSubmit} className="space-y-5 sm:space-y-6">
-                {/* First Row: Name and Email side-by-side */}
+                {}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-                  {/* Name Field */}
+                  {}
                   <div className="space-y-2">
                     <label
                       htmlFor="name"
@@ -173,8 +163,7 @@ const GetInTouch: React.FC = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Email Field */}
+                  {}
                   <div className="space-y-2">
                     <label
                       htmlFor="email"
@@ -208,10 +197,9 @@ const GetInTouch: React.FC = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Second Row: Phone and Subject side-by-side */}
+                {}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-                  {/* Phone Field */}
+                  {}
                   <div className="space-y-2">
                     <label
                       htmlFor="phone"
@@ -244,8 +232,7 @@ const GetInTouch: React.FC = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Subject Field */}
+                  {}
                   <div className="space-y-2">
                     <label
                       htmlFor="subject"
@@ -279,8 +266,7 @@ const GetInTouch: React.FC = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Third Row: Message textarea full width */}
+                {}
                 <div className="space-y-2">
                   <label
                     htmlFor="message"
@@ -313,8 +299,7 @@ const GetInTouch: React.FC = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Submit Button - Centered */}
+                {}
                 <div className="flex justify-center pt-2">
                   <Button
                     type="submit"
@@ -345,5 +330,4 @@ const GetInTouch: React.FC = () => {
     </section>
   );
 };
-
 export default GetInTouch;

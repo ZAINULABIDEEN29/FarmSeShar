@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
 interface OrderSummaryProps {
   subtotal: number;
   discount: number;
@@ -14,7 +13,6 @@ interface OrderSummaryProps {
   className?: string;
   promoCode?: string;
 }
-
 const OrderSummary: React.FC<OrderSummaryProps> = ({
   subtotal,
   discount,
@@ -27,13 +25,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   promoCode,
 }) => {
   const [promoInput, setPromoInput] = useState(promoCode || "");
-
   const handleApplyPromo = () => {
     if (promoInput.trim() && onApplyPromoCode) {
       onApplyPromoCode(promoInput.trim());
     }
   };
-
   return (
     <div
       className={cn(
@@ -42,14 +38,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       )}
     >
       <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
-
-      {/* Summary Details */}
+      {}
       <div className="space-y-4 mb-6">
         <div className="flex justify-between items-center text-sm sm:text-base">
           <span className="text-gray-600">Subtotal:</span>
           <span className="font-medium text-gray-900">Rs. {subtotal}</span>
         </div>
-
         {discount > 0 && (
           <div className="flex justify-between items-center text-sm sm:text-base">
             <span className="text-gray-600">
@@ -60,7 +54,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             </span>
           </div>
         )}
-
         <div className="flex justify-between items-center text-sm sm:text-base">
           <span className="text-gray-600">Delivery Fee:</span>
           <span className="font-medium text-gray-900">
@@ -71,7 +64,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             )}
           </span>
         </div>
-
         <div className="border-t border-gray-200 pt-4">
           <div className="flex justify-between items-center">
             <span className="text-lg font-bold text-gray-900">Total:</span>
@@ -79,8 +71,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Promo Code Input */}
+      {}
       <div className="mb-6">
         <div className="flex gap-2">
           <Input
@@ -104,8 +95,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           </Button>
         </div>
       </div>
-
-      {/* Checkout Button */}
+      {}
       <Button
         onClick={onCheckout}
         className="w-full bg-green-500 text-white hover:bg-green-600 text-base sm:text-lg font-semibold py-6 rounded-md"
@@ -116,6 +106,4 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     </div>
   );
 };
-
 export default OrderSummary;
-

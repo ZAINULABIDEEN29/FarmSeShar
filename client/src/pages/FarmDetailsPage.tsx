@@ -7,7 +7,6 @@ import TextAreaField from "@/components/auth/TextAreaField";
 import { Button } from "@/components/ui/button";
 import StepIndicator from "@/components/auth/StepIndicator";
 import { storage } from "@/utils/storage";
-
 const validationSchema = Yup.object({
   farmName: Yup.string()
     .min(2, "Farm name must be at least 2 characters")
@@ -22,17 +21,14 @@ const validationSchema = Yup.object({
     .max(40, "Farm description must be less than 40 characters")
     .required("Farm description is required"),
 });
-
 const FarmDetailsPage: React.FC = () => {
   const navigate = useNavigate();
-
   useEffect(() => {
     const step1Data = storage.get("farmer_registration_step1");
     if (!step1Data) {
       navigate("/farmer-registration");
     }
   }, [navigate]);
-
   const formik = useFormik({
     initialValues: {
       farmName: "",
@@ -50,7 +46,6 @@ const FarmDetailsPage: React.FC = () => {
       navigate("/bank-details");
     },
   });
-
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
@@ -61,16 +56,13 @@ const FarmDetailsPage: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
           <StepIndicator currentStep={2} totalSteps={3} backTo="/farmer-registration" />
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Farm Details
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             This information showcases your farm and products to our buyers.
           </p>
-
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div>
               <FormField
@@ -87,7 +79,6 @@ const FarmDetailsPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.farmName}</p>
               )}
             </div>
-
             <div>
               <FormField
                 label="Farm Location"
@@ -103,7 +94,6 @@ const FarmDetailsPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.farmLocation}</p>
               )}
             </div>
-
             <div>
               <TextAreaField
                 label="Farm Description"
@@ -119,7 +109,6 @@ const FarmDetailsPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.farmDescription}</p>
               )}
             </div>
-
             <Button
               type="submit"
               className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg text-base"
@@ -129,12 +118,10 @@ const FarmDetailsPage: React.FC = () => {
           </form>
         </div>
       </div>
-
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default FarmDetailsPage;

@@ -2,7 +2,6 @@ import React from "react";
 import ProductGridCard from "./ProductGridCard";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-
 interface RelatedProduct {
   _id: string;
   name: string;
@@ -17,32 +16,24 @@ interface RelatedProduct {
   createdAt?: string;
   isAvailable?: boolean;
 }
-
 interface RelatedProductsSectionProps {
   products: RelatedProduct[];
   onAddToCart: (productId: string) => void;
   isAuthenticated: boolean;
 }
-
-/**
- * Reusable related products section component
- * Displays "You Might Also Like" section with product grid
- */
 const RelatedProductsSection: React.FC<RelatedProductsSectionProps> = ({
   products,
   onAddToCart,
   isAuthenticated,
 }) => {
   const navigate = useNavigate();
-
   return (
     <div className="mb-8 sm:mb-12">
-      {/* Section Title - Centered */}
+      {}
       <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 text-center">
         You Might Also Like
       </h2>
-      
-      {/* Products Grid - Responsive */}
+      {}
       {products && products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
           {products.map((product) => (
@@ -74,6 +65,4 @@ const RelatedProductsSection: React.FC<RelatedProductsSectionProps> = ({
     </div>
   );
 };
-
 export default RelatedProductsSection;
-

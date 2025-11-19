@@ -1,6 +1,5 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-
 interface TextAreaFieldProps {
   label: string;
   id: string;
@@ -14,7 +13,6 @@ interface TextAreaFieldProps {
   required?: boolean;
   rows?: number;
 }
-
 const TextAreaField: React.FC<TextAreaFieldProps> = ({
   label,
   id,
@@ -58,6 +56,4 @@ const TextAreaField: React.FC<TextAreaFieldProps> = ({
     </div>
   );
 };
-
 export default TextAreaField;
-

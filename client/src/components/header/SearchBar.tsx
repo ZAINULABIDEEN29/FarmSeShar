@@ -2,14 +2,12 @@ import React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
 interface SearchBarProps {
   placeholder?: string;
   className?: string;
   inputClassName?: string;
   onSearch?: (value: string) => void;
 }
-
 const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "Search products...",
   className,
@@ -22,7 +20,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const searchValue = formData.get("search") as string;
     onSearch?.(searchValue);
   };
-
   return (
     <form onSubmit={handleSubmit} className={cn("relative", className)}>
       <div className="relative">
@@ -40,6 +37,4 @@ const SearchBar: React.FC<SearchBarProps> = ({
     </form>
   );
 };
-
 export default SearchBar;
-

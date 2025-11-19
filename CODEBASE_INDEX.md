@@ -97,7 +97,8 @@ Farmers/
 │   │   │   ├── payment.controller.ts
 │   │   │   ├── product.controller.ts
 │   │   │   ├── publicProduct.controller.ts
-│   │   │   └── stripeWebhook.controller.ts
+│   │   │   ├── stripeWebhook.controller.ts
+│   │   │   └── upload.controller.ts
 │   │   ├── db/            # Database configuration
 │   │   │   └── db.ts      # MongoDB connection
 │   │   ├── emails/        # Email templates (React Email)
@@ -110,6 +111,7 @@ Farmers/
 │   │   │   ├── asyncHandler.middleware.ts
 │   │   │   ├── auth.middleware.ts
 │   │   │   ├── errorHandler.middleware.ts
+│   │   │   ├── upload.middleware.ts
 │   │   │   └── validate.middleware.ts
 │   │   ├── models/        # Mongoose models
 │   │   │   ├── blackListToken.model.ts
@@ -124,6 +126,7 @@ Farmers/
 │   │   │   ├── farmer.routes.ts
 │   │   │   ├── payment.routes.ts
 │   │   │   ├── publicProduct.routes.ts
+│   │   │   ├── upload.routes.ts
 │   │   │   └── user.routes.ts
 │   │   ├── services/      # Business logic layer
 │   │   │   ├── cart.service.ts
@@ -140,6 +143,7 @@ Farmers/
 │   │   ├── utils/         # Utility functions
 │   │   │   ├── ApiError.ts
 │   │   │   ├── auth.utils.ts
+│   │   │   ├── cloudinary.ts
 │   │   │   ├── db.utils.ts
 │   │   │   ├── farmers.utils.ts
 │   │   │   ├── jwt.ts
@@ -316,6 +320,7 @@ Farmers/
 - **order.service.ts** - Order management API calls
 - **payment.service.ts** - Payment processing API calls
 - **product.service.ts** - Product CRUD operations API calls
+- **upload.service.ts** - Image upload service for Cloudinary integration
 - **user.service.ts** - User authentication and management API calls
 
 ### Hooks (`client/src/hooks/`)
@@ -449,6 +454,10 @@ Farmers/
 - `POST /confirm` - Confirm payment (protected)
 - `POST /webhook` - Stripe webhook endpoint (public)
 
+### Upload Routes (`upload.routes.ts`) - `/api/upload`
+- `POST /image` - Upload single image to Cloudinary (protected, farmer only)
+- `POST /images` - Upload multiple images to Cloudinary (protected, farmer only)
+
 ### Controllers (`server/src/controllers/`)
 
 #### User Authentication Controller (`authUser.controller.ts`)
@@ -506,6 +515,10 @@ Farmers/
 - `getDashboardCustomers` - Get farmer's customers
 - `getDashboardOrders` - Get farmer's orders with filtering
 - `getDashboardShipments` - Get farmer's shipments
+
+#### Upload Controller (`upload.controller.ts`)
+- `uploadSingleImage` - Handle single image upload to Cloudinary
+- `uploadMultipleImagesController` - Handle multiple image uploads to Cloudinary
 
 ### Services (`server/src/services/`)
 
@@ -575,7 +588,8 @@ Farmers/
 
 #### Product Model (`product.model.ts`)
 - Mongoose schema for products
-- Fields: name, description, price, category, quantity, unit, image, images, farmerId, isAvailable, etc.
+- Fields: name, description, price, category, quantity, unit, images (required array), farmerId, isAvailable, etc.
+- Images field is required (at least one image must be provided)
 
 #### Cart Model (`cart.model.ts`)
 - Mongoose schema for shopping carts
@@ -613,6 +627,12 @@ Farmers/
 - Validates request body/query/params using Zod schemas
 - Returns validation errors if invalid
 
+#### Upload Middleware (`upload.middleware.ts`)
+- `uploadSingle` - Multer middleware for single image upload
+- `uploadMultiple` - Multer middleware for multiple image uploads (max 10)
+- File validation (image types only, 5MB max size)
+- Memory storage for file handling
+
 ### Validators (`server/src/validator/`)
 
 #### User Auth Schema (`auth.schema.ts`)
@@ -633,7 +653,7 @@ Farmers/
 
 #### Product Schema (`product.schema.ts`)
 - Zod schemas for product operations:
-  - `createProductSchema` - Product creation validation
+  - `createProductSchema` - Product creation validation (images array required, min 1 image)
   - `updateProductSchema` - Product update validation
   - `productQuerySchema` - Product query/filter validation
 
@@ -677,6 +697,14 @@ Farmers/
 #### Resend Utility (`resend.ts`)
 - Resend email service configuration
 - Email sending utilities
+
+#### Cloudinary Utility (`cloudinary.ts`)
+- Cloudinary SDK configuration and integration
+- `uploadImage` - Upload single image to Cloudinary
+- `uploadMultipleImages` - Upload multiple images to Cloudinary
+- `deleteImage` - Delete image from Cloudinary
+- `deleteMultipleImages` - Delete multiple images from Cloudinary
+- Automatic image optimization (resize, quality, format)
 
 ### Helpers (`server/src/helpers/`)
 - **sendVerificationEmail.tsx** - Send email verification email using React Email template
@@ -798,6 +826,9 @@ Farmers/
 - `JWT_REFRESH_EXPIRY` - Refresh token expiration time
 - `RESEND_API_KEY` - Resend API key for email service
 - `EMAIL_FROM` - Email sender address
+- `CLOUDINARY_CLOUD_NAME` - Cloudinary cloud name
+- `CLOUDINARY_API_KEY` - Cloudinary API key
+- `CLOUDINARY_API_SECRET` - Cloudinary API secret
 
 ---
 
@@ -828,7 +859,13 @@ Farmers/
    - Product availability toggle
    - Product filtering and search
    - Category-based organization
-   - Image support
+   - **Image Upload & Management**
+     - Cloudinary integration for image storage
+     - Multiple image upload support (up to 10 images per product)
+     - Required image field (at least one image per product)
+     - Image preview and management in product form
+     - Automatic image optimization (resize, quality, format)
+     - Image gallery display on product pages
    - Public product listing for marketplace
 
 5. **Shopping Cart**
@@ -908,6 +945,12 @@ Farmers/
   - Resend for email delivery
   - Type-safe email templates
 
+- **Image Upload**: 
+  - Cloudinary for cloud-based image storage
+  - Multer for file upload handling
+  - Automatic image optimization
+  - Multiple image support per product
+
 ---
 
 ## Data Flow
@@ -928,13 +971,17 @@ Farmers/
 ### Product Management Flow
 1. Farmer logs in and navigates to dashboard
 2. React Query fetches products
-3. Farmer creates/updates/deletes product
+3. Farmer creates/updates product:
+   - Selects images from local device
+   - Images uploaded to Cloudinary via upload service
+   - Image URLs returned and stored in form state
+   - Product form submitted with image URLs
 4. Mutation hook calls service
-5. Service makes API call
-6. Backend validates and processes
-7. Database updated
+5. Service makes API call with product data including image URLs
+6. Backend validates (images required) and processes
+7. Database updated with product and image URLs
 8. React Query cache invalidated
-9. UI updates automatically
+9. UI updates automatically with product images displayed
 
 ---
 

@@ -6,7 +6,6 @@ import FooterLinks from "./FooterLinks";
 import type { FooterLink } from "./FooterLinks";
 import FooterContact from "./FooterContact";
 import FooterCopyright from "./FooterCopyright";
-
 interface FooterProps {
   onLogoClick?: () => void;
   onLinkClick?: (link: FooterLink) => void;
@@ -17,7 +16,6 @@ interface FooterProps {
   address?: string;
   description?: string;
 }
-
 const defaultQuickLinks: FooterLink[] = [
   { label: "Shop Products", href: "/products" },
   { label: "Our Farmers", href: "/farmers" },
@@ -25,7 +23,6 @@ const defaultQuickLinks: FooterLink[] = [
   { label: "FAQ", href: "/faq" },
   { label: "Delivery Info", href: "/delivery" },
 ];
-
 const defaultCustomerServiceLinks: FooterLink[] = [
   { label: "Support", href: "/support" },
   { label: "Returns", href: "/returns" },
@@ -33,7 +30,6 @@ const defaultCustomerServiceLinks: FooterLink[] = [
   { label: "Terms of Service", href: "/terms" },
   { label: "Privacy Policy", href: "/privacy" },
 ];
-
 const Footer: React.FC<FooterProps> = ({
   onLogoClick,
   onLinkClick,
@@ -47,17 +43,16 @@ const Footer: React.FC<FooterProps> = ({
   return (
     <footer className="w-full bg-[#1A202C] text-white relative">
       <Container>
-        {/* Main Footer Content */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 py-12">
-          {/* Column 1: Branding */}
+          {}
           <div className="md:col-span-2 lg:col-span-1">
             <FooterLogo description={description} onClick={onLogoClick} />
             <div className="mt-6">
               <FooterSocial />
             </div>
           </div>
-
-          {/* Column 2: Quick Links */}
+          {}
           <div className="md:col-span-1 lg:col-span-1">
             <FooterLinks
               title="Quick Links"
@@ -65,8 +60,7 @@ const Footer: React.FC<FooterProps> = ({
               onLinkClick={onLinkClick}
             />
           </div>
-
-          {/* Column 3: Customer Service */}
+          {}
           <div className="md:col-span-1 lg:col-span-1">
             <FooterLinks
               title="Customer Service"
@@ -74,8 +68,7 @@ const Footer: React.FC<FooterProps> = ({
               onLinkClick={onLinkClick}
             />
           </div>
-
-          {/* Column 4: Contact Us */}
+          {}
           <div className="md:col-span-2 lg:col-span-1">
             <FooterContact
               email={email}
@@ -85,18 +78,13 @@ const Footer: React.FC<FooterProps> = ({
           </div>
         </div>
       </Container>
-
-      {/* Gray Border Separator */}
+      {}
       <div className="border-t border-gray-600"></div>
-
-      {/* Copyright Section */}
+      {}
       <FooterCopyright />
-
-      {/* Bright Blue Bottom Border */}
+      {}
       <div className="h-0.5 bg-blue-500"></div>
     </footer>
   );
 };
-
 export default Footer;
-

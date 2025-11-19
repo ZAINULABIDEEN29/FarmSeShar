@@ -2,13 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface BackLinkProps {
   to: string;
   text?: string;
   className?: string;
 }
-
 const BackLink: React.FC<BackLinkProps> = ({
   to,
   text = "Back to login",
@@ -27,6 +25,4 @@ const BackLink: React.FC<BackLinkProps> = ({
     </Link>
   );
 };
-
 export default BackLink;
-

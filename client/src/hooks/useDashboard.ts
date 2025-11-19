@@ -6,8 +6,6 @@ import type {
   DashboardOrdersQuery,
   DashboardShipmentsQuery,
 } from "@/types/dashboard.types";
-
-// Query Keys
 export const dashboardKeys = {
   all: ["dashboard"] as const,
   stats: (filters?: DashboardStatsQuery) =>
@@ -19,18 +17,14 @@ export const dashboardKeys = {
   shipments: (filters?: DashboardShipmentsQuery) =>
     [...dashboardKeys.all, "shipments", filters] as const,
 };
-
-// Get dashboard statistics
 export const useDashboardStats = (filters?: DashboardStatsQuery) => {
   return useQuery({
     queryKey: dashboardKeys.stats(filters),
     queryFn: () => dashboardService.getDashboardStats(filters),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 1 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
 };
-
-// Get customers
 export const useDashboardCustomers = (
   filters?: DashboardCustomersQuery,
   options?: { enabled?: boolean }
@@ -38,13 +32,11 @@ export const useDashboardCustomers = (
   return useQuery({
     queryKey: dashboardKeys.customers(filters),
     queryFn: () => dashboardService.getCustomers(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
     enabled: options?.enabled !== false,
   });
 };
-
-// Get orders
 export const useDashboardOrders = (
   filters?: DashboardOrdersQuery,
   options?: { enabled?: boolean }
@@ -52,13 +44,11 @@ export const useDashboardOrders = (
   return useQuery({
     queryKey: dashboardKeys.orders(filters),
     queryFn: () => dashboardService.getOrders(filters),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 1 * 60 * 1000,
     refetchOnWindowFocus: false,
     enabled: options?.enabled !== false,
   });
 };
-
-// Get shipments
 export const useDashboardShipments = (
   filters?: DashboardShipmentsQuery,
   options?: { enabled?: boolean }
@@ -66,9 +56,8 @@ export const useDashboardShipments = (
   return useQuery({
     queryKey: dashboardKeys.shipments(filters),
     queryFn: () => dashboardService.getShipments(filters),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 1 * 60 * 1000,
     refetchOnWindowFocus: false,
     enabled: options?.enabled !== false,
   });
 };
-

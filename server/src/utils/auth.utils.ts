@@ -1,11 +1,9 @@
 import jwt from "jsonwebtoken";
 import { signJwt } from "./jwt.js";
 import { ApiError } from "./ApiError.js";
-
 export const generateAccessToken = (userId: string) => {
   return signJwt({ id: userId });
 };
-
 export const generateRefreshToken = (userId: string) => {
   const refreshSecret = process.env.JWT_REFRESH_SECRET;
   if (!refreshSecret) {
@@ -15,7 +13,6 @@ export const generateRefreshToken = (userId: string) => {
     expiresIn: "7d",
   });
 };
-
 export const verifyRefreshToken = (token: string) => {
   try {
     const refreshSecret = process.env.JWT_REFRESH_SECRET;

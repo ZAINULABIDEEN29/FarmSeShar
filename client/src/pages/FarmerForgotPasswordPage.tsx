@@ -8,15 +8,12 @@ import SocialLoginButton from "@/components/auth/SocialLoginButton";
 import Divider from "@/components/auth/Divider";
 import BackLink from "@/components/auth/BackLink";
 import { useForgotPasswordFarmer } from "@/hooks/useAuth";
-
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email address").required("Email is required"),
 });
-
 const FarmerForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const forgotPasswordMutation = useForgotPasswordFarmer();
-
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -26,11 +23,9 @@ const FarmerForgotPasswordPage: React.FC = () => {
       forgotPasswordMutation.mutate({ email: values.email });
     },
   });
-
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
     console.log(`Login with ${provider}`);
   };
-
   return (
     <div className="min-h-screen bg-white flex">
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
@@ -41,16 +36,13 @@ const FarmerForgotPasswordPage: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
           <BackLink to="/farmer-login" />
-
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Forgot your password?
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             Enter your email below to recover your password
           </p>
-
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             <div>
               <FormField
@@ -67,7 +59,6 @@ const FarmerForgotPasswordPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.email}</p>
               )}
             </div>
-
             <Button
               type="submit"
               disabled={forgotPasswordMutation.isPending}
@@ -76,7 +67,6 @@ const FarmerForgotPasswordPage: React.FC = () => {
               {forgotPasswordMutation.isPending ? "Sending..." : "Submit"}
             </Button>
           </form>
-
           <div className="mt-6 text-center">
             <span className="text-sm text-gray-600">
               Remember your password?{" "}
@@ -88,9 +78,7 @@ const FarmerForgotPasswordPage: React.FC = () => {
               </button>
             </span>
           </div>
-
           <Divider text="Or login with" className="my-8" />
-
           <div className="grid grid-cols-3 gap-4">
             <SocialLoginButton
               provider="facebook"
@@ -107,13 +95,10 @@ const FarmerForgotPasswordPage: React.FC = () => {
           </div>
         </div>
       </div>
-
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default FarmerForgotPasswordPage;
-

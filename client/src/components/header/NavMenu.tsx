@@ -1,19 +1,16 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-
 export interface NavItem {
   label: string;
   path: string;
 }
-
 interface NavMenuProps {
   items?: NavItem[];
   className?: string;
   itemClassName?: string;
   onItemClick?: (item: NavItem) => void;
 }
-
 export const NAV_ITEMS: NavItem[] = [
   { label: "Home", path: "/" },
   { label: "Vegetables", path: "/vegetables" },
@@ -23,7 +20,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "About", path: "/about" },
   { label: "Contact", path: "/contact" },
 ];
-
 const NavMenu: React.FC<NavMenuProps> = ({
   items = NAV_ITEMS,
   className,
@@ -31,14 +27,12 @@ const NavMenu: React.FC<NavMenuProps> = ({
   onItemClick,
 }) => {
   const location = useLocation();
-
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, item: NavItem) => {
     if (onItemClick) {
       e.preventDefault();
       onItemClick(item);
     }
   };
-
   return (
     <nav
       className={cn(
@@ -71,6 +65,4 @@ const NavMenu: React.FC<NavMenuProps> = ({
     </nav>
   );
 };
-
 export default NavMenu;
-

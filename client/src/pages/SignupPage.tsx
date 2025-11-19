@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import SocialLoginButton from "@/components/auth/SocialLoginButton";
 import Divider from "@/components/auth/Divider";
 import { useRegisterUser } from "@/hooks/useAuth";
-
 const validationSchema = Yup.object({
   name: Yup.string()
     .required("Name is required")
@@ -31,13 +30,10 @@ const validationSchema = Yup.object({
     .required("Please confirm your password"),
   agreeToTerms: Yup.boolean().oneOf([true], "You must agree to the terms and conditions"),
 });
-
 const SignupPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const registerMutation = useRegisterUser();
-
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -52,7 +48,6 @@ const SignupPage: React.FC = () => {
       const nameParts = values.name.trim().split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
-
       registerMutation.mutate({
         fullName: { firstName, lastName },
         email: values.email,
@@ -61,35 +56,31 @@ const SignupPage: React.FC = () => {
       });
     },
   });
-
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
     console.log(`Sign up with ${provider}`);
   };
-
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Left Section - Signup Form */}
+      {}
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
         <div className="max-w-sm w-full mx-auto lg:mx-0">
-          {/* Logo */}
+          {}
           <div className="mb-4 lg:mb-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-200 shrink-0" />
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
-          {/* Heading */}
+          {}
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Sign up
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             Create an account to get started
           </p>
-
-          {/* Signup Form */}
+          {}
           <form onSubmit={formik.handleSubmit} className="space-y-6">
-            {/* Name Field */}
+            {}
             <div>
               <FormField
                 label="Name"
@@ -105,8 +96,7 @@ const SignupPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.name}</p>
               )}
             </div>
-
-            {/* Email Field */}
+            {}
             <div>
               <FormField
                 label="Email"
@@ -122,8 +112,7 @@ const SignupPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.email}</p>
               )}
             </div>
-
-            {/* Phone Number Field */}
+            {}
             <div>
               <FormField
                 label="Phone Number"
@@ -139,8 +128,7 @@ const SignupPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.phoneNumber}</p>
               )}
             </div>
-
-            {/* Password Field */}
+            {}
             <div>
               <FormField
                 label="Password"
@@ -170,8 +158,7 @@ const SignupPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.password}</p>
               )}
             </div>
-
-            {/* Confirm Password Field */}
+            {}
             <div>
               <FormField
                 label="Confirm Password"
@@ -201,8 +188,7 @@ const SignupPage: React.FC = () => {
                 <p className="text-sm text-red-600 mt-1">{formik.errors.confirmPassword}</p>
               )}
             </div>
-
-            {/* Terms and Conditions Checkbox */}
+            {}
             <div className="flex items-start gap-2">
               <Checkbox
                 id="agreeToTerms"
@@ -227,8 +213,7 @@ const SignupPage: React.FC = () => {
             {formik.touched.agreeToTerms && formik.errors.agreeToTerms && (
               <p className="text-sm text-red-600">{formik.errors.agreeToTerms}</p>
             )}
-
-            {/* Sign Up Button */}
+            {}
             <Button
               type="submit"
               disabled={registerMutation.isPending}
@@ -237,8 +222,7 @@ const SignupPage: React.FC = () => {
               {registerMutation.isPending ? "Signing up..." : "Sign up"}
             </Button>
           </form>
-
-          {/* Login Link */}
+          {}
           <div className="mt-6 text-center">
             <span className="text-sm text-gray-600">
               Already have an account?{" "}
@@ -250,11 +234,9 @@ const SignupPage: React.FC = () => {
               </Link>
             </span>
           </div>
-
-          {/* Divider */}
+          {}
           <Divider text="Or sign up with" className="my-8" />
-
-          {/* Social Login Buttons */}
+          {}
           <div className="grid grid-cols-3 gap-4">
             <SocialLoginButton
               provider="facebook"
@@ -271,14 +253,11 @@ const SignupPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Right Section - Grey Panel */}
+      {}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default SignupPage;
-

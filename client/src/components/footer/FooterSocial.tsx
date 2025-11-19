@@ -1,18 +1,15 @@
 import React from "react";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface SocialLink {
   name: string;
   icon: React.ReactNode;
   href: string;
 }
-
 interface FooterSocialProps {
   className?: string;
   socialLinks?: SocialLink[];
 }
-
 const defaultSocialLinks: SocialLink[] = [
   {
     name: "Facebook",
@@ -35,7 +32,6 @@ const defaultSocialLinks: SocialLink[] = [
     href: "https://linkedin.com",
   },
 ];
-
 const FooterSocial: React.FC<FooterSocialProps> = ({
   className,
   socialLinks = defaultSocialLinks,
@@ -57,6 +53,4 @@ const FooterSocial: React.FC<FooterSocialProps> = ({
     </div>
   );
 };
-
 export default FooterSocial;
-

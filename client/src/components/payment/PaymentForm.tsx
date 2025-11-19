@@ -6,14 +6,12 @@ import FormField from "@/components/auth/FormField";
 import type { PaymentMethod, CardPaymentDetails, PaymentData } from "@/types/payment.types";
 import { cn } from "@/lib/utils";
 import { CreditCard, Wallet } from "lucide-react";
-
 interface PaymentFormProps {
   onSubmit: (paymentData: PaymentData) => void;
   initialPaymentMethod?: PaymentMethod;
   className?: string;
   isLoading?: boolean;
 }
-
 const cardValidationSchema = Yup.object({
   cardNumber: Yup.string()
     .required("Card number is required")
@@ -28,7 +26,6 @@ const cardValidationSchema = Yup.object({
     .required("CVV is required")
     .matches(/^\d{3,4}$/, "CVV must be 3 or 4 digits"),
 });
-
 const PaymentForm: React.FC<PaymentFormProps> = ({
   onSubmit,
   initialPaymentMethod = "card",
@@ -36,8 +33,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   isLoading = false,
 }) => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(initialPaymentMethod);
-
-  // Card form
   const cardFormik = useFormik<CardPaymentDetails>({
     initialValues: {
       cardNumber: "",
@@ -54,15 +49,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     },
     enableReinitialize: true,
   });
-
   const handlePaymentMethodChange = (method: PaymentMethod) => {
     setPaymentMethod(method);
-    // Reset card form when switching payment methods
     if (method === "cash") {
       cardFormik.resetForm();
     }
   };
-
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\s/g, "").replace(/\D/g, "");
     if (value.length > 0) {
@@ -70,7 +62,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
     cardFormik.setFieldValue("cardNumber", value);
   };
-
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
     if (value.length >= 2) {
@@ -78,7 +69,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
     cardFormik.setFieldValue("expiryDate", value);
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (paymentMethod === "card") {
@@ -89,18 +79,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       });
     }
   };
-
   const isFormValid = paymentMethod === "cash" || cardFormik.isValid;
-
   return (
     <form onSubmit={handleSubmit} className={cn("space-y-6", className)} noValidate>
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
         Payment Method
       </h2>
-
-      {/* Payment Method Selection */}
+      {}
       <div className="space-y-3">
-        {/* Card Payment Option */}
+        {}
         <label
           className={cn(
             "flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
@@ -122,8 +109,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             Pay with Card
           </span>
         </label>
-
-        {/* Cash Payment Option */}
+        {}
         <label
           className={cn(
             "flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
@@ -146,8 +132,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </span>
         </label>
       </div>
-
-      {/* Card Payment Form */}
+      {}
       {paymentMethod === "card" && (
         <div className="space-y-4 pt-4 border-t border-gray-200">
           <FormField
@@ -166,7 +151,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             required
             inputClassName="tracking-widest"
           />
-
           <FormField
             label="Card Holder Name"
             id="cardHolderName"
@@ -182,7 +166,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             }
             required
           />
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               label="Expiry Date"
@@ -200,7 +183,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               required
               inputClassName="uppercase"
             />
-
             <FormField
               label="CVV"
               id="cvv"
@@ -222,8 +204,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </div>
         </div>
       )}
-
-      {/* Cash Payment Info */}
+      {}
       {paymentMethod === "cash" && (
         <div className="pt-4 border-t border-gray-200">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -233,8 +214,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </div>
         </div>
       )}
-
-      {/* Submit Button */}
+      {}
       <div className="pt-4">
         <Button
           type="submit"
@@ -248,6 +228,4 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     </form>
   );
 };
-
 export default PaymentForm;
-

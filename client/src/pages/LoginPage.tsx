@@ -7,57 +7,47 @@ import { Button } from "@/components/ui/button";
 import SocialLoginButton from "@/components/auth/SocialLoginButton";
 import Divider from "@/components/auth/Divider";
 import { useLoginUser } from "@/hooks/useAuth";
-
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
-
   const loginMutation = useLoginUser();
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    // Validation
     if (!email || !password) {
       setError("Please fill in all fields");
       return;
     }
-
     loginMutation.mutate({ email, password });
   };
-
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
     console.log(`Login with ${provider}`);
   };
-
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Left Section - Login Form */}
+      {}
       <div className="w-full lg:w-1/2 flex flex-col px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 lg:py-10">
         <div className="max-w-sm w-full mx-auto lg:mx-0">
-          {/* Logo */}
+          {}
           <div className="mb-4 lg:mb-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-200 shrink-0" />
               <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
             </div>
           </div>
-
-          {/* Heading */}
+          {}
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Login
           </h1>
           <p className="text-sm sm:text-base text-gray-500 mb-6 lg:mb-8">
             Login to access your account
           </p>
-
-          {/* Login Form */}
+          {}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Field */}
+            {}
             <FormField
               label="Email"
               id="email"
@@ -67,8 +57,7 @@ const LoginPage: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-
-            {/* Password Field */}
+            {}
             <FormField
               label="Password"
               id="password"
@@ -92,8 +81,7 @@ const LoginPage: React.FC = () => {
                 </button>
               }
             />
-
-            {/* Remember Me and Forgot Password */}
+            {}
             <div className="flex items-center justify-between">
               <Checkbox
                 id="remember-me"
@@ -108,15 +96,13 @@ const LoginPage: React.FC = () => {
                 Forgot Password?
               </Link>
             </div>
-
-            {/* Error Message */}
+            {}
             {error && (
               <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
                 {error}
               </div>
             )}
-
-            {/* Login Button */}
+            {}
             <Button
               type="submit"
               disabled={loginMutation.isPending}
@@ -125,8 +111,7 @@ const LoginPage: React.FC = () => {
               {loginMutation.isPending ? "Logging in..." : "Login"}
             </Button>
           </form>
-
-          {/* Sign Up Link */}
+          {}
           <div className="mt-6 text-center">
             <span className="text-sm text-gray-600">
               Don't have an account?{" "}
@@ -138,11 +123,9 @@ const LoginPage: React.FC = () => {
               </Link>
             </span>
           </div>
-
-          {/* Divider */}
+          {}
           <Divider text="Or login with" className="my-8" />
-
-          {/* Social Login Buttons */}
+          {}
           <div className="grid grid-cols-3 gap-4">
             <SocialLoginButton
               provider="facebook"
@@ -159,14 +142,11 @@ const LoginPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Right Section - Grey Panel */}
+      {}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-100 rounded-l-3xl items-center justify-center p-6 xl:p-8">
         <div className="w-full max-w-xl h-[600px] rounded-2xl bg-gray-200" />
       </div>
     </div>
   );
 };
-
 export default LoginPage;
-

@@ -12,47 +12,35 @@ import {
   useToggleProductAvailability,
 } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
-
-// Debounce hook
 const useDebounce = <T,>(value: T, delay: number): T => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
-
     return () => {
       clearTimeout(handler);
     };
   }, [value, delay]);
-
   return debouncedValue;
 };
-
 interface ProductsSectionProps {
   className?: string;
 }
-
 const ProductsSection: React.FC<ProductsSectionProps> = ({ className }) => {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-
-  // Debounce search query to avoid excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-
   const { data: products = [], isLoading } = useGetMyProducts({
     search: debouncedSearchQuery || undefined,
     category: selectedCategory || undefined,
   });
-
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
   const toggleMutation = useToggleProductAvailability();
-
   const handleSubmit = useCallback(
     (values: CreateProductInput | UpdateProductInput) => {
       if (editingProduct) {
@@ -75,12 +63,10 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ className }) => {
     },
     [editingProduct, updateMutation, createMutation]
   );
-
   const handleEdit = useCallback((product: Product) => {
     setEditingProduct(product);
     setShowForm(true);
   }, []);
-
   const handleDelete = useCallback(
     (productId: string) => {
       if (window.confirm("Are you sure you want to delete this product?")) {
@@ -89,35 +75,25 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ className }) => {
     },
     [deleteMutation]
   );
-
   const handleCancel = useCallback(() => {
     setShowForm(false);
     setEditingProduct(null);
   }, []);
-
   const handleToggleAvailability = useCallback(
     (productId: string) => {
       toggleMutation.mutate(productId);
     },
     [toggleMutation]
   );
-
-  // Memoize categories array
   const categories = useMemo(
     () => [
       "Vegetables",
       "Fruits",
-      "Grains",
       "Dairy",
-      "Meat",
-      "Poultry",
       "Herbs",
-      "Spices",
-      "Other",
     ],
     []
   );
-
   return (
     <div className={cn("space-y-6", className)}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -126,10 +102,9 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ className }) => {
           <p className="text-gray-600 mt-1">Manage your product inventory</p>
         </div>
       </div>
-
       {!showForm ? (
         <>
-          {/* Search and Filter Bar */}
+          {}
           <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
@@ -163,8 +138,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ className }) => {
               </Button>
             </div>
           </div>
-
-          {/* Products List */}
+          {}
           <ProductList
             products={products}
             onEdit={handleEdit}
@@ -190,6 +164,4 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ className }) => {
     </div>
   );
 };
-
 export default ProductsSection;
-

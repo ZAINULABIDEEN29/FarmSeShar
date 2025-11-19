@@ -1,18 +1,15 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-
 export interface FooterLink {
   label: string;
   href: string;
 }
-
 interface FooterLinksProps {
   title: string;
   links: FooterLink[];
   className?: string;
   onLinkClick?: (link: FooterLink) => void;
 }
-
 const FooterLinks: React.FC<FooterLinksProps> = ({
   title,
   links,
@@ -25,7 +22,6 @@ const FooterLinks: React.FC<FooterLinksProps> = ({
       onLinkClick(link);
     }
   };
-
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       <h3 className="text-white font-bold text-base">{title}</h3>
@@ -45,6 +41,4 @@ const FooterLinks: React.FC<FooterLinksProps> = ({
     </div>
   );
 };
-
 export default FooterLinks;
-

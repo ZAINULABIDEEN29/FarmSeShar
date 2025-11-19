@@ -1,6 +1,5 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-
 interface FormFieldProps {
   label: string;
   id: string;
@@ -15,7 +14,6 @@ interface FormFieldProps {
   rightElement?: React.ReactNode;
   required?: boolean;
 }
-
 const FormField: React.FC<FormFieldProps> = ({
   label,
   id,
@@ -65,6 +63,4 @@ const FormField: React.FC<FormFieldProps> = ({
     </div>
   );
 };
-
 export default FormField;
-

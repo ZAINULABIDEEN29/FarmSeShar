@@ -5,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import FormField from "@/components/auth/FormField";
 import type { CheckoutAddress } from "@/types/checkout.types";
 import { cn } from "@/lib/utils";
-
 interface CheckoutAddressFormProps {
   onSubmit: (address: CheckoutAddress) => void;
   initialValues?: Partial<CheckoutAddress>;
   className?: string;
   isLoading?: boolean;
 }
-
 const validationSchema = Yup.object({
   streetAddress: Yup.string()
     .min(5, "Street address must be at least 5 characters")
@@ -32,7 +30,6 @@ const validationSchema = Yup.object({
     .max(10, "Postal code must not exceed 10 characters")
     .required("Postal code is required"),
 });
-
 const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   onSubmit,
   initialValues,
@@ -53,7 +50,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       onSubmit(values);
     },
   });
-
   return (
     <form
       onSubmit={formik.handleSubmit}
@@ -61,7 +57,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       noValidate
     >
       <div className="space-y-6">
-        {/* Street Address */}
+        {}
         <FormField
           label="Street Address"
           id="streetAddress"
@@ -77,8 +73,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           }
           required
         />
-
-        {/* House Number */}
+        {}
         <FormField
           label="House Number"
           id="houseNo"
@@ -94,8 +89,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           }
           required
         />
-
-        {/* Town and City - Side by side on larger screens */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <FormField
             label="Town"
@@ -112,7 +106,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             }
             required
           />
-
           <FormField
             label="City"
             id="city"
@@ -129,8 +122,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             required
           />
         </div>
-
-        {/* Country and Postal Code - Side by side on larger screens */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <FormField
             label="Country"
@@ -147,7 +139,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             }
             required
           />
-
           <FormField
             label="Postal Code"
             id="postalCode"
@@ -165,8 +156,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           />
         </div>
       </div>
-
-      {/* Submit Button */}
+      {}
       <div className="pt-4">
         <Button
           type="submit"
@@ -180,6 +170,4 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
     </form>
   );
 };
-
 export default CheckoutAddressForm;
-

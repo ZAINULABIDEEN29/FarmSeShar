@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-
 export interface IPRODUCT extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
@@ -15,7 +14,6 @@ export interface IPRODUCT extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 const productSchema: Schema<IPRODUCT> = new Schema(
   {
     name: {
@@ -64,14 +62,15 @@ const productSchema: Schema<IPRODUCT> = new Schema(
       trim: true,
       enum: ["kg", "g", "lb", "piece", "box", "bunch", "dozen", "liter", "ml"],
     },
-    image: {
-      type: String,
-      trim: true,
-      default: null,
-    },
     images: {
       type: [String],
-      default: [],
+      required: [true, "At least one product image is required"],
+      validate: {
+        validator: function (v: string[]) {
+          return Array.isArray(v) && v.length > 0;
+        },
+        message: "At least one product image is required",
+      },
     },
     farmerId: {
       type: Schema.Types.ObjectId,
@@ -85,12 +84,8 @@ const productSchema: Schema<IPRODUCT> = new Schema(
   },
   { timestamps: true }
 );
-
-// Index for faster queries
 productSchema.index({ farmerId: 1 });
 productSchema.index({ category: 1 });
 productSchema.index({ isAvailable: 1 });
-
 export const Product = mongoose.model<IPRODUCT>("Product", productSchema);
 export default Product;
-

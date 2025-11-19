@@ -10,17 +10,12 @@ import {
   updateShipmentStatusSchema,
 } from "../validator/order.schema.js";
 import { ZodError } from "zod";
-
-// Create order (user endpoint)
 export const createOrder = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
-
     if (!userId) {
       throw new ApiError(401, "Unauthorized: User not authenticated");
     }
-
-    // Validate request body
     let orderData;
     try {
       orderData = createOrderSchema.parse(req.body);
@@ -30,9 +25,7 @@ export const createOrder = asyncHandler(
       }
       throw error;
     }
-
     const order = await createOrderService(userId, orderData);
-
     return res.status(201).json({
       success: true,
       message: "Order created successfully",
@@ -40,18 +33,13 @@ export const createOrder = asyncHandler(
     });
   }
 );
-
-// Update order status (farmer endpoint)
 export const updateOrderStatus = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
     const orderId = req.params.id;
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate request body
     let updateData;
     try {
       updateData = updateOrderStatusSchema.parse(req.body);
@@ -61,9 +49,7 @@ export const updateOrderStatus = asyncHandler(
       }
       throw error;
     }
-
     const order = await updateOrderStatusService(orderId, farmerId, updateData.status);
-
     return res.status(200).json({
       success: true,
       message: "Order status updated successfully",
@@ -71,17 +57,12 @@ export const updateOrderStatus = asyncHandler(
     });
   }
 );
-
-// Create shipment (farmer endpoint)
 export const createShipment = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate request body
     let shipmentData;
     try {
       shipmentData = createShipmentSchema.parse(req.body);
@@ -91,9 +72,7 @@ export const createShipment = asyncHandler(
       }
       throw error;
     }
-
     const shipment = await createShipmentService(farmerId, shipmentData);
-
     return res.status(201).json({
       success: true,
       message: "Shipment created successfully",
@@ -101,18 +80,13 @@ export const createShipment = asyncHandler(
     });
   }
 );
-
-// Update shipment status (farmer endpoint)
 export const updateShipmentStatus = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
     const shipmentId = req.params.id;
-
     if (!farmerId) {
       throw new ApiError(401, "Unauthorized: Farmer not authenticated");
     }
-
-    // Validate request body
     let updateData;
     try {
       updateData = updateShipmentStatusSchema.parse(req.body);
@@ -122,13 +96,11 @@ export const updateShipmentStatus = asyncHandler(
       }
       throw error;
     }
-
     const shipment = await updateShipmentStatusService(
       shipmentId,
       farmerId,
       updateData
     );
-
     return res.status(200).json({
       success: true,
       message: "Shipment status updated successfully",
@@ -136,4 +108,3 @@ export const updateShipmentStatus = asyncHandler(
     });
   }
 );
-

@@ -1,11 +1,9 @@
 import React from "react";
 import {  Mail, Phone, MessageCircle, FileText, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface HelpSectionProps {
   className?: string;
 }
-
 interface HelpCardProps {
   icon: React.ReactNode;
   title: string;
@@ -14,7 +12,6 @@ interface HelpCardProps {
   onClick?: () => void;
   className?: string;
 }
-
 const HelpCard: React.FC<HelpCardProps> = ({
   icon,
   title,
@@ -50,13 +47,10 @@ const HelpCard: React.FC<HelpCardProps> = ({
     </div>
   );
 };
-
 const HelpSection: React.FC<HelpSectionProps> = ({ className }) => {
   const handleContact = (method: string) => {
-    // Handle contact method
     console.log(`Contact via ${method}`);
   };
-
   return (
     <div className={cn("space-y-6", className)}>
       <div>
@@ -67,8 +61,7 @@ const HelpSection: React.FC<HelpSectionProps> = ({ className }) => {
           Get assistance with your dashboard, manage your account, or contact our support team.
         </p>
       </div>
-
-      {/* Quick Help Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <HelpCard
           icon={<BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />}
@@ -85,8 +78,7 @@ const HelpSection: React.FC<HelpSectionProps> = ({ className }) => {
           onClick={() => handleContact("faq")}
         />
       </div>
-
-      {/* Contact Support */}
+      {}
       <div className="bg-white p-5 sm:p-6 rounded-lg shadow-sm border border-gray-200">
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">
           Contact Support
@@ -108,7 +100,6 @@ const HelpSection: React.FC<HelpSectionProps> = ({ className }) => {
               </p>
             </div>
           </button>
-
           <button
             onClick={() => handleContact("phone")}
             className="flex flex-col items-center gap-3 p-4 sm:p-5 rounded-lg border border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all duration-200 text-center"
@@ -125,7 +116,6 @@ const HelpSection: React.FC<HelpSectionProps> = ({ className }) => {
               </p>
             </div>
           </button>
-
           <button
             onClick={() => handleContact("chat")}
             className="flex flex-col items-center gap-3 p-4 sm:p-5 rounded-lg border border-gray-200 hover:border-green-500 hover:bg-green-50 transition-all duration-200 text-center sm:col-span-2 lg:col-span-1"
@@ -144,11 +134,7 @@ const HelpSection: React.FC<HelpSectionProps> = ({ className }) => {
           </button>
         </div>
       </div>
-
-     
     </div>
   );
 };
-
 export default HelpSection;
-

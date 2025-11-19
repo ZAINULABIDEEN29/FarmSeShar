@@ -2,20 +2,17 @@ import React, { useState } from "react";
 import { Search, Mail, Phone, Calendar, Users } from "lucide-react";
 import type { Customer } from "@/types/dashboard.types";
 import { cn } from "@/lib/utils";
-
 interface CustomersSectionProps {
   customers: Customer[];
   isLoading?: boolean;
   className?: string;
 }
-
 const CustomersSection: React.FC<CustomersSectionProps> = ({
   customers,
   isLoading = false,
   className,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-
   const filteredCustomers = customers.filter((customer) => {
     const fullName = `${customer.fullName.firstName} ${customer.fullName.lastName}`.toLowerCase();
     const email = customer.email.toLowerCase();
@@ -23,7 +20,6 @@ const CustomersSection: React.FC<CustomersSectionProps> = ({
     const query = searchQuery.toLowerCase();
     return fullName.includes(query) || email.includes(query) || phone.includes(query);
   });
-
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -32,7 +28,6 @@ const CustomersSection: React.FC<CustomersSectionProps> = ({
       day: "numeric",
     });
   };
-
   if (isLoading) {
     return (
       <div className={cn("flex items-center justify-center py-12", className)}>
@@ -43,7 +38,6 @@ const CustomersSection: React.FC<CustomersSectionProps> = ({
       </div>
     );
   }
-
   return (
     <div className={cn("space-y-6", className)}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -54,8 +48,7 @@ const CustomersSection: React.FC<CustomersSectionProps> = ({
           </p>
         </div>
       </div>
-
-      {/* Search Bar */}
+      {}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -68,8 +61,7 @@ const CustomersSection: React.FC<CustomersSectionProps> = ({
           />
         </div>
       </div>
-
-      {/* Customers Table */}
+      {}
       {filteredCustomers.length === 0 ? (
         <div className="bg-white p-8 sm:p-12 rounded-lg shadow-sm border border-gray-200 text-center">
           <Users className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-4" />
@@ -160,6 +152,4 @@ const CustomersSection: React.FC<CustomersSectionProps> = ({
     </div>
   );
 };
-
 export default CustomersSection;
-

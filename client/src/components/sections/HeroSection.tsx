@@ -2,12 +2,10 @@ import React from "react";
 import { Leaf, Users, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Container from "../container/Container";
-
 interface HeroSectionProps {
   onShopNow?: () => void;
   onLearnMore?: () => void;
 }
-
 const HeroSection: React.FC<HeroSectionProps> = ({
   onShopNow,
   onLearnMore,
@@ -26,33 +24,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({
       text: "Farm Fresh & Locally Sourced",
     },
   ];
-
   const stats = [
     { value: "500+", label: "Local Farmers" },
     { value: "10k+", label: "Happy Customers" },
     { value: "99%", label: "Locally Sourced" },
   ];
-
   return (
     <section className="w-full bg-green-50 py-12 md:py-16 lg:py-20">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left Content */}
+          {}
           <div className="flex flex-col gap-6 md:gap-8">
-            {/* Heading */}
+            {}
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
               Fresh <span className="text-green-600">Organic</span> Produce
               Direct From Farmers
             </h1>
-
-            {/* Description */}
+            {}
             <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-xl">
               Connect directly with local organic farmers. No middlemen, no
               markup - just fresh, sustainable produce delivered straight from
               the farm to your table.
             </p>
-
-            {/* Feature Boxes */}
+            {}
             <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
               {features.map((feature, index) => (
                 <div
@@ -66,8 +60,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               ))}
             </div>
-
-            {/* Buttons */}
+            {}
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 onClick={onShopNow}
@@ -85,8 +78,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 Join as a Farmer
               </Button>
             </div>
-
-            {/* Statistics */}
+            {}
             <div className="flex flex-col sm:flex-row gap-6 md:gap-8 pt-4">
               {stats.map((stat, index) => (
                 <div key={index} className="flex flex-col">
@@ -100,11 +92,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               ))}
             </div>
           </div>
-
-          {/* Right Content - Image Placeholder */}
+          {}
           <div className="hidden lg:flex justify-center items-center">
-            <div className="w-full max-w-md h-96 md:h-[500px] bg-white rounded-2xl shadow-lg flex items-center justify-center">
-              <span className="text-gray-400 text-lg">Image Placeholder</span>
+            <div className="w-full max-w-md h-96 md:h-[500px] bg-white rounded-2xl shadow-lg overflow-hidden">
+              <img
+                src="./src/assets/hero.jpg"
+                alt="Fresh organic produce"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>
@@ -112,6 +107,4 @@ const HeroSection: React.FC<HeroSectionProps> = ({
     </section>
   );
 };
-
 export default HeroSection;
-

@@ -33,36 +33,25 @@ import {
   createShipmentSchema,
   updateShipmentStatusSchema,
 } from "../validator/order.schema.js";
-
-// Authentication routes
 router.post("/register-farmer", validate(registerFarmerSchema), registerFarmer);
 router.post("/verify-farmer", validate(verifyCodeSchema), verifyCodeForFarmer);
 router.post("/login-farmer", validate(loginFarmerSchema), loginFarmer);
-router.post("/refresh", refreshTokenFarmer); // Public route - uses refresh token from cookie
+router.post("/refresh", refreshTokenFarmer);
 router.post("/forgot-password", validate(forgotPasswordSchema), forgotPasswordFarmer);
 router.post("/reset-password", validate(resetPasswordSchema), resetPasswordFarmer);
 router.get("/farmer", authFarmer, getFarmer);
 router.get("/logout", authFarmer, logoutFarmer);
-
-// Product routes (protected - requires farmer authentication)
 router.get("/products", authFarmer, getProducts);
 router.get("/products/:id", authFarmer, getProductById);
 router.post("/products", authFarmer, validate(createProductSchema), createProduct);
 router.put("/products/:id", authFarmer, validate(updateProductSchema), updateProduct);
 router.delete("/products/:id", authFarmer, deleteProduct);
 router.patch("/products/:id/toggle-availability", authFarmer, toggleProductAvailability);
-
-// Dashboard routes (protected - requires farmer authentication)
 router.get("/dashboard/stats", authFarmer, getDashboardStats);
 router.get("/dashboard/customers", authFarmer, getDashboardCustomers);
 router.get("/dashboard/orders", authFarmer, getDashboardOrders);
 router.get("/dashboard/shipments", authFarmer, getDashboardShipments);
-
-// Order management routes (protected - requires farmer authentication)
 router.patch("/orders/:id/status", authFarmer, validate(updateOrderStatusSchema), updateOrderStatus);
-
-// Shipment management routes (protected - requires farmer authentication)
 router.post("/shipments", authFarmer, validate(createShipmentSchema), createShipment);
 router.patch("/shipments/:id/status", authFarmer, validate(updateShipmentStatusSchema), updateShipmentStatus);
-
 export default router;

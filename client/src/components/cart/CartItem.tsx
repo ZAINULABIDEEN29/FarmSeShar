@@ -3,14 +3,12 @@ import { Minus, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { CartItem as CartItemType } from "@/types/cart.types";
 import { cn } from "@/lib/utils";
-
 interface CartItemProps {
   item: CartItemType;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemove: (id: string) => void;
   className?: string;
 }
-
 const CartItem: React.FC<CartItemProps> = ({
   item,
   onUpdateQuantity,
@@ -22,15 +20,12 @@ const CartItem: React.FC<CartItemProps> = ({
       onUpdateQuantity(item.id, item.quantity - 1);
     }
   };
-
   const handleIncrease = () => {
     onUpdateQuantity(item.id, item.quantity + 1);
   };
-
   const handleRemove = () => {
     onRemove(item.id);
   };
-
   return (
     <div
       className={cn(
@@ -38,7 +33,7 @@ const CartItem: React.FC<CartItemProps> = ({
         className
       )}
     >
-      {/* Product Image */}
+      {}
       <div className="w-full sm:w-24 h-24 sm:h-24 bg-gray-200 rounded-lg shrink-0 flex items-center justify-center overflow-hidden">
         {item.image ? (
           <img
@@ -47,13 +42,12 @@ const CartItem: React.FC<CartItemProps> = ({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400 text-xs">No Image</span>
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+            <span className="text-xs">No image</span>
           </div>
         )}
       </div>
-
-      {/* Product Details */}
+      {}
       <div className="flex-1 flex flex-col gap-2 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -67,8 +61,7 @@ const CartItem: React.FC<CartItemProps> = ({
               Rs. {item.price * item.quantity}
             </p>
           </div>
-
-          {/* Remove Button */}
+          {}
           <button
             onClick={handleRemove}
             className="shrink-0 w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-md transition-colors"
@@ -77,8 +70,7 @@ const CartItem: React.FC<CartItemProps> = ({
             <X className="h-4 w-4" />
           </button>
         </div>
-
-        {/* Quantity Controls */}
+        {}
         <div className="flex items-center gap-2 mt-2">
           <Button
             variant="outline"
@@ -107,6 +99,4 @@ const CartItem: React.FC<CartItemProps> = ({
     </div>
   );
 };
-
 export default CartItem;
-

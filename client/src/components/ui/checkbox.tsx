@@ -1,15 +1,12 @@
 import * as React from "react"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-
 interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
   label?: string
 }
-
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   ({ className, label, id, checked, onChange, ...props }, ref) => {
     const checkboxId = id || React.useId()
-    
     return (
       <div className="flex items-center gap-2">
         <div className="relative inline-flex items-center">
@@ -41,6 +38,4 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
   }
 )
 Checkbox.displayName = "Checkbox"
-
 export { Checkbox }
-

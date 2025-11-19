@@ -1,12 +1,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-
 interface LogoProps {
   className?: string;
   showIcon?: boolean;
   onClick?: () => void;
 }
-
 const Logo: React.FC<LogoProps> = ({ className, showIcon = true, onClick }) => (
   <div
     className={cn(
@@ -29,5 +27,4 @@ const Logo: React.FC<LogoProps> = ({ className, showIcon = true, onClick }) => (
     <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
   </div>
 );
-
 export default Logo;

@@ -10,16 +10,11 @@ import type {
   GetFarmerResponse,
   Farmer,
 } from "@/types/farmer.types";
-
-// Farmer API Service Layer
 export const farmerService = {
-  // Register a new farmer
   register: async (data: RegisterFarmerInput): Promise<RegisterFarmerResponse> => {
     const response = await api.post<RegisterFarmerResponse>("/farmers/register-farmer", data);
     return response.data;
   },
-
-  // Verify farmer code
   verifyCode: async (data: VerifyFarmerCodeInput): Promise<{ success: boolean; message: string }> => {
     const response = await api.post<{ success: boolean; message: string }>(
       "/farmers/verify-farmer",
@@ -27,14 +22,10 @@ export const farmerService = {
     );
     return response.data;
   },
-
-  // Login farmer
   login: async (data: LoginFarmerInput): Promise<LoginFarmerResponse> => {
     const response = await api.post<LoginFarmerResponse>("/farmers/login-farmer", data);
     return response.data;
   },
-
-  // Forgot password
   forgotPassword: async (
     data: ForgotPasswordFarmerInput
   ): Promise<{ success: boolean; message: string }> => {
@@ -44,8 +35,6 @@ export const farmerService = {
     );
     return response.data;
   },
-
-  // Reset password
   resetPassword: async (
     data: ResetPasswordFarmerInput
   ): Promise<{ success: boolean; message: string }> => {
@@ -55,28 +44,18 @@ export const farmerService = {
     );
     return response.data;
   },
-
-  // Get current farmer
   getCurrentFarmer: async (): Promise<GetFarmerResponse> => {
     const response = await api.get<GetFarmerResponse>("/farmers/farmer");
     return response.data;
   },
-
-  // Refresh token
   refreshToken: async (): Promise<{ success: boolean; farmer?: Farmer; message?: string }> => {
-    // Refresh token is sent via HTTP-only cookie
-    // New access token is returned in HTTP-only cookie
-    // Returns success: false if no valid refresh token (farmer not logged in)
     const response = await api.post<{ success: boolean; farmer?: Farmer; message?: string }>(
       "/farmers/refresh"
     );
     return response.data;
   },
-
-  // Logout farmer
   logout: async (): Promise<{ success: boolean; message: string }> => {
     const response = await api.get<{ success: boolean; message: string }>("/farmers/logout");
     return response.data;
   },
 };
-

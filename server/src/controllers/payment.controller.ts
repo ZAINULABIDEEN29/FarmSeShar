@@ -6,30 +6,25 @@ import {
 } from "../services/stripe.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import { shippingAddressSchema } from "../validator/order.schema.js";
-import { z } from "zod";
-
-export const createPaymentSchema = z.object({
-  shippingAddress: shippingAddressSchema,
-  paymentMethod: z.enum(["card", "cash"]),
-});
-
 export const createPaymentIntent = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
-
     if (!userId) {
       throw new ApiError(401, "Unauthorized: User not authenticated");
     }
-
-    // Validate request body
-    const validatedData = createPaymentSchema.parse(req.body);
-
+    // Validation is already done by middleware, req.body is validated
+    const { shippingAddress, paymentMethod } = req.body;
+    if (!shippingAddress) {
+      throw new ApiError(400, "Shipping address is required");
+    }
+    if (!paymentMethod) {
+      throw new ApiError(400, "Payment method is required");
+    }
     const result = await createPaymentIntentService(
       userId,
-      validatedData.shippingAddress,
-      validatedData.paymentMethod
+      shippingAddress,
+      paymentMethod
     );
-
     return res.status(200).json({
       success: true,
       clientSecret: result.clientSecret,
@@ -37,33 +32,31 @@ export const createPaymentIntent = asyncHandler(
     });
   }
 );
-
 export const confirmPayment = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
-
     if (!userId) {
       throw new ApiError(401, "Unauthorized: User not authenticated");
     }
-
     const { paymentIntentId, shippingAddress } = req.body;
-
     if (!paymentIntentId) {
       throw new ApiError(400, "Payment intent ID is required");
     }
-
     if (!shippingAddress) {
       throw new ApiError(400, "Shipping address is required");
     }
-
-    const validatedAddress = shippingAddressSchema.parse(shippingAddress);
-
+    // Validate shipping address
+    let validatedAddress;
+    try {
+      validatedAddress = shippingAddressSchema.parse(shippingAddress);
+    } catch (error: any) {
+      throw new ApiError(400, `Invalid shipping address: ${error.message || "Validation failed"}`);
+    }
     const order = await confirmPaymentService(
       userId,
       paymentIntentId,
       validatedAddress
     );
-
     return res.status(200).json({
       success: true,
       message: "Payment confirmed and order created successfully",
@@ -71,4 +64,3 @@ export const confirmPayment = asyncHandler(
     });
   }
 );
-

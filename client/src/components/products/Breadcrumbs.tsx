@@ -1,18 +1,15 @@
 import React from "react";
 import { ChevronRight, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 interface BreadcrumbsProps {
   items?: Array<{ label: string; path?: string }>;
   currentPage?: string;
 }
-
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ 
   items = [{ label: "Home", path: "/" }],
   currentPage = "Vegetables"
 }) => {
   const navigate = useNavigate();
-
   return (
     <nav className="flex items-center gap-2 text-sm sm:text-base text-gray-600 mb-4">
       {items.map((item, index) => (
@@ -42,6 +39,4 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     </nav>
   );
 };
-
 export default Breadcrumbs;
-

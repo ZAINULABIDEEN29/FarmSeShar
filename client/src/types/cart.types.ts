@@ -4,14 +4,12 @@ export interface CartItem {
   image?: string;
   price: number;
   quantity: number;
-  unit: string; // "Kg", "Bunch", etc.
+  unit: string;
   category?: string;
 }
-
 export interface CartState {
   items: CartItem[];
-  discount: number; // Percentage discount (e.g., 5 for 5%)
+  discount: number;
   promoCode?: string;
-  freeDeliveryThreshold: number; // Minimum amount for free delivery
+  freeDeliveryThreshold: number;
 }
-

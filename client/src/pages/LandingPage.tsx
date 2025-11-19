@@ -5,39 +5,30 @@ import { useNavigate } from 'react-router-dom'
 import React from 'react'
 import { useAppSelector } from '@/store/hooks'
 import { selectCartItemCount } from '@/store/slices/cartSlice'
-
 const LandingPage:React.FC = () => {
     const navigate = useNavigate()
     const cartItemCount = useAppSelector(selectCartItemCount)
-    
     const handleShopNow = () => {
         console.log('Shop Now clicked')
       }
-    
       const handleLearnMore = () => {
         navigate('/farmer-registration')
       }
-      
       const handleAccountClick = () => {
         navigate('/login')
       }
-      
       const handleCartClick = () => {
         navigate('/cart')
       }
-      
       const handleLogoClick = () => {
         navigate('/')
       }
-    
       const handleCategoryClick = (category: unknown) => {
         console.log('Category clicked:', category)
       }
-    
       const handleViewAll = () => {
         console.log('View All clicked')
       }
-    
       const handleAddToCart = (product: unknown) => {
         console.log('Add to Cart:', product)
       }
@@ -67,5 +58,4 @@ const LandingPage:React.FC = () => {
   </div>
   )
 }
-
 export default LandingPage

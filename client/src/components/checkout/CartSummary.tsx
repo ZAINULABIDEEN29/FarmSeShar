@@ -1,7 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import type { CartItem as CartItemType } from "@/types/cart.types";
-
 interface CartSummaryProps {
   items: CartItemType[];
   subtotal: number;
@@ -11,7 +10,6 @@ interface CartSummaryProps {
   total: number;
   className?: string;
 }
-
 const CartSummary: React.FC<CartSummaryProps> = ({
   items,
   subtotal,
@@ -31,8 +29,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       <h2 className="text-xl font-bold text-gray-900 mb-6">
         Order Summary
       </h2>
-
-      {/* Cart Items */}
+      {}
       <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto">
         {items.length === 0 ? (
           <p className="text-gray-500 text-sm text-center py-4">
@@ -44,7 +41,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               key={item.id}
               className="flex gap-3 sm:gap-4 p-3 border border-gray-200 rounded-lg"
             >
-              {/* Product Image */}
+              {}
               <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-lg shrink-0 flex items-center justify-center overflow-hidden">
                 {item.image ? (
                   <img
@@ -53,13 +50,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400 text-xs">No Image</span>
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                    <span className="text-xs">No image</span>
                   </div>
                 )}
               </div>
-
-              {/* Product Details */}
+              {}
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                   {item.name}
@@ -75,14 +71,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           ))
         )}
       </div>
-
-      {/* Summary Details */}
+      {}
       <div className="space-y-4 border-t border-gray-200 pt-4">
         <div className="flex justify-between items-center text-sm sm:text-base">
           <span className="text-gray-600">Subtotal:</span>
           <span className="font-medium text-gray-900">Rs. {subtotal}</span>
         </div>
-
         {discount > 0 && (
           <div className="flex justify-between items-center text-sm sm:text-base">
             <span className="text-gray-600">
@@ -93,7 +87,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             </span>
           </div>
         )}
-
         <div className="flex justify-between items-center text-sm sm:text-base">
           <span className="text-gray-600">Delivery Fee:</span>
           <span className="font-medium text-gray-900">
@@ -104,7 +97,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             )}
           </span>
         </div>
-
         <div className="border-t border-gray-200 pt-4">
           <div className="flex justify-between items-center">
             <span className="text-lg font-bold text-gray-900">Total:</span>
@@ -115,6 +107,4 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     </div>
   );
 };
-
 export default CartSummary;
-

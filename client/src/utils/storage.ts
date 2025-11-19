@@ -1,4 +1,3 @@
-// Local Storage Utilities
 export const storage = {
   set: (key: string, value: any): void => {
     try {
@@ -7,7 +6,6 @@ export const storage = {
       console.error("Error saving to localStorage:", error);
     }
   },
-
   get: <T = any>(key: string): T | null => {
     try {
       const item = localStorage.getItem(key);
@@ -17,7 +15,6 @@ export const storage = {
       return null;
     }
   },
-
   remove: (key: string): void => {
     try {
       localStorage.removeItem(key);
@@ -25,7 +22,6 @@ export const storage = {
       console.error("Error removing from localStorage:", error);
     }
   },
-
   clear: (): void => {
     try {
       localStorage.clear();
@@ -34,13 +30,8 @@ export const storage = {
     }
   },
 };
-
-// Storage Keys
-// Only non-sensitive data should be stored in localStorage
-// Tokens and user/farmer data are stored in Redux (memory) and HTTP-only cookies
 export const STORAGE_KEYS = {
-  USER_ID: "userId", // Temporary storage for verification flow (non-sensitive)
-  FARMER_ID: "farmerId", // Temporary storage for verification flow (non-sensitive)
-  RESET_TOKEN: "resetToken", // Temporary storage for password reset (non-sensitive)
+  USER_ID: "userId",
+  FARMER_ID: "farmerId",
+  RESET_TOKEN: "resetToken",
 } as const;
-

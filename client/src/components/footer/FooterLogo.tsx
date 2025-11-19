@@ -1,13 +1,11 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-
 interface FooterLogoProps {
   className?: string;
   description?: string;
   showIcon?: boolean;
   onClick?: () => void;
 }
-
 const FooterLogo: React.FC<FooterLogoProps> = ({
   className,
   description = "Connecting communities with local organic farmers fresh, sustainable produce without intermediaries",
@@ -44,6 +42,4 @@ const FooterLogo: React.FC<FooterLogoProps> = ({
     </div>
   );
 };
-
 export default FooterLogo;
-

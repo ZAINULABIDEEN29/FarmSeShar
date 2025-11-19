@@ -1,12 +1,10 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 import Container from "../container/Container";
-
 interface FooterCopyrightProps {
   text?: string;
   className?: string;
 }
-
 const FooterCopyright: React.FC<FooterCopyrightProps> = ({
   text = "© 2025 LocalHarvest. All rights reserved.",
   className,
@@ -19,6 +17,4 @@ const FooterCopyright: React.FC<FooterCopyrightProps> = ({
     </div>
   );
 };
-
 export default FooterCopyright;
-

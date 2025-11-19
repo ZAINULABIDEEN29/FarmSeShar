@@ -13,13 +13,9 @@ import {
   addToCartSchema,
   updateCartItemSchema,
 } from "../validator/cart.schema.js";
-
-// All cart routes require user authentication
 router.get("/", authUser, getCart);
 router.post("/add", authUser, validate(addToCartSchema), addToCart);
 router.put("/items/:productId", authUser, validate(updateCartItemSchema), updateCartItem);
 router.delete("/items/:productId", authUser, removeFromCart);
 router.delete("/clear", authUser, clearCart);
-
 export default router;
-

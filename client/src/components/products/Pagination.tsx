@@ -2,13 +2,11 @@ import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 }
-
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
@@ -39,10 +37,9 @@ const Pagination: React.FC<PaginationProps> = ({
     }
     return pages;
   };
-
   return (
     <div className="flex items-center justify-center gap-2 mt-8 sm:mt-10 lg:mt-12">
-      {/* Previous Button */}
+      {}
       <Button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -57,8 +54,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <ChevronLeft className="h-4 w-4" />
         <span>Previous</span>
       </Button>
-
-      {/* Page Numbers */}
+      {}
       <div className="flex items-center gap-2">
         {getPageNumbers().map((page, index) => {
           if (page === "...") {
@@ -86,8 +82,7 @@ const Pagination: React.FC<PaginationProps> = ({
           );
         })}
       </div>
-
-      {/* Next Button */}
+      {}
       <Button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
@@ -105,5 +100,4 @@ const Pagination: React.FC<PaginationProps> = ({
     </div>
   );
 };
-
 export default Pagination;

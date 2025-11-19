@@ -27,12 +27,10 @@ import DairyPage from './pages/DairyPage';
 import HerbsPage from './pages/HerbsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
-
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
 import { useCartRestore } from './hooks/useCart';
 import ErrorBoundary from './components/common/ErrorBoundary';
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -154,29 +152,18 @@ const router = createBrowserRouter([
     path: "*",
     element: <NotFoundPage />,
   },
- 
 ]);
-
 const App:React.FC = () => {
-  // Restore authentication state on app load (non-blocking)
-  // This allows the app to render immediately, auth restoration happens in background
   useAuthRestore();
-  
-  // Restore cart state on app load (non-blocking)
-  // This fetches cart from API and syncs to Redux store when user is authenticated
   useCartRestore();
-
   return (
     <ErrorBoundary
       onError={(error, errorInfo) => {
-        // Log error to error tracking service
         console.error("Unhandled React error:", error, errorInfo);
-        // TODO: Send to error tracking service
       }}
     >
       <RouterProvider router={router} />
     </ErrorBoundary>
   )
 }
-
 export default App

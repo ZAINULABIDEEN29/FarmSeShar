@@ -9,22 +9,16 @@ import type {
   DashboardOrdersQuery,
   DashboardShipmentsQuery,
 } from "@/types/dashboard.types";
-
-// Dashboard API Service Layer
 export const dashboardService = {
-  // Get dashboard statistics
   getDashboardStats: async (filters?: DashboardStatsQuery): Promise<DashboardStats> => {
     const params = new URLSearchParams();
     if (filters?.startDate) params.append("startDate", filters.startDate);
     if (filters?.endDate) params.append("endDate", filters.endDate);
-
     const queryString = params.toString();
     const url = `/farmers/dashboard/stats${queryString ? `?${queryString}` : ""}`;
     const response = await api.get<{ success: boolean; data: DashboardStats }>(url);
     return response.data.data;
   },
-
-  // Get customers
   getCustomers: async (
     filters?: DashboardCustomersQuery
   ): Promise<{ customers: Customer[]; pagination: any }> => {
@@ -32,7 +26,6 @@ export const dashboardService = {
     if (filters?.search) params.append("search", filters.search);
     if (filters?.page) params.append("page", filters.page.toString());
     if (filters?.limit) params.append("limit", filters.limit.toString());
-
     const queryString = params.toString();
     const url = `/farmers/dashboard/customers${queryString ? `?${queryString}` : ""}`;
     const response = await api.get<{
@@ -45,8 +38,6 @@ export const dashboardService = {
       pagination: response.data.pagination,
     };
   },
-
-  // Get orders
   getOrders: async (
     filters?: DashboardOrdersQuery
   ): Promise<{ orders: Order[]; pagination: any }> => {
@@ -57,7 +48,6 @@ export const dashboardService = {
     if (filters?.limit) params.append("limit", filters.limit.toString());
     if (filters?.startDate) params.append("startDate", filters.startDate);
     if (filters?.endDate) params.append("endDate", filters.endDate);
-
     const queryString = params.toString();
     const url = `/farmers/dashboard/orders${queryString ? `?${queryString}` : ""}`;
     const response = await api.get<{
@@ -70,8 +60,6 @@ export const dashboardService = {
       pagination: response.data.pagination,
     };
   },
-
-  // Get shipments
   getShipments: async (
     filters?: DashboardShipmentsQuery
   ): Promise<{ shipments: Shipment[]; pagination: any }> => {
@@ -82,7 +70,6 @@ export const dashboardService = {
     if (filters?.limit) params.append("limit", filters.limit.toString());
     if (filters?.startDate) params.append("startDate", filters.startDate);
     if (filters?.endDate) params.append("endDate", filters.endDate);
-
     const queryString = params.toString();
     const url = `/farmers/dashboard/shipments${queryString ? `?${queryString}` : ""}`;
     const response = await api.get<{
@@ -96,4 +83,3 @@ export const dashboardService = {
     };
   },
 };
-
