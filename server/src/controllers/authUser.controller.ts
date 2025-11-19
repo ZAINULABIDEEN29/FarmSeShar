@@ -31,9 +31,11 @@ export const registerUser = asyncHandler(
         throw new ApiError(500, emailResponse.message);
       }
       console.log("✅ Verification email resent successfully to:", email);
+      const { password: _, ...userResponse } = user.toObject();
       return res.status(200).json({
         success: true,
-        message: "Verification code resent. Please verify your email."
+        message: "Verification code resent. Please verify your email.",
+        user: userResponse
       });
     }
     user = await registerService({

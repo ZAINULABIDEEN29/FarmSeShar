@@ -21,21 +21,26 @@ import type {
   ResetPasswordFarmerInput,
 } from "@/types/farmer.types";
 import { storage, STORAGE_KEYS } from "@/utils/storage";
+
 export const useRegisterUser = () => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: (data: RegisterUserInput) => userService.register(data),
     onSuccess: (response) => {
       toast.success(response.message || "Registration successful! Please verify your email.");
-      if (response.user) {
+      if (response.user && response.user._id) {
         storage.set(STORAGE_KEYS.USER_ID, response.user._id);
         navigate("/verify-code");
+      } else {
+        console.error("❌ Registration response missing user object:", response);
+        toast.error("Registration successful but user ID not found. Please try logging in.");
       }
     },
     onError: (error: any) => {
       const errorMessage =
         error.response?.data?.message || error.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
+      console.error("❌ Registration error:", error);
     },
   });
 };
@@ -160,15 +165,19 @@ export const useRegisterFarmer = () => {
     mutationFn: (data: RegisterFarmerInput) => farmerService.register(data),
     onSuccess: (response) => {
       toast.success(response.message || "Farmer registration successful! Please verify your email.");
-      if (response.farmer) {
+      if (response.farmer && response.farmer._id) {
         storage.set(STORAGE_KEYS.FARMER_ID, response.farmer._id);
-        navigate("/verify-code");
+        navigate("/farmer-verify-code");
+      } else {
+        console.error("❌ Registration response missing farmer object:", response);
+        toast.error("Registration successful but farmer ID not found. Please try logging in.");
       }
     },
     onError: (error: any) => {
       const errorMessage =
         error.response?.data?.message || error.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
+      console.error("❌ Farmer registration error:", error);
     },
   });
 };
@@ -196,7 +205,14 @@ export const useLoginFarmer = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: LoginFarmerInput) => farmerService.login(data),
-    onSuccess: (response) => {
+    onSuccess: (response: any) => {
+      // Check if farmer needs verification
+      if (response.requiresVerification && response.farmer) {
+        toast.warning(response.message || "Please verify your email before logging in.");
+        storage.set(STORAGE_KEYS.FARMER_ID, response.farmer._id);
+        navigate("/farmer-verify-code");
+        return;
+      }
       toast.success(response.message || "Login successful!");
       if (response.farmer) {
         dispatch(setFarmer(response.farmer));
@@ -208,6 +224,7 @@ export const useLoginFarmer = () => {
       const errorMessage =
         error.response?.data?.message || error.message || "Login failed. Please check your credentials.";
       toast.error(errorMessage);
+      console.error("❌ Farmer login error:", error);
     },
   });
 };

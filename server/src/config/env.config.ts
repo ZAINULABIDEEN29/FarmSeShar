@@ -7,7 +7,12 @@ interface EnvConfig {
   CLIENT_URL: string;
   JWT_SECRET: string;
   JWT_REFRESH_SECRET: string;
-  RESEND_API_KEY?: string;
+  SMTP_HOST?: string;
+  SMTP_SERVICE?: string;
+  SMTP_PORT?: string;
+  SMTP_MAIL?: string;
+  SMTP_PASSWORD?: string;
+  ADMIN_EMAIL?: string;
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PUBLISHABLE_KEY?: string;
@@ -55,7 +60,12 @@ export const env: EnvConfig = {
   CLIENT_URL: process.env.CLIENT_URL!,
   JWT_SECRET: process.env.JWT_SECRET!,
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET!,
-  RESEND_API_KEY: process.env.RESEND_API_KEY,
+  SMTP_HOST: process.env.SMTP_HOST,
+  SMTP_SERVICE: process.env.SMTP_SERVICE,
+  SMTP_PORT: process.env.SMTP_PORT,
+  SMTP_MAIL: process.env.SMTP_MAIL,
+  SMTP_PASSWORD: process.env.SMTP_PASSWORD,
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   STRIPE_PUBLISHABLE_KEY: process.env.STRIPE_PUBLISHABLE_KEY,

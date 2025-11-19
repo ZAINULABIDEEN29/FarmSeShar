@@ -27,9 +27,11 @@ export const registerFarmer = asyncHandler(
                 throw new ApiError(500,emailResponse.message)
                }
                console.log("✅ Verification email resent successfully to:", email);
+               const {password:_,...farmerResponse} = farmer.toObject();
                return res.status(200).json({
                 success:true,
-                message:"Verification code resent. Please verify your email."
+                message:"Verification code resent. Please verify your email.",
+                farmer:farmerResponse
                })
         }
         const farmerRegistered = await registerFarmerService({
@@ -131,6 +133,16 @@ export const loginFarmer =asyncHandler(
         const isMatch = await farmer.comparePassword(password);
         if(!isMatch){
             throw new ApiError(400,"Invalid credentials")
+        }
+        // Check if farmer is verified
+        if(!farmer.isVerified){
+            const { password: _, refreshToken: __, ...farmerResponse } = farmer.toObject();
+            return res.status(200).json({
+                success: false,
+                message: "Please verify your email before logging in.",
+                farmer: farmerResponse,
+                requiresVerification: true
+            });
         }
         const accessToken = generateAccessToken(farmer._id.toString());
         const refreshToken = generateRefreshToken(farmer._id.toString());

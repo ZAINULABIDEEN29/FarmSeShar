@@ -22,7 +22,7 @@ A full-stack e-commerce platform connecting farmers directly with customers. Bui
 ### Platform Features
 - **Secure Token Handling**: HTTP-only cookies for access and refresh tokens
 - **Automatic Token Refresh**: Seamless authentication experience
-- **Email Verification**: Email-based verification using Resend
+- **Email Verification**: Email-based verification using Nodemailer
 - **Password Reset**: Secure password reset functionality
 - **Responsive Design**: Fully responsive UI for all screen sizes
 - **Modern UI/UX**: Clean, professional interface using Tailwind CSS and Shadcn UI
@@ -52,7 +52,7 @@ A full-stack e-commerce platform connecting farmers directly with customers. Bui
 - **JWT (jsonwebtoken)** - Authentication tokens
 - **Bcryptjs** - Password hashing
 - **Zod** - Schema validation
-- **Resend** - Email service
+- **Nodemailer** - Email service (SMTP)
 - **React Email** - Email templates
 - **Cookie Parser** - Cookie handling
 - **CORS** - Cross-origin resource sharing
@@ -165,9 +165,13 @@ JWT_REFRESH_SECRET=your-refresh-token-secret-key
 JWT_ACCESS_EXPIRY=15m
 JWT_REFRESH_EXPIRY=7d
 
-# Email Service (Resend)
-RESEND_API_KEY=your-resend-api-key
-EMAIL_FROM=noreply@yourdomain.com
+# Email Service (Nodemailer - SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_SERVICE=gmail
+SMTP_PORT=587
+SMTP_MAIL=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+ADMIN_EMAIL=noreply@yourdomain.com
 ```
 
 **Note**: Replace all placeholder values with your actual credentials.
@@ -359,7 +363,7 @@ This project is licensed under the ISC License.
 ## 🙏 Acknowledgments
 
 - React Email for email templates
-- Resend for email delivery service
+- Nodemailer for email delivery service
 - Shadcn UI for UI components
 - Tailwind CSS for styling
 
