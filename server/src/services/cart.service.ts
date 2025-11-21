@@ -4,6 +4,9 @@ import Cart from "../models/cart.model.js";
 import Product from "../models/product.model.js";
 import type { ICART, ICartItem } from "../models/cart.model.js";
 import type { AddToCartInput, UpdateCartItemInput, RemoveFromCartInput } from "../validator/cart.schema.js";
+
+
+
 export const getCartService = async (userId: string): Promise<ICART> => {
   if (!userId) {
     throw new ApiError(400, "User ID is required");
@@ -66,6 +69,9 @@ export const addToCartService = async (
   await cart.save();
   return cart;
 };
+
+
+
 export const updateCartItemService = async (
   userId: string,
   productId: string,
@@ -99,6 +105,9 @@ export const updateCartItemService = async (
   await cart.save();
   return cart;
 };
+
+
+
 export const removeFromCartService = async (
   userId: string,
   productId: string

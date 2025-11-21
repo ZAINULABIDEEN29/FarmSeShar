@@ -5,11 +5,13 @@ import { useNavigate } from 'react-router-dom'
 import React from 'react'
 import { useAppSelector } from '@/store/hooks'
 import { selectCartItemCount } from '@/store/slices/cartSlice'
+
+
+
 const LandingPage:React.FC = () => {
     const navigate = useNavigate()
     const cartItemCount = useAppSelector(selectCartItemCount)
     const handleShopNow = () => {
-        console.log('Shop Now clicked')
       }
       const handleLearnMore = () => {
         navigate('/farmer-registration')
@@ -28,14 +30,10 @@ const LandingPage:React.FC = () => {
           navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
         }
       }
-      const handleCategoryClick = (category: unknown) => {
-        console.log('Category clicked:', category)
+      const handleCategoryClick = () => {
       }
       const handleViewAll = () => {
-        console.log('View All clicked')
-      }
-      const handleAddToCart = (product: unknown) => {
-        console.log('Add to Cart:', product)
+        navigate('/search')
       }
   return (
     <div className="w-full flex flex-col min-h-screen">
@@ -56,7 +54,6 @@ const LandingPage:React.FC = () => {
       />
       <FeaturedProductsSection
         onViewAll={handleViewAll}
-        onAddToCart={handleAddToCart}
       />
       <WhyChooseUsSection />
     </main>

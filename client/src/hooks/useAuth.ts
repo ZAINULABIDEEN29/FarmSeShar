@@ -21,6 +21,7 @@ import type {
   ResetPasswordFarmerInput,
 } from "@/types/farmer.types";
 import { storage, STORAGE_KEYS } from "@/utils/storage";
+import { hasRefreshToken } from "@/utils/jwt";
 
 export const useRegisterUser = () => {
   const navigate = useNavigate();
@@ -32,7 +33,6 @@ export const useRegisterUser = () => {
         storage.set(STORAGE_KEYS.USER_ID, response.user._id);
         navigate("/verify-code");
       } else {
-        console.error("❌ Registration response missing user object:", response);
         toast.error("Registration successful but user ID not found. Please try logging in.");
       }
     },
@@ -40,7 +40,6 @@ export const useRegisterUser = () => {
       const errorMessage =
         error.response?.data?.message || error.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
-      console.error("❌ Registration error:", error);
     },
   });
 };
@@ -68,11 +67,26 @@ export const useLoginUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: LoginUserInput) => userService.login(data),
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       toast.success(response.message || "Login successful!");
       if (response.user) {
         dispatch(setUser(response.user));
         queryClient.setQueryData(["user"], response.user);
+        
+        // Refresh token after login to ensure session is valid
+        // Cookies are automatically sent with the request
+        try {
+          const refreshResponse = await userService.refreshToken();
+          if (refreshResponse?.success && refreshResponse?.user) {
+            dispatch(setUser(refreshResponse.user));
+            queryClient.setQueryData(["user"], refreshResponse.user);
+          }
+        } catch (error) {
+          // If refresh fails, don't block navigation - tokens were just set by login
+          // The proactive refresh hook will handle subsequent refreshes
+          console.warn("Token refresh after login failed, but login was successful");
+        }
+        
         navigate("/");
       }
     },
@@ -169,7 +183,6 @@ export const useRegisterFarmer = () => {
         storage.set(STORAGE_KEYS.FARMER_ID, response.farmer._id);
         navigate("/farmer-verify-code");
       } else {
-        console.error("❌ Registration response missing farmer object:", response);
         toast.error("Registration successful but farmer ID not found. Please try logging in.");
       }
     },
@@ -177,7 +190,6 @@ export const useRegisterFarmer = () => {
       const errorMessage =
         error.response?.data?.message || error.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
-      console.error("❌ Farmer registration error:", error);
     },
   });
 };
@@ -205,8 +217,7 @@ export const useLoginFarmer = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: LoginFarmerInput) => farmerService.login(data),
-    onSuccess: (response: any) => {
-      // Check if farmer needs verification
+    onSuccess: async (response: any) => {
       if (response.requiresVerification && response.farmer) {
         toast.warning(response.message || "Please verify your email before logging in.");
         storage.set(STORAGE_KEYS.FARMER_ID, response.farmer._id);
@@ -217,6 +228,21 @@ export const useLoginFarmer = () => {
       if (response.farmer) {
         dispatch(setFarmer(response.farmer));
         queryClient.setQueryData(["farmer"], response.farmer);
+        
+        // Refresh token after login to ensure session is valid
+        // Cookies are automatically sent with the request
+        try {
+          const refreshResponse = await farmerService.refreshToken();
+          if (refreshResponse?.success && refreshResponse?.farmer) {
+            dispatch(setFarmer(refreshResponse.farmer));
+            queryClient.setQueryData(["farmer"], refreshResponse.farmer);
+          }
+        } catch (error) {
+          // If refresh fails, don't block navigation - tokens were just set by login
+          // The proactive refresh hook will handle subsequent refreshes
+          console.warn("Token refresh after login failed, but login was successful");
+        }
+        
         navigate("/farmer-dashboard");
       }
     },
@@ -224,7 +250,6 @@ export const useLoginFarmer = () => {
       const errorMessage =
         error.response?.data?.message || error.message || "Login failed. Please check your credentials.";
       toast.error(errorMessage);
-      console.error("❌ Farmer login error:", error);
     },
   });
 };
@@ -309,6 +334,12 @@ export const useAuthRestore = () => {
     if (isRestoredRef.current) return;
     const restoreAuth = async () => {
       isRestoredRef.current = true;
+      
+      if (!hasRefreshToken()) {
+        dispatch(setRestoring(false));
+        return;
+      }
+      
       try {
         const userRefreshResponse = await userService.refreshToken();
         if (userRefreshResponse?.success && userRefreshResponse?.user) {
@@ -316,6 +347,7 @@ export const useAuthRestore = () => {
           dispatch(setRestoring(false));
           return;
         }
+        
         const farmerRefreshResponse = await farmerService.refreshToken();
         if (farmerRefreshResponse?.success && farmerRefreshResponse?.farmer) {
           dispatch(setFarmer(farmerRefreshResponse.farmer));

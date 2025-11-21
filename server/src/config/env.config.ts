@@ -1,5 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
+
+
+
 interface EnvConfig {
   PORT: string;
   NODE_ENV: string;
@@ -20,6 +23,8 @@ interface EnvConfig {
   CLOUDINARY_API_KEY?: string;
   CLOUDINARY_API_SECRET?: string;
 }
+
+
 const requiredEnvVars: (keyof EnvConfig)[] = [
   "PORT",
   "NODE_ENV",
@@ -28,10 +33,13 @@ const requiredEnvVars: (keyof EnvConfig)[] = [
   "JWT_SECRET",
   "JWT_REFRESH_SECRET",
 ];
+
+
 const optionalEnvVars: Record<string, string> = {
   JWT_ACCESS_EXPIRY: "15m",
   JWT_REFRESH_EXPIRY: "7d",
 };
+
 export const validateEnv = (): void => {
   const missingVars: string[] = [];
   requiredEnvVars.forEach((varName) => {
@@ -46,13 +54,11 @@ export const validateEnv = (): void => {
   });
   if (missingVars.length > 0) {
     const errorMessage = `Missing required environment variables: ${missingVars.join(", ")}`;
-    console.error("❌ Environment Validation Error:");
     console.error(errorMessage);
-    console.error("\nPlease set these variables in your .env file.");
     throw new Error(errorMessage);
   }
-  console.log("✅ Environment variables validated successfully");
 };
+
 export const env: EnvConfig = {
   PORT: process.env.PORT || "5000",
   NODE_ENV: process.env.NODE_ENV || "development",
@@ -73,4 +79,6 @@ export const env: EnvConfig = {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 };
+
+
 validateEnv();

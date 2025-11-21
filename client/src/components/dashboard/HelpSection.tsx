@@ -49,7 +49,6 @@ const HelpCard: React.FC<HelpCardProps> = ({
 };
 const HelpSection: React.FC<HelpSectionProps> = ({ className }) => {
   const handleContact = (method: string) => {
-    console.log(`Contact via ${method}`);
   };
   return (
     <div className={cn("space-y-6", className)}>

@@ -11,6 +11,10 @@ import {
 import { ApiError } from "../utils/ApiError.js";
 import { productQuerySchema } from "../validator/product.schema.js";
 import { ZodError } from "zod";
+
+
+
+
 export const createProduct = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -25,6 +29,9 @@ export const createProduct = asyncHandler(
     });
   }
 );
+
+
+
 export const getProducts = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -48,6 +55,9 @@ export const getProducts = asyncHandler(
     });
   }
 );
+
+
+
 export const getProductById = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -65,6 +75,9 @@ export const getProductById = asyncHandler(
     });
   }
 );
+
+
+
 export const updateProduct = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -83,6 +96,8 @@ export const updateProduct = asyncHandler(
     });
   }
 );
+
+
 export const deleteProduct = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -100,6 +115,9 @@ export const deleteProduct = asyncHandler(
     });
   }
 );
+
+
+
 export const toggleProductAvailability = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();

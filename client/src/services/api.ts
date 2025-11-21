@@ -20,12 +20,8 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-if (import.meta.env.DEV) {
-  console.log('API Base URL:', getBaseURL());
-}
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Don't show loader for auth restoration requests
     const isAuthRestoreRequest =
       config.url?.includes("/users/me") ||
       config.url?.includes("/farmers/farmer") ||
@@ -35,13 +31,11 @@ api.interceptors.request.use(
     if (isAuthRestoreRequest) {
       isRestoringAuth = true;
     } else {
-      // Show loader for all other requests
       store.dispatch(showLoader());
     }
     return config;
   },
   (error) => {
-    // Hide loader on request error
     store.dispatch(hideLoader());
     return Promise.reject(error);
   }
@@ -57,7 +51,6 @@ api.interceptors.response.use(
     if (isAuthRestoreRequest) {
       isRestoringAuth = false;
     } else {
-      // Hide loader on successful response
       store.dispatch(hideLoader());
     }
     return response;
@@ -72,7 +65,6 @@ api.interceptors.response.use(
     if (isAuthRestoreRequest) {
       isRestoringAuth = false;
     } else {
-      // Hide loader on error response (but not for retry attempts)
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
       if (!originalRequest?._retry) {
         store.dispatch(hideLoader());
@@ -119,7 +111,6 @@ api.interceptors.response.use(
             ? await api.post<{ success: boolean }>("/farmers/refresh")
             : await api.post<{ success: boolean }>("/users/refresh");
           if (refreshResponse.data.success) {
-            // Retry the original request - loader will be managed by interceptors
             return api(originalRequest);
           } else {
             store.dispatch(hideLoader());

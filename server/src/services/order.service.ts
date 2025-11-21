@@ -4,6 +4,9 @@ import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
 import type { IORDER } from "../models/order.model.js";
 import type { CreateOrderInput } from "../validator/order.schema.js";
+
+
+
 export const createOrderService = async (
   userId: string,
   data: CreateOrderInput
@@ -61,6 +64,9 @@ export const createOrderService = async (
   }
   return order;
 };
+
+
+
 export const updateOrderStatusService = async (
   orderId: string,
   farmerId: string,

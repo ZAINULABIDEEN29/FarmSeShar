@@ -6,7 +6,7 @@ interface FooterCopyrightProps {
   className?: string;
 }
 const FooterCopyright: React.FC<FooterCopyrightProps> = ({
-  text = "© 2025 LocalHarvest. All rights reserved.",
+  text = "© 2025 FarmSeGhar. All rights reserved.",
   className,
 }) => {
   return (

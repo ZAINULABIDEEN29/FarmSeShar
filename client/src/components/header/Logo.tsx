@@ -1,5 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/logo.png";
+
 interface LogoProps {
   className?: string;
   showIcon?: boolean;
@@ -22,9 +24,11 @@ const Logo: React.FC<LogoProps> = ({ className, showIcon = true, onClick }) => (
     }}
   >
     {showIcon && (
-      <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0" />
+      <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0 " >
+        <img src={logo} alt="Logo" className="w-full h-full object-cover rounded-full" />
+      </div>
     )}
-    <span className="text-xl font-bold text-gray-900">LocalHarvest</span>
+    <span className="text-xl font-bold text-gray-900">FarmSeGhar</span>
   </div>
 );
 export default Logo;

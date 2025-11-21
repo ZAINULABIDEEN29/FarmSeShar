@@ -8,6 +8,8 @@ import blackListTokenModel from "../models/blackListToken.model.js"
 import { sendVerificationEmail } from "../helpers/sendVerificationEmail.js";
 import {sendResetPasswordEmail} from "../helpers/sendResetPasswordEmail.js";
 import crypto from "crypto";
+
+
 export const registerUser = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const { fullName, email, phoneNumber, password } = req.body;
@@ -30,7 +32,6 @@ export const registerUser = asyncHandler(
         console.error("❌ Failed to resend verification email:", emailResponse.message);
         throw new ApiError(500, emailResponse.message);
       }
-      console.log("✅ Verification email resent successfully to:", email);
       const { password: _, ...userResponse } = user.toObject();
       return res.status(200).json({
         success: true,
@@ -54,10 +55,9 @@ export const registerUser = asyncHandler(
       verifyCode
     );
     if (!emailResponse.success) {
-      console.error("❌ Failed to send verification email:", emailResponse.message);
+      console.error("Failed to send verification email:", emailResponse.message);
       throw new ApiError(500, emailResponse.message);
     }
-    console.log("✅ Verification email sent successfully to:", email);
     const { password: _, ...userResponse } = user.toObject();
     return res.status(201).json({
       success: true,
@@ -66,6 +66,8 @@ export const registerUser = asyncHandler(
     });
   }
 );
+
+
 export const resendVerificationCode = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const { email } = req.body;
@@ -93,13 +95,14 @@ export const resendVerificationCode = asyncHandler(
       console.error("❌ Failed to resend verification email:", emailResponse.message);
       throw new ApiError(500, emailResponse.message);
     }
-    console.log("✅ Verification code resent successfully to:", email);
     return res.status(200).json({
       success: true,
       message: "Verification code resent. Please check your email.",
     });
   }
 );
+
+
 export const verifyOtp = asyncHandler(
     async (req: Request, res: Response):Promise<any> => {
     const { userId, otp } = req.body;
@@ -129,6 +132,7 @@ export const verifyOtp = asyncHandler(
     });
 }
 )
+
 export const forgotPassword = asyncHandler(
   async (req: Request, res: Response):Promise<any> => {
     const { email } = req.body;
@@ -159,6 +163,8 @@ export const forgotPassword = asyncHandler(
     });
   }
 );
+
+
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response):Promise<any> => {
     const { userId, token, newPassword } = req.body;
@@ -188,6 +194,8 @@ export const resetPassword = asyncHandler(
     });
   }
 );
+
+
 export const loginUser = asyncHandler(
     async (req: Request, res: Response):Promise<any> => {
     const { email, password } = req.body;
@@ -226,6 +234,7 @@ export const loginUser = asyncHandler(
       });
 }
 )
+
 export const refreshToken = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const refreshToken = req.cookies.refreshToken;
@@ -289,6 +298,7 @@ export const refreshToken = asyncHandler(
       });
   }
 );
+
 export const getUser = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     res.status(200).json({
@@ -297,6 +307,8 @@ export const getUser = asyncHandler(
     });
   }
 );
+
+
 export const logoutUser = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const accessToken = req.cookies.accessToken;

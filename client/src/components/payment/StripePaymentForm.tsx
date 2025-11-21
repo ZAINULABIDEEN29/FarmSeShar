@@ -22,7 +22,6 @@ interface StripePaymentFormProps {
   isLoading?: boolean;
   onCashPayment: () => void;
 }
-// Separate component for when we're inside Elements provider
 const PaymentFormContentWithStripe: React.FC<{
   onSubmit: () => void;
   isLoading?: boolean;
@@ -48,14 +47,12 @@ const PaymentFormContentWithStripe: React.FC<{
     }
     setIsProcessing(true);
     try {
-      // First, submit the form to get the payment intent status
       const { error: submitError } = await elements.submit();
       if (submitError) {
         console.error("Form submission error:", submitError);
         throw new Error(submitError.message || "Please check your payment details");
       }
 
-      // Confirm the payment
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -66,15 +63,11 @@ const PaymentFormContentWithStripe: React.FC<{
 
       if (error) {
         console.error("Stripe payment error:", error);
-        // Handle specific error codes
         if (error.code === "payment_intent_unexpected_state") {
-          // Payment intent might already be processing or completed
-          // Try to retrieve it to check status if we have clientSecret
           if (clientSecret) {
             try {
               const retrieved = await stripe.retrievePaymentIntent(clientSecret);
               if (retrieved.paymentIntent?.status === "succeeded") {
-                // Payment already succeeded, proceed
                 onSubmit();
                 return;
               } else if (retrieved.paymentIntent?.status === "processing") {
@@ -93,17 +86,12 @@ const PaymentFormContentWithStripe: React.FC<{
         }
       }
 
-      // Check payment intent status
       if (paymentIntent) {
         if (paymentIntent.status === "succeeded") {
-          // Payment succeeded, call the success handler
           onSubmit();
         } else if (paymentIntent.status === "processing") {
-          // Payment is processing, wait a bit and check again
           throw new Error("Payment is being processed. Please wait a moment.");
         } else if (paymentIntent.status === "requires_action") {
-          // Payment requires additional action (3D Secure, etc.)
-          // Stripe will handle the redirect automatically
           return;
         } else {
           throw new Error(`Payment status: ${paymentIntent.status}. Please try again.`);
@@ -113,7 +101,6 @@ const PaymentFormContentWithStripe: React.FC<{
       }
     } catch (error: any) {
       console.error("Payment error:", error);
-      // Re-throw to be handled by parent component
       throw error;
     } finally {
       setIsProcessing(false);

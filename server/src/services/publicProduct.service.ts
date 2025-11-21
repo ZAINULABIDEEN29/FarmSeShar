@@ -1,10 +1,11 @@
 import Product from "../models/product.model.js";
-import Farmer from "../models/farmer.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import type { ProductQueryInput } from "../validator/product.schema.js";
-import type { IPRODUCT } from "../models/product.model.js";
 import { getProductRatingStatsService } from "./review.service.js";
 import mongoose from "mongoose";
+
+
+
 export interface PublicProduct {
   _id: string;
   name: string;
@@ -71,7 +72,6 @@ export const getPublicProductsService = async (
            (product.farmerId._id || product.farmerId.toString());
   });
 
-  // Fetch ratings for all products in parallel
   const productIds = filteredProducts.map((p: any) => p._id.toString());
   const ratingPromises = productIds.map(async (id: string) => {
     try {
@@ -96,20 +96,16 @@ export const getPublicProductsService = async (
         }
       : undefined;
     
-    // Generate seller name from farmer info
     const sellerName = farmer
       ? `${farmer.fullName.firstName} ${farmer.fullName.lastName}`.trim() || farmer.farmName || "Unknown Farmer"
       : "Unknown Farmer";
     
-    // Get location from farmer
     const location = farmer?.farmLocation || "Unknown Location";
     
-    // Use farmer's actual profile image if available, otherwise generate with DiceBear
     const farmerImage = farmer
       ? (farmer.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`)
       : undefined;
     
-    // Get actual rating from reviews
     const rating = ratingMap.get(product._id.toString()) || 4.5;
     
     return {
@@ -135,6 +131,8 @@ export const getPublicProductsService = async (
   });
   return transformedProducts;
 };
+
+
 export const getPublicProductByIdService = async (
   productId: string
 ): Promise<PublicProduct> => {
@@ -169,28 +167,23 @@ export const getPublicProductByIdService = async (
       }
     : undefined;
   
-  // Generate seller name from farmer info
   const sellerName = farmer
     ? `${farmer.fullName.firstName} ${farmer.fullName.lastName}`.trim() || farmer.farmName || "Unknown Farmer"
     : "Unknown Farmer";
   
-  // Get location from farmer
   const location = farmer?.farmLocation || "Unknown Location";
   
-  // Use farmer's actual profile image if available, otherwise generate with DiceBear
   const farmerImage = farmer
     ? (farmer.profileImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${farmer.fullName.firstName}${farmer.fullName.lastName}`)
     : undefined;
   
-  // Get actual rating from reviews
-  let rating = 4.5; // Default fallback
+  let rating = 4.5;
   try {
     const ratingStats = await getProductRatingStatsService(productId);
     if (ratingStats.totalReviews > 0) {
       rating = ratingStats.averageRating;
     }
   } catch (error) {
-    // If rating service fails, use default
     console.error("Error fetching rating:", error);
   }
   

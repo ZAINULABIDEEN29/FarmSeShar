@@ -25,7 +25,6 @@ const LoginPage: React.FC = () => {
     loginMutation.mutate({ email, password });
   };
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
-    console.log(`Login with ${provider}`);
   };
   return (
     <div className="min-h-screen bg-white flex">

@@ -8,6 +8,8 @@ import {
   clearCartService,
 } from "../services/cart.service.js";
 import { ApiError } from "../utils/ApiError.js";
+
+
 export const getCart = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
@@ -21,6 +23,8 @@ export const getCart = asyncHandler(
     });
   }
 );
+
+
 export const addToCart = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
@@ -35,6 +39,8 @@ export const addToCart = asyncHandler(
     });
   }
 );
+
+
 export const updateCartItem = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
@@ -53,6 +59,8 @@ export const updateCartItem = asyncHandler(
     });
   }
 );
+
+
 export const removeFromCart = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
@@ -71,6 +79,8 @@ export const removeFromCart = asyncHandler(
     });
   }
 );
+
+
 export const clearCart = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();

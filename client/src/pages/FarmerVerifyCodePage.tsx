@@ -46,7 +46,6 @@ const FarmerVerifyCodePage: React.FC = () => {
     verifyFarmerMutation.mutate({ farmerId, code });
   };
   const handleResend = () => {
-    console.log("Resend code");
     setError("");
     setCode("");
   };

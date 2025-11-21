@@ -44,7 +44,6 @@ const GetInTouch: React.FC = () => {
       setIsSubmitting(true);
       try {
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        console.log("Contact form submitted:", values);
         toast.success("Thank you! Your message has been sent successfully.");
         resetForm();
       } catch (error) {

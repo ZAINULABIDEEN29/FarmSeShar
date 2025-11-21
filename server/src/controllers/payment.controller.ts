@@ -6,13 +6,15 @@ import {
 } from "../services/stripe.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import { shippingAddressSchema } from "../validator/order.schema.js";
+
+
+
 export const createPaymentIntent = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
     if (!userId) {
       throw new ApiError(401, "Unauthorized: User not authenticated");
     }
-    // Validation is already done by middleware, req.body is validated
     const { shippingAddress, paymentMethod } = req.body;
     if (!shippingAddress) {
       throw new ApiError(400, "Shipping address is required");
@@ -32,6 +34,8 @@ export const createPaymentIntent = asyncHandler(
     });
   }
 );
+
+
 export const confirmPayment = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
@@ -45,7 +49,6 @@ export const confirmPayment = asyncHandler(
     if (!shippingAddress) {
       throw new ApiError(400, "Shipping address is required");
     }
-    // Validate shipping address
     let validatedAddress;
     try {
       validatedAddress = shippingAddressSchema.parse(shippingAddress);

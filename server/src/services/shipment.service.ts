@@ -2,12 +2,13 @@ import mongoose from "mongoose";
 import { ApiError } from "../utils/ApiError.js";
 import Shipment from "../models/shipment.model.js";
 import Order from "../models/order.model.js";
-import User from "../models/user.model.js";
 import type { ISHIPMENT } from "../models/shipment.model.js";
 import type {
   CreateShipmentInput,
   UpdateShipmentStatusInput,
 } from "../validator/order.schema.js";
+
+
 export const createShipmentService = async (
   farmerId: string,
   data: CreateShipmentInput
@@ -33,7 +34,7 @@ export const createShipmentService = async (
     ? `${customer.fullName.firstName} ${customer.fullName.lastName}`
     : "Unknown Customer";
   
-  // Generate shipmentId before creating the document
+  
   let shipmentId: string;
   try {
     const count = await Shipment.countDocuments();

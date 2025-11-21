@@ -5,6 +5,9 @@ import {
   getPublicProductByIdService,
 } from "../services/publicProduct.service.js";
 import { ApiError } from "../utils/ApiError.js";
+
+
+
 export const getPublicProducts = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const filters = req.query as any;
@@ -16,6 +19,9 @@ export const getPublicProducts = asyncHandler(
     });
   }
 );
+
+
+
 export const getPublicProductById = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const productId = req.params.id;

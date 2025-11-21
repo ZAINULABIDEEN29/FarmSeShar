@@ -22,7 +22,7 @@ export const updateFarmerProfileService = async (
   }
 
   if (input.phoneNumber !== undefined) {
-    // Check if phone number is already taken by another farmer
+  
     const existingFarmer = await Farmer.findOne({
       phoneNumber: input.phoneNumber,
       _id: { $ne: new mongoose.Types.ObjectId(farmerId) },
@@ -59,7 +59,7 @@ export const updateFarmerProfileService = async (
 
   await farmer.save();
 
-  // Return farmer without password
+  
   const farmerObj = farmer.toObject();
   delete (farmerObj as any).password;
   delete (farmerObj as any).refreshToken;

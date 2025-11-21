@@ -2,53 +2,52 @@ services:
 
   mongodb:
     image: mongo:7.0
-    container_name: farmers_marketplace_mongodb
-    restart: unless-stopped
+    container_name: farmseghar-mongodb
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
     networks:
-      - farmers-network
+      - farmseghar-network
 
   server:
     build: ./server
-    image: ${DOCKERHUB_USERNAME}/farmers_marketplace_server
-    container_name: farmer_marketplace_server
+    image: farmseghar/mern-server
+    container_name: farmseghar-server
     ports:
       - "8000:8000"
     environment:
       - PORT=8000
-      - MONGO_URI=mongodb://mongodb:27017/farmers
+      - MONGO_URI=mongodb://mongodb:27017/mern
     depends_on:
       - mongodb
     volumes:
       - ./server:/app
       - /app/node_modules
     networks:
-      - farmers-network
+      - farmseghar-network
 
   client:
     build: ./client
-    image: ${DOCKERHUB_USERNAME}/farmers_marketplace_client
-    container_name: farmer_client
+    image: farmseghar/mern-client
+    container_name: farmseghar-client
     restart: unless-stopped
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://server:8000
+      - VITE_API_URL=http://server:8000/api
     depends_on:
       - server
     volumes:
       - ./client:/app
       - /app/node_modules
     networks:
-      - farmers-network
+      - farmseghar-network
 
 volumes:
   mongodb_data:
     driver: local
 
 networks:
-  farmers-network:
+  farmseghar-network:
     driver: bridge

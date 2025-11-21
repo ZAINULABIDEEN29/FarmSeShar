@@ -10,6 +10,9 @@ import type {
   DashboardOrdersQuery, 
   DashboardShipmentsQuery 
 } from "../validator/dashboard.schema.js";
+
+
+
 export interface DashboardStats {
   totalProducts: number;
   availableProducts: number;
@@ -22,6 +25,8 @@ export interface DashboardStats {
   deliveredShipments: number;
   totalCustomers: number;
 }
+
+
 export const getDashboardStatsService = async (
   farmerId: string,
   filters?: DashboardStatsQuery
@@ -109,6 +114,8 @@ export const getDashboardStatsService = async (
     totalCustomers,
   };
 };
+
+
 export interface Customer {
   _id: string;
   fullName: {
@@ -122,6 +129,8 @@ export interface Customer {
   lastOrderDate?: Date;
   createdAt?: Date;
 }
+
+
 export const getDashboardCustomersService = async (
   farmerId: string,
   filters?: DashboardCustomersQuery
@@ -206,6 +215,9 @@ export const getDashboardCustomersService = async (
     total,
   };
 };
+
+
+
 export const getDashboardOrdersService = async (
   farmerId: string,
   filters?: DashboardOrdersQuery
@@ -278,6 +290,8 @@ export const getDashboardOrdersService = async (
     total,
   };
 };
+
+
 export const getDashboardShipmentsService = async (
   farmerId: string,
   filters?: DashboardShipmentsQuery
@@ -321,13 +335,10 @@ export const getDashboardShipmentsService = async (
   const transformedShipments = shipments.map((shipment: any) => {
     let orderIdValue: string = "";
     
-    // Handle orderId - it might be populated or just an ObjectId
     if (shipment.orderId) {
       if (typeof shipment.orderId === 'object' && shipment.orderId !== null) {
-        // Populated orderId object
         orderIdValue = shipment.orderId.orderId || shipment.orderId._id?.toString() || "";
       } else if (typeof shipment.orderId === 'string') {
-        // Just ObjectId string - we'll need to fetch the order
         orderIdValue = shipment.orderId;
       }
     }
@@ -363,7 +374,6 @@ export const getDashboardShipmentsService = async (
     };
   });
   
-  // If we have shipments with string orderIds, fetch the actual orderIds
   const shipmentsWithStringOrderIds = transformedShipments.filter(s => s.orderId && !s.orderId.startsWith("ORD-"));
   if (shipmentsWithStringOrderIds.length > 0) {
     const orderObjectIds = shipmentsWithStringOrderIds

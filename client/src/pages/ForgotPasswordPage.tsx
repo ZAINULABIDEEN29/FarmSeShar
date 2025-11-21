@@ -23,7 +23,6 @@ const ForgotPasswordPage: React.FC = () => {
     },
   });
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
-    console.log(`Login with ${provider}`);
   };
   return (
     <div className="min-h-screen bg-white flex">

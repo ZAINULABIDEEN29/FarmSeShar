@@ -21,7 +21,6 @@ interface LocationState {
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // Check if Stripe is configured, default to cash if not
   const hasStripeConfig = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
   const [paymentMethod, setPaymentMethod] = useState<"card" | "cash">(
     hasStripeConfig ? "card" : "cash"
@@ -50,7 +49,6 @@ const PaymentPage: React.FC = () => {
       setPaymentIntentId("");
       return;
     }
-    // Validate address structure before sending
     const requiredFields = ['streetAddress', 'houseNo', 'town', 'city', 'country', 'postalCode'];
     const missingFields = requiredFields.filter(field => !address[field as keyof CheckoutAddress]);
     if (missingFields.length > 0) {
@@ -61,7 +59,6 @@ const PaymentPage: React.FC = () => {
       return;
     }
     
-    // Don't create a new intent if we already have one for the current payment method
     if (clientSecret && paymentIntentId) {
       return;
     }
@@ -87,12 +84,10 @@ const PaymentPage: React.FC = () => {
       }
     };
     
-    // Only create intent if we don't already have one
     createIntent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, paymentMethod]);
   
-  // Reset payment intent when payment method changes
   useEffect(() => {
     if (clientSecret && paymentIntentId) {
       setClientSecret("");

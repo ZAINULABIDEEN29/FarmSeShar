@@ -8,6 +8,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from ".
 import Token from "../models/blackListToken.model.js";
 import crypto from "crypto";
 import { sendResetPasswordEmail } from "../helpers/sendResetPasswordEmail.js";
+
 export const registerFarmer = asyncHandler(
     async (req:Request, res:Response):Promise<any> => {
         const {fullName, cnic,email, phoneNumber , farmName,farmLocation,farmDescription,accountHolderName,bankAccountNumber,password} = req.body;
@@ -23,10 +24,8 @@ export const registerFarmer = asyncHandler(
             await farmer.save();
                const emailResponse = await sendVerificationEmail(email,fullName.firstName,verifyCode);
                if(!emailResponse.success){
-                console.error("❌ Failed to resend verification email:", emailResponse.message);
                 throw new ApiError(500,emailResponse.message)
                }
-               console.log("✅ Verification email resent successfully to:", email);
                const {password:_,...farmerResponse} = farmer.toObject();
                return res.status(200).json({
                 success:true,
@@ -52,10 +51,8 @@ export const registerFarmer = asyncHandler(
         })
      const emailResponse = await sendVerificationEmail(email,fullName.firstName,verifyCode)
      if(!emailResponse.success){
-        console.error("❌ Failed to send verification email:", emailResponse.message);
         throw new ApiError(500,emailResponse.message)
      }
-     console.log("✅ Verification email sent successfully to:", email);
      const {password:_,...farmerResponse} = farmerRegistered.toObject();
      res.status(201).json({
         success:true,
@@ -64,6 +61,7 @@ export const registerFarmer = asyncHandler(
      })
     }
 )
+
 export const resendVerificationCodeForFarmer = asyncHandler(
     async(req:Request, res:Response):Promise<any>=>{
         const {email} = req.body;
@@ -87,13 +85,13 @@ export const resendVerificationCodeForFarmer = asyncHandler(
             console.error("❌ Failed to resend verification email:", emailResponse.message);
             throw new ApiError(500,emailResponse.message)
         }
-        console.log("✅ Verification code resent successfully to:", email);
         return res.status(200).json({
             success:true,
             message:"Verification code resent. Please check your email."
         })
     }
 )
+
 export const verifyCodeForFarmer = asyncHandler(
     async(req:Request, res:Response):Promise<any>=>{
         const {farmerId, code} = req.body;
@@ -123,6 +121,7 @@ export const verifyCodeForFarmer = asyncHandler(
         })
     }
 )
+
 export const loginFarmer =asyncHandler(
     async (req:Request, res:Response):Promise<any>=>{
         const {email,password} = req.body;
@@ -134,7 +133,6 @@ export const loginFarmer =asyncHandler(
         if(!isMatch){
             throw new ApiError(400,"Invalid credentials")
         }
-        // Check if farmer is verified
         if(!farmer.isVerified){
             const { password: _, refreshToken: __, ...farmerResponse } = farmer.toObject();
             return res.status(200).json({
@@ -171,6 +169,7 @@ export const loginFarmer =asyncHandler(
           });
     }
 )
+
 export const forgotPasswordFarmer = asyncHandler(
     async (req:Request, res:Response):Promise<any>=>{
         const {email} = req.body;
@@ -201,6 +200,7 @@ export const forgotPasswordFarmer = asyncHandler(
         })
     }
 )
+
 export const resetPasswordFarmer = asyncHandler(
     async (req:Request, res:Response):Promise<any>=>{
         const {farmerId,token,newPassword} = req.body;
@@ -230,6 +230,7 @@ export const resetPasswordFarmer = asyncHandler(
         })
     }
 )
+
 export const refreshTokenFarmer = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const refreshToken = req.cookies.refreshToken;
@@ -288,6 +289,7 @@ export const refreshTokenFarmer = asyncHandler(
       });
   }
 );
+
 export const getFarmer = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     res.status(200).json({
@@ -296,6 +298,8 @@ export const getFarmer = asyncHandler(
     });
   }
 );
+
+
 export const logoutFarmer = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const accessToken = req.cookies.accessToken;

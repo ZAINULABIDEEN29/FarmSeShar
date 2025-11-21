@@ -15,7 +15,7 @@ interface FooterContactProps {
 }
 const FooterContact: React.FC<FooterContactProps> = ({
   title = "Contact Us",
-  email = "admin@localharvest.com",
+  email = "admin@farmseghar.com",
   phone = "(111)-2347-1968",
   address = "Lahore, Punjab, Pakistan",
   className,

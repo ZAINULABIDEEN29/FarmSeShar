@@ -71,12 +71,10 @@ const AccountSettingsSection: React.FC<AccountSettingsSectionProps> = ({
           profileImage: profileImage || undefined,
         });
       } catch (error) {
-        // Error handling is done in the hook
       }
     },
   });
 
-  // Update form values when farmer data loads
   useEffect(() => {
     if (farmerData?.farmer) {
       const farmer = farmerData.farmer;
@@ -100,13 +98,11 @@ const AccountSettingsSection: React.FC<AccountSettingsSectionProps> = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       toast.error("Please select a valid image file");
       return;
     }
 
-    // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image size must be less than 5MB");
       return;
@@ -158,7 +154,6 @@ const AccountSettingsSection: React.FC<AccountSettingsSectionProps> = ({
         </p>
       </div>
 
-      {/* Profile Image Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8">
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
           Profile Picture

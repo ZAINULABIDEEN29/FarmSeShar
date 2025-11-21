@@ -36,9 +36,7 @@ export interface ProductRatingStats {
   };
 }
 
-/**
- * Calculate average rating and statistics for a product
- */
+
 export const getProductRatingStatsService = async (
   productId: string
 ): Promise<ProductRatingStats> => {
@@ -78,15 +76,13 @@ export const getProductRatingStatsService = async (
   };
 
   return {
-    averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal place
+    averageRating: Math.round(averageRating * 10) / 10, 
     totalReviews,
     ratingDistribution,
   };
 };
 
-/**
- * Create a new review
- */
+
 export const createReviewService = async (
   userId: string,
   data: CreateReviewInput
@@ -95,13 +91,13 @@ export const createReviewService = async (
     throw new ApiError(400, "User ID is required");
   }
 
-  // Verify product exists and is available
+  
   const product = await Product.findById(data.productId);
   if (!product) {
     throw new ApiError(404, "Product not found");
   }
 
-  // Check if user already reviewed this product
+
   const existingReview = await Review.findOne({
     productId: new mongoose.Types.ObjectId(data.productId),
     userId: new mongoose.Types.ObjectId(userId),
@@ -122,9 +118,7 @@ export const createReviewService = async (
   return review;
 };
 
-/**
- * Get reviews for a product
- */
+
 export const getProductReviewsService = async (
   productId: string,
   filters?: ReviewQueryInput
@@ -188,9 +182,7 @@ export const getProductReviewsService = async (
   };
 };
 
-/**
- * Get user's review for a product
- */
+
 export const getUserReviewService = async (
   userId: string,
   productId: string
@@ -234,9 +226,7 @@ export const getUserReviewService = async (
   };
 };
 
-/**
- * Update a review
- */
+
 export const updateReviewService = async (
   userId: string,
   reviewId: string,
@@ -266,9 +256,7 @@ export const updateReviewService = async (
   return review;
 };
 
-/**
- * Delete a review
- */
+
 export const deleteReviewService = async (
   userId: string,
   reviewId: string

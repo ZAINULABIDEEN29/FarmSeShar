@@ -16,8 +16,12 @@ import uploadRoutes from "./routes/upload.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import { stripeWebhook } from "./controllers/stripeWebhook.controller.js";
 const app = express();
+
 const PORT = process.env.PORT || 5000;
 connectDB();
+
+
+
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 app.use(
@@ -38,6 +42,9 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     }
     next(err);
 });
+
+
+
 app.use("/api/users", userRoutes);
 app.use("/api/farmers", farmerRoutes);
 app.use("/api/public", publicProductRoutes);
@@ -47,6 +54,8 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api", reviewRoutes);
 app.get("/", (_req, res) => res.json({ status: "OK" }));
 app.use(errorHandler);
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

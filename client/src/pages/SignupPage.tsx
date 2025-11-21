@@ -57,7 +57,6 @@ const SignupPage: React.FC = () => {
     },
   });
   const handleSocialLogin = (provider: "facebook" | "google" | "apple") => {
-    console.log(`Sign up with ${provider}`);
   };
   return (
     <div className="min-h-screen bg-white flex">

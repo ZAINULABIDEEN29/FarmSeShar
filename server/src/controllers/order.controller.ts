@@ -10,6 +10,9 @@ import {
   updateShipmentStatusSchema,
 } from "../validator/order.schema.js";
 import { ZodError } from "zod";
+
+
+
 export const createOrder = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const userId = req.user?._id?.toString();
@@ -33,6 +36,8 @@ export const createOrder = asyncHandler(
     });
   }
 );
+
+
 export const updateOrderStatus = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -57,6 +62,8 @@ export const updateOrderStatus = asyncHandler(
     });
   }
 );
+
+
 export const createShipment = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -80,6 +87,8 @@ export const createShipment = asyncHandler(
     });
   }
 );
+
+
 export const updateShipmentStatus = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();

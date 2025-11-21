@@ -1,4 +1,7 @@
 import { z } from "zod";
+
+
+
 export const orderItemSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
   productName: z.string().min(1, "Product name is required"),
@@ -7,6 +10,8 @@ export const orderItemSchema = z.object({
   price: z.number().min(0, "Price cannot be negative"),
   total: z.number().min(0, "Total cannot be negative"),
 });
+
+
 export const shippingAddressSchema = z.object({
   streetAddress: z.string().min(1, "Street address is required"),
   houseNo: z.string().min(1, "House number is required"),
@@ -19,12 +24,12 @@ export const createOrderSchema = z.object({
   items: z.array(orderItemSchema).min(1, "Order must have at least one item"),
   shippingAddress: shippingAddressSchema,
   paymentMethod: z.enum(["card", "cash"], {
-    errorMap: () => ({ message: "Payment method must be either 'card' or 'cash'" }),
+    message: "Payment method must be either 'card' or 'cash'",
   }),
 });
 export const updateOrderStatusSchema = z.object({
   status: z.enum(["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"], {
-    errorMap: () => ({ message: "Invalid order status" }),
+    message: "Invalid order status",
   }),
 });
 export const createShipmentSchema = z.object({
@@ -35,7 +40,7 @@ export const createShipmentSchema = z.object({
 });
 export const updateShipmentStatusSchema = z.object({
   status: z.enum(["pending", "preparing", "in_transit", "out_for_delivery", "delivered", "cancelled"], {
-    errorMap: () => ({ message: "Invalid shipment status" }),
+    message: "Invalid shipment status",
   }),
   trackingNumber: z.string().optional(),
   carrier: z.string().optional(),

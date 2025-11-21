@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import { ApiError } from "./ApiError.js";
 
-// Configure Cloudinary
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -16,12 +16,12 @@ export interface UploadResult {
 
 /**
  * Upload a single image to Cloudinary
- * @param filePath - Path to the file buffer or base64 string
+ * @param filePath - Base64 string or file path
  * @param folder - Optional folder name in Cloudinary
  * @returns Upload result with URL and public_id
  */
 export const uploadImage = async (
-  filePath: string | Buffer,
+  filePath: string,
   folder: string = "farmers-app/products"
 ): Promise<UploadResult> => {
   try {
@@ -51,12 +51,12 @@ export const uploadImage = async (
 
 /**
  * Upload multiple images to Cloudinary
- * @param files - Array of file paths or buffers
+ * @param files - Array of base64 strings or file paths
  * @param folder - Optional folder name in Cloudinary
  * @returns Array of upload results
  */
 export const uploadMultipleImages = async (
-  files: (string | Buffer)[],
+  files: string[],
   folder: string = "farmers-app/products"
 ): Promise<UploadResult[]> => {
   try {

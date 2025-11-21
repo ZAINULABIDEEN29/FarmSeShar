@@ -1,5 +1,7 @@
 import User from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js";
+
+
 interface UserService{
     firstName:string;
     lastName:string;

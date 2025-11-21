@@ -3,19 +3,13 @@ import { asyncHandler } from "../middlewares/asyncHandler.middleware.js";
 import { uploadImage, uploadMultipleImages } from "../utils/cloudinary.js";
 import { ApiError } from "../utils/ApiError.js";
 
-/**
- * Upload a single image
- */
 export const uploadSingleImage = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     if (!req.file) {
       throw new ApiError(400, "No image file provided");
     }
 
-    // Convert buffer to base64
     const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
-
-    // Use farmers-app/profile folder for profile images, otherwise products
     const folder = req.body?.folder === "profile" 
       ? "farmers-app/profile" 
       : "farmers-app/products";
@@ -32,9 +26,6 @@ export const uploadSingleImage = asyncHandler(
   }
 );
 
-/**
- * Upload multiple images
- */
 export const uploadMultipleImagesController = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     if (!req.files || (Array.isArray(req.files) && req.files.length === 0)) {
@@ -43,7 +34,6 @@ export const uploadMultipleImagesController = asyncHandler(
 
     const files = Array.isArray(req.files) ? req.files : [req.files];
     
-    // Convert buffers to base64
     const base64Images = files.map((file) => 
       `data:${file.mimetype};base64,${file.buffer.toString("base64")}`
     );

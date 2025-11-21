@@ -14,6 +14,8 @@ import {
   dashboardShipmentsQuerySchema,
 } from "../validator/dashboard.schema.js";
 import { ZodError } from "zod";
+
+
 export const getDashboardStats = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -37,6 +39,9 @@ export const getDashboardStats = asyncHandler(
     });
   }
 );
+
+
+
 export const getDashboardCustomers = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -66,6 +71,8 @@ export const getDashboardCustomers = asyncHandler(
     });
   }
 );
+
+
 export const getDashboardOrders = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();
@@ -95,6 +102,8 @@ export const getDashboardOrders = asyncHandler(
     });
   }
 );
+
+
 export const getDashboardShipments = asyncHandler(
   async (req: Request, res: Response): Promise<any> => {
     const farmerId = req.farmer?._id?.toString();

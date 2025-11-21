@@ -13,6 +13,8 @@ export const generateRefreshToken = (userId: string) => {
     expiresIn: "7d",
   });
 };
+
+
 export const verifyRefreshToken = (token: string) => {
   try {
     const refreshSecret = process.env.JWT_REFRESH_SECRET;

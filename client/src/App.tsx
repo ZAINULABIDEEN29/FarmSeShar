@@ -31,6 +31,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuthRestore } from './hooks/useAuth';
 import { useCartRestore } from './hooks/useCart';
+import { useTokenRefresh } from './hooks/useTokenRefresh';
 import ErrorBoundary from './components/common/ErrorBoundary';
 const router = createBrowserRouter([
   {
@@ -161,6 +162,7 @@ const router = createBrowserRouter([
 const App:React.FC = () => {
   useAuthRestore();
   useCartRestore();
+  useTokenRefresh(); // Proactive token refresh when user is logged in
   return (
     <ErrorBoundary
       onError={(error, errorInfo) => {

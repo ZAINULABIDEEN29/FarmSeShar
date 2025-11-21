@@ -12,7 +12,6 @@ export const sendVerificationEmail = async (
   username: string,
   otp: string
 ): Promise<EmailResult> => {
-  // Create transporter
   const transporter = createTransporter();
   if (!transporter) {
     return {
@@ -22,10 +21,8 @@ export const sendVerificationEmail = async (
   }
 
   try {
-    // Render email template
     const html = await render(<VerificationEmail username={username} otp={otp} />);
     
-    // Email options
     const mailOptions = {
       from: `${getFromName()} <${getFromEmail()}>`,
       to: email,
@@ -33,18 +30,14 @@ export const sendVerificationEmail = async (
       html,
     };
 
-    // Send email
-    const info = await transporter.sendMail(mailOptions);
-    
-    console.log("✅ Verification email sent successfully to:", email);
-    console.log("Message ID:", info.messageId);
+    await transporter.sendMail(mailOptions);
     
     return {
       success: true,
       message: "Verification email sent successfully",
     };
   } catch (error: any) {
-    console.error("❌ Error sending verification email:", error);
+   
     const errorMessage = error?.message || error?.toString() || "Unknown error occurred";
     return {
       success: false,

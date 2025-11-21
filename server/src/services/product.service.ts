@@ -3,6 +3,9 @@ import { ApiError } from "../utils/ApiError.js";
 import type { CreateProductInput, UpdateProductInput, ProductQueryInput } from "../validator/product.schema.js";
 import type { IPRODUCT } from "../models/product.model.js";
 import mongoose from "mongoose";
+
+
+
 export const createProductService = async (
   farmerId: string,
   data: CreateProductInput

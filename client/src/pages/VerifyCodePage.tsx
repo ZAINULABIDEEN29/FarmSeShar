@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import BackLink from "@/components/auth/BackLink";
 import { useVerifyUserCode, useVerifyFarmerCode } from "@/hooks/useAuth";
 import { storage, STORAGE_KEYS } from "@/utils/storage";
+
+
+
+
 const VerifyCodePage: React.FC = () => {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
@@ -52,7 +56,6 @@ const VerifyCodePage: React.FC = () => {
     }
   };
   const handleResend = () => {
-    console.log("Resend code");
     setError("");
     setCode("");
   };
